@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_ddtaquiz-modform",
+    "builds": {
+        "moodle-mod_ddtaquiz-modform": {
+            "jsfiles": [
+                "modform.js"
+            ]
+        }
+    }
+}

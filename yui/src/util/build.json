@@ -1,0 +1,21 @@
+{
+  "name": "moodle-mod_ddtaquiz-util",
+  "builds": {
+    "moodle-mod_ddtaquiz-util-base": {
+      "jsfiles": [
+        "base.js"
+      ]
+    },
+    "moodle-mod_ddtaquiz-util-slot": {
+      "jsfiles": [
+        "slot.js"
+      ]
+    }
+    ,
+    "moodle-mod_ddtaquiz-util-page": {
+      "jsfiles": [
+        "page.js"
+      ]
+    }
+  }
+}

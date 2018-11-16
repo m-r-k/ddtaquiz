@@ -1,0 +1,26 @@
+{
+  "moodle-mod_ddtaquiz-util": {
+    "requires": [
+        "node", "moodle-core-actionmenu"
+    ],
+    "use": [
+        "moodle-mod_ddtaquiz-util-base"
+    ],
+    "submodules": {
+        "moodle-mod_ddtaquiz-util-base": {
+        },
+        "moodle-mod_ddtaquiz-util-slot": {
+            "requires": [
+                "node",
+                "moodle-mod_ddtaquiz-util-base"
+            ]
+        },
+        "moodle-mod_ddtaquiz-util-page": {
+            "requires": [
+                "node",
+                "moodle-mod_ddtaquiz-util-base"
+            ]
+        }
+    }
+  }
+}

@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_ddtaquiz-repaginate",
+    "builds": {
+        "moodle-mod_ddtaquiz-repaginate": {
+            "jsfiles": [
+                "repaginate.js"
+            ]
+        }
+    }
+}

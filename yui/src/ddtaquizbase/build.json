@@ -1,0 +1,10 @@
+{
+    "name": "moodle-mod_ddtaquiz-ddtaquizbase",
+    "builds": {
+        "moodle-mod_ddtaquiz-ddtaquizbase": {
+            "jsfiles": [
+                "ddtaquizbase.js"
+            ]
+        }
+    }
+}

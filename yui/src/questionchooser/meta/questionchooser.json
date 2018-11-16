@@ -1,0 +1,9 @@
+{
+    "moodle-mod_ddtaquiz-questionchooser": {
+        "requires": [
+            "moodle-core-chooserdialogue",
+            "moodle-mod_ddtaquiz-util",
+            "querystring-parse"
+        ]
+    }
+}

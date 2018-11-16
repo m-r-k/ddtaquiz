@@ -1,0 +1,14 @@
+{
+    "moodle-mod_ddtaquiz-toolboxes": {
+        "requires": [
+            "base",
+            "node",
+            "event",
+            "event-key",
+            "io",
+            "moodle-mod_ddtaquiz-ddtaquizbase",
+            "moodle-mod_ddtaquiz-util-slot",
+            "moodle-core-notification-ajaxexception"
+        ]
+    }
+}
