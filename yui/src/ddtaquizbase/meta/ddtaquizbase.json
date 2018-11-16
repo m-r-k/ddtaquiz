@@ -1,8 +1,0 @@
-{
-    "moodle-mod_ddtaquiz-ddtaquizbase": {
-        "requires": [
-            "base",
-            "node"
-        ]
-    }
-}

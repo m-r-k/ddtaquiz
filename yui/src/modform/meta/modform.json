@@ -1,9 +1,0 @@
-{
-    "moodle-mod_ddtaquiz-modform": {
-        "requires": [
-            "base",
-            "node",
-            "event"
-        ]
-    }
-}
