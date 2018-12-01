@@ -75,6 +75,7 @@ class edit_renderer extends \plugin_renderer_base {
 
         $container = '';
 
+        $container .=
         $container .= \html_writer::tag('h3', get_string('questions', 'ddtaquiz'), array('class' => 'questionheader'));
         $container .= html_writer::start_tag('ul', array('id' => 'block-children-list'));
 
@@ -244,7 +245,7 @@ class edit_renderer extends \plugin_renderer_base {
 
         // Build the icon.
         return html_writer::tag('button',
-            '<img src="' . $OUTPUT->pix_url($icon) . '" alt="' . $stredit . '" />',
+            '<img src="' . $OUTPUT->image_url($icon) . '" alt="' . $stredit . '" />',
             array('type' => 'submit', 'name' => 'feedbackedit', 'value' => $element->get_id()));
     }
 
@@ -541,7 +542,7 @@ class edit_renderer extends \plugin_renderer_base {
             'Add'.
             html_writer::end_tag('button');
 
-        return  modal_render::createModal(
+        return  bootstrap_render::createModal(
             '',
             $body,
             $addButton,
@@ -565,7 +566,7 @@ class edit_renderer extends \plugin_renderer_base {
             html_writer::tag('button','Add Selected Questions',
                 ['class'=> 'btn btn-primary', 'id'=>'qbankAddButton']);
 
-        return  modal_render::createModal(
+        return  bootstrap_render::createModal(
             get_string('addfromquestionbank', 'ddtaquiz'),
             '',
             $buttons,

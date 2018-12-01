@@ -9,7 +9,7 @@
 namespace mod_ddtaquiz\output;
 
 
-class modal_render extends \html_writer
+class bootstrap_render extends \html_writer
 {
     public static function createModal($title,$body,$yesButton,$attr):string{
         $output = '';
