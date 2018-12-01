@@ -84,7 +84,7 @@ class ddtaquiz_bootstrap_render extends \html_writer
 
     public static function  createCard($cardBody, $cardHeader = null, $cardFooter= null):string {
         $output = '';
-        $output .= self::start_div('card');
+        $output .= self::start_div('card mb-5');
             if($cardHeader){
                 $output .= self::start_div('card-header');
                     $output .= $cardHeader;
@@ -111,10 +111,11 @@ class ddtaquiz_bootstrap_render extends \html_writer
        return $output;
     }
 
-    public static function createAccordionHeader ($headerId,$preContent, $content, $postContent, $collapseId = null):string {
+    public static function createAccordionHeader ($preContent, $content, $postContent, $attr = null , $collapseId = null):string {
         $output =
             self::start_div('card-header', [
-                'id' => $headerId
+                'id' => (array_key_exists('id',$attr))?$attr['id']:'',
+                'class' => (array_key_exists('class',$attr))?$attr['class']:'',
             ]).
             self::start_tag('h5',['class'=>'mb-0']).
             $preContent;

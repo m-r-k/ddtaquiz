@@ -711,10 +711,12 @@ class block_element {
      */
     public function get_name() {
         if ($this->is_question()) {
-            return $this->quiz->get_slot_for_element($this->id) . '. ' . $this->element->name;
+            //return $this->quiz->get_slot_for_element($this->id) . '. ' . $this->element->name;
+            return $this->element->name;
         }
         if ($this->is_block()) {
-            return $this->quiz->get_slot_for_element($this->id) . '. ' . $this->element->get_name();
+            //return $this->quiz->get_slot_for_element($this->id) . '. ' . $this->element->get_name();
+            return $this->element->get_name();
         }
     }
 

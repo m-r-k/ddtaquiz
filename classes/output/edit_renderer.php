@@ -79,21 +79,31 @@ class edit_renderer extends \plugin_renderer_base {
         /********************** Questions Card  *****************************************/
         $questionCardHeader = \html_writer::tag('h3', get_string('questions', 'ddtaquiz'), array('class' => 'questionheader'));
 
-
+        // children of Accordion
         $accordionChildren = '';
         $children = $block->get_children();
+        $counter = 1;
         foreach ($children as $child) {
             $accordionChildren .= html_writer::start_div('card');
-            $accordionChildren .= $this->block_elem($child, $pageurl,'block-children-list', true);
+            $accordionChildren .= $this->block_elem(
+                $child,
+                $pageurl,
+                'block-children-list',
+                null,
+                $counter,
+                true
+            );
             $accordionChildren .= html_writer::end_div();
+            $counter++;
         }
+        // build questionCard body
         $questionCardBody = ddtaquiz_bootstrap_render::createAccordion('block-children-list',$accordionChildren);
 
         $questionCardFooter = null;
         $category = question_get_category_id_from_pagevars($pagevars);
         if (!$block->get_quiz()->has_attempts()) {
             $addmenu = $this->add_menu($block, $pageurl, $category);
-            $questionCardFooter = html_writer::tag('div', $addmenu,['class'=>'float-right btn btn-primary', 'id' => 'addQuestionBtnContainer']);
+            $questionCardFooter = html_writer::tag('div', $addmenu,['class'=>'float-right btn btn-dark card-btn', 'id' => 'addQuestionBtnContainer']);
         }
 
         $output .= ddtaquiz_bootstrap_render::createCard($questionCardBody,$questionCardHeader, $questionCardFooter);
@@ -103,8 +113,13 @@ class edit_renderer extends \plugin_renderer_base {
             $output .= $this->feedback_block($feedback, $pageurl);
         }
 
-        $output .= html_writer::tag('button', get_string('done', 'ddtaquiz'),
-            array('type' => 'submit', 'name' => 'done', 'value' => 1));
+        /********************** close tags, load scripts *****************************************/
+        $output .=
+            html_writer::start_div('card-footer text-right').
+            html_writer::tag('button', get_string('done', 'ddtaquiz'),
+                array('class'=>'btn btn-primary card-btn','type' => 'submit', 'name' => 'done', 'value' => 1)).
+            html_writer::end_div();
+
         $output .= html_writer::end_tag('form');
 
         $output .= $this->question_chooser($pageurl, $category);
@@ -131,15 +146,23 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * Render one element of a block.
+     * TODO: done
      *
-     * @param \block_element $blockelem An element of a block.
-     * @param \moodle_url $pageurl The URL of the page.
-     * @return string HTML to display this element.
+     *
+     * @param \block_element $blockelem
+     * @param $pageurl
+     * @param $accordionId
+     * @param $parentCounter
+     * @param $counter
+     * @param bool $isMain
+     * @return string
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
-    public function block_elem(\block_element $blockelem, $pageurl,$accordionId,$isMain = false) {
+    public function block_elem(\block_element $blockelem, $pageurl,$accordionId,$parentCounter , $counter, $isMain = false) {
         // constants
         $headerId = 'block-element-'. $blockelem->get_id(). '-'.time();
+        $nr = \html_writer::tag('b',($parentCounter)?$parentCounter.'.'.$counter:$counter);
         $collapseId = null;
 
         // elements
@@ -148,25 +171,18 @@ class edit_renderer extends \plugin_renderer_base {
         $postContent = '';
         $collapseContent = '';
 
-        if ($isMain && !$blockelem->get_quiz()->has_attempts()) {
-            $preContent .= $this->question_move_icon();
-        }
-        if($isMain)
+        // add only if main block
+        if ($isMain){
+            //mover
+            if(!$blockelem->get_quiz()->has_attempts()) {
+                $preContent .= $this->question_move_icon();
+            }
+            //number to count questions/blocks
             $preContent .=
                 html_writer::tag('input', '',
                     array('type' => 'hidden', 'name' => 'elementsorder[]', 'value' => $blockelem->get_id()));
 
-        if($blockelem->is_block()){
-            $content .= html_writer::span($blockelem->get_name(), 'blockelementblock');
-            /** @var \block $blockelem */
-            $collapseId = 'collapse-'. $blockelem->get_id();
-            $collapseContent = $this->block_elem_desc($blockelem,$pageurl,$collapseId,$headerId,$accordionId);
-        }else{
-            $content .= html_writer::span($blockelem->get_name(), 'blockelementdescriptionname');
-        }
-
-
-        if($isMain){
+            // edit/delete buttons
             $edithtml = '';
             $removehtml = '';
             if (!$blockelem->get_quiz()->has_attempts()) {
@@ -179,11 +195,25 @@ class edit_renderer extends \plugin_renderer_base {
             $postContent .= \html_writer::div($edithtml . $removehtml, 'blockelementbuttons');
         }
 
+        $blockClass='';
+        // render collapsible body if block, with block elements
+        if($blockelem->is_block()){
+            $content .= html_writer::span($nr.' '. $blockelem->get_name(), 'blockelementblock');
+            /** @var \block $blockelem */
+            $blockClass = 'blockAccordionHeader';
+            $collapseId = 'collapse-'. $blockelem->get_id();
+            $newParentCounter = ($parentCounter)?++$parentCounter:$counter;
+            $collapseContent = $this->block_elem_desc($blockelem,$pageurl,$collapseId,$headerId,$accordionId,$newParentCounter);
+        }else{
+            // otherwise just show body
+            $content .= html_writer::span($nr.' '. $blockelem->get_name(), 'blockelementdescriptionname');
+        }
+        // return as accordion header + accordion body , expected to be part of an accordion
         $container = ddtaquiz_bootstrap_render::createAccordionHeader(
-            $headerId,
             $preContent,
             $content,
             $postContent,
+            ['id'=>$headerId,'class'=>$blockClass],
             $collapseId
         ).
         $collapseContent;
@@ -193,9 +223,13 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * TODO: done
+     *
      * Renders the icon to move questions and blocks.
      *
      * @return string the HTML of the move icon.
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
     public function question_move_icon() {
         return html_writer::link(new \moodle_url('#'),
@@ -205,19 +239,28 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * TODO: done
+     *
      * Render the description.
      *
-     * @param \block_element $blockelem the element to get the description for.
-     * @return string HTML to output.
+     * @param \block_element $blockelem
+     * @param $pageurl
+     * @param $id
+     * @param $triggerId
+     * @param $parentAccordionId
+     * @return string
+     * @throws
      */
-    protected function block_elem_desc(\block_element $blockelem,$pageurl,$id,$triggerId,$parentAccordionId) {
+    protected function block_elem_desc(\block_element $blockelem,$pageurl,$id,$triggerId,$parentAccordionId,$parentCounter) {
         $accordionId = 'block-element-accordion-'. $blockelem->get_id();
         $accordionChildren = '';
         $children = $blockelem->get_element()->get_children();
+        $counter = 1;
         foreach ($children as $child) {
             $accordionChildren .= html_writer::start_div('card');
-            $accordionChildren .= $this->block_elem($child, $pageurl,$accordionId, false);
+            $accordionChildren .= $this->block_elem($child, $pageurl,$accordionId, $parentCounter,$counter,false);
             $accordionChildren .= html_writer::end_div();
+            $counter++;
         }
         $elementDescrp = ddtaquiz_bootstrap_render::createAccordionCollapsible(
             $id,
@@ -269,11 +312,15 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * TODO: done
+     *
      * Outputs the edit button HTML for a feedbackelement.
      *
      * @param \feedback_block $element the element to get the button for.
      * @param \moodle_url $returnurl the URL of the page.
      * @return string HTML to output.
+     *
+     * @throws \coding_exception
      */
     public function feedback_edit_button($element, $returnurl) {
         global $OUTPUT, $CFG;
@@ -288,10 +335,12 @@ class edit_renderer extends \plugin_renderer_base {
         // Build the icon.
         return html_writer::tag('button',
             '<img src="' . $OUTPUT->image_url($icon) . '" alt="' . $stredit . '" />',
-            array('type' => 'submit', 'name' => 'feedbackedit', 'value' => $element->get_id()));
+            array('class'=>'btn btn-warning','type' => 'submit', 'name' => 'feedbackedit', 'value' => $element->get_id()));
     }
 
     /**
+     * TODO: done
+     *
      * Outputs the remove button HTML for an element.
      *
      * @param \block_element $element the element to get the button for.
@@ -306,19 +355,24 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * TODO: done
+     *
      * Outputs the remove button HTML for a feedbackelement.
      *
      * @param \feedback_block $element the element to get the button for.
      * @param \moodle_url $pageurl The URL of the page.
      * @return string HTML to output.
+     * @throws
      */
     public function feedback_element_remove_button($element, $pageurl) {
         $image = $this->pix_icon('t/delete', get_string('delete'));
         return html_writer::tag('button', $image,
-            array('type' => 'submit', 'name' => 'feedbackdelete', 'value' => $element->get_id()));
+            array('class'=>'btn btn-danger','type' => 'submit', 'name' => 'feedbackdelete', 'value' => $element->get_id()));
     }
 
     /**
+     * TODO: done
+     *
      * Outputs the add menu HTML.
      *
      * @param \block $block object containing all the block information.
@@ -709,45 +763,76 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * TODO: done
+     *
      * Render the feedback block.
      *
      * @param \feedback $feedback the feedback for which to render the block.
      * @param \moodle_url $pageurl the url of this page.
      * @return string the HTML of the feedback block.
+     *
+     * @throws \coding_exception
      */
     public function feedback_block($feedback, $pageurl) {
-        $header = html_writer::tag('h3', get_string('feedback', 'ddtaquiz'), array('class' => 'feedbackheader'));
+        $questionCardHeader = html_writer::tag('h3', get_string('feedback', 'ddtaquiz'), array('class' => 'feedbackheader'));
         $output = '';
 
-        $output .= html_writer::start_tag('ul', array('id' => 'feedbackblock-children-list'));
-
+        // children of Accordion
+        $accordionChildren = '';
         $blocks = $feedback->get_blocks();
+        $counter = 1;
         foreach ($blocks as $block) {
-            $output .= $this->feedback_block_elem($block, $pageurl);
+            $accordionChildren .= html_writer::start_div('card');
+            $accordionChildren .= $this->feedback_block_elem($block, $pageurl,$counter);
+            $accordionChildren .= html_writer::end_div();
+            $counter++;
         }
-        $addbutton = html_writer::tag('button', get_string('addfeedback', 'ddtaquiz'),
-            array('type' => 'submit', 'name' => 'addfeedback', 'value' => 1,'class'=>'btn btn-primary'));
-        $container = $header . $output . $addbutton;
-        return html_writer::div($container, 'feedbackblock');
+        // build questionCard body
+        $questionCardBody = ddtaquiz_bootstrap_render::createAccordion('feedbackblock-children-list',$accordionChildren);
+
+        $questionCardFooter = html_writer::tag('button', get_string('addfeedback', 'ddtaquiz'),
+            array('type' => 'submit', 'name' => 'addfeedback', 'value' => 1,'class'=>'btn btn-dark card-btn float-right'));
+
+        return ddtaquiz_bootstrap_render::createCard($questionCardBody,$questionCardHeader, $questionCardFooter);
+        //return html_writer::div($output, 'feedbackblock');
     }
 
     /**
+     * TODO: done
+     *
      * Render one element of a feedbackbblock.
      *
      * @param \feedback_block $feedbackelem An element of a block.
      * @param \moodle_url $pageurl The URL of the page.
      * @return string HTML to display this element.
      */
-    public function feedback_block_elem(\feedback_block $feedbackelem, $pageurl) {
-        // Description of the element.
-        $elementhtml = '';
-        $edithtml = '';
+    public function feedback_block_elem(\feedback_block $feedbackelem, $pageurl,$counter) {
+        // constants
+        $headerId = 'feedback-element-'. $feedbackelem->get_id(). '-'.time();
+        $nr = \html_writer::tag('b',$counter);
 
-        $elementhtml = \html_writer::div($feedbackelem->get_name(), 'blockelement');
+        // elements
+        $preContent = '';
+        $content = '';
+        $postContent = '';
+
+        // Description of the element.
+        $content = \html_writer::div($nr.' '.$feedbackelem->get_name(), 'blockelement');
         $edithtml = $this->feedback_edit_button($feedbackelem, $pageurl);
         $removehtml = $this->feedback_element_remove_button($feedbackelem, $pageurl);
-        $buttons = \html_writer::div($edithtml . $removehtml, 'blockelementbuttons');
-        return html_writer::tag('li', html_writer::div($elementhtml . $buttons, 'blockelementline'));
+        $postContent = \html_writer::div($edithtml . $removehtml, 'blockelementbuttons');
+
+
+        // return as accordion header + accordion body , expected to be part of an accordion
+        $container = ddtaquiz_bootstrap_render::createAccordionHeader(
+                $preContent,
+                $content,
+                $postContent,
+                ['id'=>$headerId]
+        );
+
+
+        return $container;
     }
 
     /**

@@ -217,6 +217,15 @@ input[type=number].conditionelement {
 .chooserdialoguebody, .choosertitle {
 	display: inline !important;
 }
+
+.card-btn{
+    width:150px;
+    text-align: center;
+    margin-right:22px;
+}
+.card-btn .menubar{
+    display: inline!important;
+}
 /** Modal Styles */
 .modal, .modal-dialog{
     height: 100% !important;
@@ -248,4 +257,8 @@ input[type=number].conditionelement {
 /** Edit: Question Card styles */
 #addQuestionBtnContainer .dropdown-toggle{
     color:white !important;
+}
+
+.blockAccordionHeader{
+    background-color: rgba(0,0,0,.2)!important;
 }
