@@ -102,7 +102,7 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= html_writer::end_tag('form');
 
         $output .= $this->question_chooser($pageurl, $category);
-        $this->page->requires->js_call_amd('mod_ddtaquiz/questionchooser', 'init');
+        $this->page->requires->js_call_amd('mod_ddtaquiz/questionChooserInitializer', 'init');
 
         $output .= $this->questionbank_loading();
         $this->page->requires->js_call_amd('mod_ddtaquiz/questionbank', 'init');
@@ -294,8 +294,12 @@ class edit_renderer extends \plugin_renderer_base {
             new \moodle_url('/question/addquestion.php', $params),
             new \pix_icon('t/add', get_string('addaquestion', 'ddtaquiz'),
                 'moodle', array('class' => 'iconsmall', 'title' => '')), get_string('addaquestion', 'ddtaquiz'),
-            array('class' => 'cm-edit-action addquestion', 'data-action' => 'addquestion')
-            );
+            array(
+                'class' => 'cm-edit-action',
+                'data-toggle'=>"modal",
+                'data-target'=>"#qtypeChoiceModal"
+            )
+        );
         $menu->add($addaquestion);
 
         // Button to add question from question bank.
@@ -517,10 +521,20 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string the HTML of the dialogue.
      */
     public function question_chooser(\moodle_url $returnurl, $category) {
-        $container = html_writer::div(print_choose_qtype_to_add_form(array('returnurl' => $returnurl->out_as_local_url(false),
+        $body = html_writer::div(print_choose_qtype_to_add_form(array('returnurl' => $returnurl->out_as_local_url(false),
             'cmid' => $returnurl->get_param('cmid'), 'appendqnumstring' => 'addquestion', 'category' => $category),
-            null, false), '', array('id' => 'qtypechoicecontainer'));
-        return html_writer::div($container, 'createnewquestion');
+            null, false), '', array('id' => 'qtypeChoiceBody'));
+        $addButton =
+            html_writer::start_tag('button',['class'=> 'btn btn-primary', 'id'=>'addQuestionBtn']).
+            'Add'.
+            html_writer::end_tag('button');
+
+        return  modal_render::createModal(
+            '',
+            $body,
+            $addButton,
+            ['id'=>'qtypeChoiceModal']
+        );
     }
 
     /**
@@ -644,7 +658,7 @@ class edit_renderer extends \plugin_renderer_base {
             $output .= $this->feedback_block_elem($block, $pageurl);
         }
         $addbutton = html_writer::tag('button', get_string('addfeedback', 'ddtaquiz'),
-            array('type' => 'submit', 'name' => 'addfeedback', 'value' => 1));
+            array('type' => 'submit', 'name' => 'addfeedback', 'value' => 1,'class'=>'btn btn-primary'));
         $container = $header . $output . $addbutton;
         return html_writer::div($container, 'feedbackblock');
     }
