@@ -219,9 +219,11 @@ input[type=number].conditionelement {
 	transform: translate(-50%, -50%)!important;
 }
 
+
 .chooserdialoguebody, .choosertitle {
 	display: inline !important;
 }
+/** Modal Styles */
 .modal, .modal-dialog{
     height: 100% !important;
 }
@@ -239,4 +241,12 @@ input[type=number].conditionelement {
 }
 .modal-content .modal-footer{
     height : 10%;
+}
+
+/** Question Bank Styles */
+#qbankChoiceModal .header.qtype {
+    margin: 0 .2rem;
+}
+#qbankChoiceModal .header.qtype .icon{
+    margin:0;
 }

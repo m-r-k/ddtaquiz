@@ -26,42 +26,21 @@ define(['jquery', 'core/ajax'], function($, ajax) {
     var questionbank_chooser = {
          // The panel widget
         panel: null,
+        addButton: null,
+        loading: null,
 
-        // The icon displayed when loading data from the server
-        loadingDiv: '',
         
-        prepare_chooser : function() {
-            if (this.panel) {
-                return;
-            }
-            
-            var params = {
-                    headerContent : $('div.questionbankloadingcontainer').data('title'),
-                    bodyContent : $('div.questionbankloading').parent().html(),
-                    draggable : true,
-                    modal: true,
-                    centered: true,
-                    width: null,
-                    visible: false,
-                    postmethod: 'form',
-                    footerContent: null,
-                    extraClasses: ['mod_ddtaquiz_qbank_dialogue']
-            };
-            // Create the panel
-            this.panel = new M.core.dialogue(params);
-    
-            // Hide and then render the panel
-            this.panel.hide();
-            this.panel.render();
+        prepare_chooser : function(panelId, addButtonId, loadingId) {
+            this.panel = $('#'+panelId);
+            this.addButton = $('#'+addButtonId);
+            this.loading = $('#'+loadingId);
 
-            this.loadingDiv = this.panel.bodyNode.getHTML();
+
+            $(this.panel).find('.modal-body').html(this.loading);
         },
-        
-        display_chooserdialogue : function(e) {
-            this.prepare_chooser();
-            e.preventDefault();
-            this.panel.bodyNode.setHTML($('div.questionbankloading').parent().html());
-            this.panel.show();
+
+        init_question_bank_modal : function(panelId, addButtonId, loadingId) {
+            this.prepare_chooser(panelId, addButtonId, loadingId);
             this.load();
         },
         
@@ -78,8 +57,11 @@ define(['jquery', 'core/ajax'], function($, ajax) {
         },
         
         questionbank_loaded : function(response) {
-            this.panel.bodyNode.setHTML(response);
-            this.panel.centerDialogue();
+            $(this.panel).find('.modal-body').html(response);
+
+            $(this.panel).find('.modulespecificbuttonscontainer').html('');
+            $(this.panel).find('.tag-condition-container').html('');
+
             $('.addfromquestionbank').click(function(e) {
                 e.preventDefault();
                 var input = $('<input>')
@@ -88,7 +70,7 @@ define(['jquery', 'core/ajax'], function($, ajax) {
                 $('#blockeditingform').append($(input));
                $('#blockeditingform').submit(); 
             });
-            $('#addselected').click(function(e) {
+            $(this.addButton).click(function(e) {
                 e.preventDefault();
                 var selected = $('input:checkbox:checked[name^="q"]');
                 for (var i = 0; i < selected.length; i++) {
@@ -108,11 +90,7 @@ define(['jquery', 'core/ajax'], function($, ajax) {
             $('.questionbankcontent').find('a').click($.proxy(this.link_clicked, this));
             $('#id_selectacategory').change($.proxy(this.category_changed, this));
             
-            this.panel.fire('widget:contentUpdate');
-            if (this.panel.get('visible')) {
-                this.panel.hide();
-                this.panel.show();
-            }
+
         },
         
         category_changed : function(e) {
@@ -144,7 +122,7 @@ define(['jquery', 'core/ajax'], function($, ajax) {
                 args.qbs1 = qbs1;
             }
             args.category = $('#id_selectacategory').val();
-            this.panel.bodyNode.setHTML($('div.questionbankloading').parent().html());
+            //this.panel.bodyNode.setHTML($('div.questionbankloading').parent().html());
             var promises = ajax.call([{
                 methodname: 'mod_ddtaquiz_get_questionbank', 
                 args: args
@@ -153,14 +131,12 @@ define(['jquery', 'core/ajax'], function($, ajax) {
         },
         
         questionbank_load_failed : function() {
-            this.panel.bodyNode.setHTML('Error fetching from question bank');
+            $(this.panel).find('.modal-body').html('Error fetching from question bank');
         }
     };
     return {
-        init: function() {
-            $('.questionbank').click(function(e) {
-                questionbank_chooser.display_chooserdialogue(e);
-            });
+        init: function(panelId, addButtonId, loadingId) {
+            questionbank_chooser.init_question_bank_modal(panelId, addButtonId, loadingId);
         }
     };
 });

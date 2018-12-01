@@ -104,8 +104,13 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= $this->question_chooser($pageurl, $category);
         $this->page->requires->js_call_amd('mod_ddtaquiz/questionChooserInitializer', 'init');
 
+        $output .= $this->question_bank_modal();
         $output .= $this->questionbank_loading();
-        $this->page->requires->js_call_amd('mod_ddtaquiz/questionbank', 'init');
+        $this->page->requires->js_call_amd('mod_ddtaquiz/questionbank', 'init',[
+            'panelId'=>'qbankChoiceModal',
+            'addButtonId'=> 'qbankAddButton',
+            'loadingId' => 'qbankLoading'
+        ]);
 
         $this->page->requires->js_call_amd('mod_ddtaquiz/addnewblock', 'init');
 
@@ -239,7 +244,7 @@ class edit_renderer extends \plugin_renderer_base {
 
         // Build the icon.
         return html_writer::tag('button',
-            '<img src="' . $OUTPUT->image_url($icon) . '" alt="' . $stredit . '" />',
+            '<img src="' . $OUTPUT->pix_url($icon) . '" alt="' . $stredit . '" />',
             array('type' => 'submit', 'name' => 'feedbackedit', 'value' => $element->get_id()));
     }
 
@@ -306,8 +311,15 @@ class edit_renderer extends \plugin_renderer_base {
         $questionbank = new \action_menu_link_secondary($pageurl,
             new \pix_icon('t/add', get_string('questionbank', 'ddtaquiz'), 'moodle',
                 array('class' => 'iconsmall', 'title' => '')), get_string('questionbank', 'ddtaquiz'),
-            array('class' => 'cm-edit-action questionbank', 'data-action' => 'questionbank',
-                'data-cmid' => $block->get_quiz()->get_cmid(), 'data-bid' => $block->get_id()));
+            array(
+                'class' => 'cm-edit-action questionbank',
+                'data-action' => 'questionbank',
+                'data-cmid' => $block->get_quiz()->get_cmid(),
+                'data-bid' => $block->get_id(),
+                'data-toggle'=>"modal",
+                'data-target'=>"#qbankChoiceModal"
+            )
+        );
         $menu->add($questionbank);
         $menu->prioritise = true;
 
@@ -543,13 +555,23 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string the HTML div of the icon.
      */
     public function questionbank_loading() {
-        return html_writer::div(html_writer::div(html_writer::empty_tag('img',
+        return html_writer::div(html_writer::empty_tag('img',
             array('alt' => 'loading', 'class' => 'loading-icon', 'src' => $this->image_url('i/loading'))),
-            'questionbankloading'), 'questionbankloadingcontainer',
-            array('data-title' => get_string('addfromquestionbank', 'ddtaquiz')));
+            'questionbankloading', ['id'=>'qbankLoading']);
     }
 
+    public function question_bank_modal(){
+        $buttons =
+            html_writer::tag('button','Add Selected Questions',
+                ['class'=> 'btn btn-primary', 'id'=>'qbankAddButton']);
 
+        return  modal_render::createModal(
+            get_string('addfromquestionbank', 'ddtaquiz'),
+            '',
+            $buttons,
+            ['id'=>'qbankChoiceModal']
+        );
+    }
 
     /**
      * Return the contents of the question bank, to be displayed in the question-bank pop-up.
