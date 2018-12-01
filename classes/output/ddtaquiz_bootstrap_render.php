@@ -9,7 +9,7 @@
 namespace mod_ddtaquiz\output;
 
 
-class bootstrap_render extends \html_writer
+class ddtaquiz_bootstrap_render extends \html_writer
 {
     public static function createModal($title,$body,$yesButton,$attr):string{
         $output = '';
@@ -78,6 +78,80 @@ class bootstrap_render extends \html_writer
         ]);
             $output .= $triggerText;
         $output .= self::end_tag($triggerType);
+
+        return $output;
+    }
+
+    public static function  createCard($cardBody, $cardHeader = null, $cardFooter= null):string {
+        $output = '';
+        $output .= self::start_div('card');
+            if($cardHeader){
+                $output .= self::start_div('card-header');
+                    $output .= $cardHeader;
+                $output .= self::end_div();
+            }
+            $output .= self::start_div('card-body');
+                $output .= $cardBody;
+            $output .= self::end_div();
+            if($cardFooter){
+                $output .= self::start_div('card-footer');
+                    $output .= $cardFooter;
+                $output .= self::end_div();
+            }
+        $output .= self::end_div();
+
+        return $output;
+    }
+
+    public static function createAccordion ($accordionId,$children):string {
+       $output =
+           self::start_div('accordion', array('id' => $accordionId)).
+           $children.
+           self::end_div();
+       return $output;
+    }
+
+    public static function createAccordionHeader ($headerId,$preContent, $content, $postContent, $collapseId = null):string {
+        $output =
+            self::start_div('card-header', [
+                'id' => $headerId
+            ]).
+            self::start_tag('h5',['class'=>'mb-0']).
+            $preContent;
+
+        if($collapseId){
+            $output .=
+                self::start_tag('span',[
+                    'data-toggle'=>"collapse",
+                    'data-target'=>"#" . $collapseId,
+                    'aria-expanded'=>"true",
+                    'aria-controls'=>$collapseId
+                ]).
+                $content.
+                self::end_tag('span');
+        }else{
+            $output .= $content;
+        }
+
+        $output .=
+            $postContent.
+            self::end_tag('h5').
+            self::end_div();
+
+        return $output;
+    }
+
+    public static function createAccordionCollapsible($collapseId,$triggerId, $accordionId, $content):string{
+        $output =
+            self::start_div('collapse',[
+                'id' => $collapseId,
+                'aria-labelledby'=>$triggerId,
+                'data-parent'=>"#". $accordionId
+            ]).
+            self::start_div('card-body').
+            $content.
+            self::end_div().
+            self::end_div();
 
         return $output;
     }

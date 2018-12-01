@@ -45,10 +45,12 @@ class edit_renderer extends \plugin_renderer_base {
      * @param array $pagevars the variables from {@link question_edit_setup()}.
      * @param \feedback $feedback object containing all the feedback information.
      * @return string HTML to output.
+     * @throws
      */
     public function edit_page(\block $block, \moodle_url $pageurl, array $pagevars, $feedback) {
         $output = '';
 
+        /********************** Initializing  *****************************************/
         $output .= html_writer::start_tag('form',
             array('method' => 'POST', 'id' => 'blockeditingform', 'action' => $pageurl->out()));
         $output .= html_writer::tag('input', '',
@@ -73,27 +75,30 @@ class edit_renderer extends \plugin_renderer_base {
             }
         }
 
-        $container = '';
 
-        $container .=
-        $container .= \html_writer::tag('h3', get_string('questions', 'ddtaquiz'), array('class' => 'questionheader'));
-        $container .= html_writer::start_tag('ul', array('id' => 'block-children-list'));
+        /********************** Questions Card  *****************************************/
+        $questionCardHeader = \html_writer::tag('h3', get_string('questions', 'ddtaquiz'), array('class' => 'questionheader'));
 
+
+        $accordionChildren = '';
         $children = $block->get_children();
         foreach ($children as $child) {
-            $container .= $this->block_elem($child, $pageurl);
+            $accordionChildren .= html_writer::start_div('card');
+            $accordionChildren .= $this->block_elem($child, $pageurl,'block-children-list', true);
+            $accordionChildren .= html_writer::end_div();
         }
+        $questionCardBody = ddtaquiz_bootstrap_render::createAccordion('block-children-list',$accordionChildren);
 
+        $questionCardFooter = null;
         $category = question_get_category_id_from_pagevars($pagevars);
-
         if (!$block->get_quiz()->has_attempts()) {
             $addmenu = $this->add_menu($block, $pageurl, $category);
-            $container .= html_writer::tag('li', $addmenu);
+            $questionCardFooter = html_writer::tag('div', $addmenu,['class'=>'float-right btn btn-primary', 'id' => 'addQuestionBtnContainer']);
         }
-        $container .= html_writer::end_tag('ul');
 
-        $output .= \html_writer::div($container, 'questionblock');
+        $output .= ddtaquiz_bootstrap_render::createCard($questionCardBody,$questionCardHeader, $questionCardFooter);
 
+        /********************** FeedBack Card  *****************************************/
         if ($block->is_main_block()) {
             $output .= $this->feedback_block($feedback, $pageurl);
         }
@@ -132,29 +137,59 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \moodle_url $pageurl The URL of the page.
      * @return string HTML to display this element.
      */
-    public function block_elem(\block_element $blockelem, $pageurl) {
-        // Description of the element.
-        $elementhtml = '';
-        $edithtml = '';
-        $removehtml = '';
+    public function block_elem(\block_element $blockelem, $pageurl,$accordionId,$isMain = false) {
+        // constants
+        $headerId = 'block-element-'. $blockelem->get_id(). '-'.time();
+        $collapseId = null;
 
-        if (!$blockelem->get_quiz()->has_attempts()) {
-            $elementhtml .= $this->question_move_icon();
+        // elements
+        $preContent = '';
+        $content = '';
+        $postContent = '';
+        $collapseContent = '';
+
+        if ($isMain && !$blockelem->get_quiz()->has_attempts()) {
+            $preContent .= $this->question_move_icon();
         }
-        $elementhtml .= html_writer::tag('input', '',
-            array('type' => 'hidden', 'name' => 'elementsorder[]', 'value' => $blockelem->get_id()));
-        $elementhtml .= \html_writer::div($this->block_elem_desc($blockelem), 'blockelement');
+        if($isMain)
+            $preContent .=
+                html_writer::tag('input', '',
+                    array('type' => 'hidden', 'name' => 'elementsorder[]', 'value' => $blockelem->get_id()));
 
-        if (!$blockelem->get_quiz()->has_attempts()) {
-            $edithtml .= $this->element_edit_button($blockelem, $pageurl);
-            $removehtml = $this->element_remove_button($blockelem, $pageurl);
-        } else if ($blockelem->is_block()) {
-            $edithtml .= $this->element_edit_button($blockelem, $pageurl);
+        if($blockelem->is_block()){
+            $content .= html_writer::span($blockelem->get_name(), 'blockelementblock');
+            /** @var \block $blockelem */
+            $collapseId = 'collapse-'. $blockelem->get_id();
+            $collapseContent = $this->block_elem_desc($blockelem,$pageurl,$collapseId,$headerId,$accordionId);
+        }else{
+            $content .= html_writer::span($blockelem->get_name(), 'blockelementdescriptionname');
         }
 
-        $buttons = \html_writer::div($edithtml . $removehtml, 'blockelementbuttons');
 
-        return html_writer::tag('li', html_writer::div($elementhtml . $buttons, 'blockelementline'));
+        if($isMain){
+            $edithtml = '';
+            $removehtml = '';
+            if (!$blockelem->get_quiz()->has_attempts()) {
+                $edithtml .= $this->element_edit_button($blockelem, $pageurl);
+                $removehtml = $this->element_remove_button($blockelem, $pageurl);
+            } else if ($blockelem->is_block()) {
+                $edithtml .= $this->element_edit_button($blockelem, $pageurl);
+            }
+
+            $postContent .= \html_writer::div($edithtml . $removehtml, 'blockelementbuttons');
+        }
+
+        $container = ddtaquiz_bootstrap_render::createAccordionHeader(
+            $headerId,
+            $preContent,
+            $content,
+            $postContent,
+            $collapseId
+        ).
+        $collapseContent;
+
+
+        return $container;
     }
 
     /**
@@ -175,18 +210,24 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \block_element $blockelem the element to get the description for.
      * @return string HTML to output.
      */
-    protected function block_elem_desc(\block_element $blockelem) {
-        $output = \html_writer::div($blockelem->get_name(), 'blockelementdescriptionname');
-        if ($blockelem->is_block()) {
-            $childrendescription = '';
-            foreach ($blockelem->get_element()->get_children() as $child) {
-                $childrendescription .= $this->block_elem_desc($child);
-            }
-            $output .= \html_writer::div($childrendescription, 'blockelementchildrendescription');
-            return html_writer::div($output, 'blockelementdescription blockelementblock');
-        } else {
-            return html_writer::div($output, 'blockelementdescription');
+    protected function block_elem_desc(\block_element $blockelem,$pageurl,$id,$triggerId,$parentAccordionId) {
+        $accordionId = 'block-element-accordion-'. $blockelem->get_id();
+        $accordionChildren = '';
+        $children = $blockelem->get_element()->get_children();
+        foreach ($children as $child) {
+            $accordionChildren .= html_writer::start_div('card');
+            $accordionChildren .= $this->block_elem($child, $pageurl,$accordionId, false);
+            $accordionChildren .= html_writer::end_div();
         }
+        $elementDescrp = ddtaquiz_bootstrap_render::createAccordionCollapsible(
+            $id,
+            $triggerId,
+            $parentAccordionId,
+            ddtaquiz_bootstrap_render::createAccordion($accordionId,$accordionChildren)
+        );
+
+
+        return $elementDescrp;
     }
 
     /**
@@ -195,6 +236,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \block_element $element the element to get the button for.
      * @param \moodle_url $returnurl the URL of the page.
      * @return string HTML to output.
+     * @throws
      */
     public function element_edit_button($element, $returnurl) {
         global $OUTPUT, $CFG;
@@ -220,7 +262,7 @@ class edit_renderer extends \plugin_renderer_base {
         if ($action) {
             return html_writer::tag('button',
                 '<img src="' . $OUTPUT->image_url($icon) . '" alt="' . $action . '" />',
-                array('type' => 'submit', 'name' => 'edit', 'value' => $element->get_id()));
+                array('class'=>'btn btn-warning','type' => 'submit', 'name' => 'edit', 'value' => $element->get_id()));
         } else {
             return '';
         }
@@ -255,11 +297,12 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \block_element $element the element to get the button for.
      * @param \moodle_url $pageurl The URL of the page.
      * @return string HTML to output.
+     * @throws
      */
     public function element_remove_button($element, $pageurl) {
         $image = $this->pix_icon('t/delete', get_string('delete'));
         return html_writer::tag('button', $image,
-            array('type' => 'submit', 'name' => 'delete', 'value' => $element->get_id()));
+            array('class'=>'btn btn-danger','type' => 'submit', 'name' => 'delete', 'value' => $element->get_id()));
     }
 
     /**
@@ -282,6 +325,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \moodle_url $pageurl The URL of the page.
      * @param int $category the id of the category for new questions.
      * @return string HTML to output.
+     * @throws
      */
     protected function add_menu(\block $block, \moodle_url $pageurl, $category) {
         $menu = new \action_menu();
@@ -532,6 +576,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \moodle_url $returnurl the url to return to after creating the question.
      * @param int $category the id of the category for the question.
      * @return string the HTML of the dialogue.
+     * @throws
      */
     public function question_chooser(\moodle_url $returnurl, $category) {
         $body = html_writer::div(print_choose_qtype_to_add_form(array('returnurl' => $returnurl->out_as_local_url(false),
@@ -542,7 +587,7 @@ class edit_renderer extends \plugin_renderer_base {
             'Add'.
             html_writer::end_tag('button');
 
-        return  bootstrap_render::createModal(
+        return  ddtaquiz_bootstrap_render::createModal(
             '',
             $body,
             $addButton,
@@ -566,7 +611,7 @@ class edit_renderer extends \plugin_renderer_base {
             html_writer::tag('button','Add Selected Questions',
                 ['class'=> 'btn btn-primary', 'id'=>'qbankAddButton']);
 
-        return  bootstrap_render::createModal(
+        return  ddtaquiz_bootstrap_render::createModal(
             get_string('addfromquestionbank', 'ddtaquiz'),
             '',
             $buttons,
