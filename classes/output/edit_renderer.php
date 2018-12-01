@@ -213,7 +213,7 @@ class edit_renderer extends \plugin_renderer_base {
         // Build the icon.
         if ($action) {
             return html_writer::tag('button',
-                '<img src="' . $OUTPUT->pix_url($icon) . '" alt="' . $action . '" />',
+                '<img src="' . $OUTPUT->image_url($icon) . '" alt="' . $action . '" />',
                 array('type' => 'submit', 'name' => 'edit', 'value' => $element->get_id()));
         } else {
             return '';
@@ -239,7 +239,7 @@ class edit_renderer extends \plugin_renderer_base {
 
         // Build the icon.
         return html_writer::tag('button',
-            '<img src="' . $OUTPUT->pix_url($icon) . '" alt="' . $stredit . '" />',
+            '<img src="' . $OUTPUT->image_url($icon) . '" alt="' . $stredit . '" />',
             array('type' => 'submit', 'name' => 'feedbackedit', 'value' => $element->get_id()));
     }
 
@@ -544,7 +544,7 @@ class edit_renderer extends \plugin_renderer_base {
      */
     public function questionbank_loading() {
         return html_writer::div(html_writer::div(html_writer::empty_tag('img',
-            array('alt' => 'loading', 'class' => 'loading-icon', 'src' => $this->pix_url('i/loading'))),
+            array('alt' => 'loading', 'class' => 'loading-icon', 'src' => $this->image_url('i/loading'))),
             'questionbankloading'), 'questionbankloadingcontainer',
             array('data-title' => get_string('addfromquestionbank', 'ddtaquiz')));
     }
