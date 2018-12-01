@@ -218,3 +218,25 @@ input[type=number].conditionelement {
 	/* bring your own prefixes */
 	transform: translate(-50%, -50%)!important;
 }
+
+.chooserdialoguebody, .choosertitle {
+	display: inline !important;
+}
+.modal, .modal-dialog{
+    height: 100% !important;
+}
+.modal-content{
+	max-height: 80% !important;
+    position: fixed !important;
+}
+.modal-content .modal-header{
+    height : 10%;
+}
+.modal-content .modal-body{
+    height : 80%;
+    overflow-y: scroll;
+
+}
+.modal-content .modal-footer{
+    height : 10%;
+}
