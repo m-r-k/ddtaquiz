@@ -33,8 +33,8 @@ defined('MOODLE_INTERNAL') || die();
  * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-
-class combined_table extends attempts_table {
+class combined_table extends attempts_table
+{
 
     protected $regradedqs = array();
 
@@ -43,19 +43,21 @@ class combined_table extends attempts_table {
      * @param \ddtaquiz $quiz
      * @param \context $context
      * @param string $qmsubselect
-     * @param overview_options $options
+     * @param combined_options $options
      * @param array $groupstudents
      * @param array $students
      * @param array $questions
      * @param \moodle_url $reporturl
      */
     public function __construct(\ddtaquiz $quiz, $context, $qmsubselect,
-        overview_options $options, $groupstudents, $students, $questions, $reporturl) {
-            parent::__construct('mod-ddtaquiz-report-overview', $quiz , $context,
-                $qmsubselect, $options, $groupstudents, $students, $questions, $reporturl);
+                                combined_options $options, $groupstudents, $students, $questions, $reporturl)
+    {
+        parent::__construct('mod-ddtaquiz-report-combined', $quiz, $context,
+            $qmsubselect, $options, $groupstudents, $students, $questions, $reporturl);
     }
 
-    public function build_table() {
+    public function build_table()
+    {
         global $DB;
 
         if (!$this->rawdata) {
@@ -66,13 +68,13 @@ class combined_table extends attempts_table {
     }
 
 
-
     /**
      * @param string $colname the name of the column.
      * @param object $attempt the row of data
      * @return string the contents of the cell.
      */
-    public function other_cols($colname, $attempt) {
+    public function other_cols($colname, $attempt)
+    {
         if (preg_match('/^question(\d+)$/', $colname, $matches)) {
             return $this->data_col($matches[1], 'questionsummary', $attempt);
 
@@ -82,8 +84,7 @@ class combined_table extends attempts_table {
         } else if (preg_match('/^right(\d+)$/', $colname, $matches)) {
             return $this->data_col($matches[1], 'rightanswer', $attempt);
 
-        }
-        else if (!preg_match('/^qsgrade(\d+)$/', $colname, $matches)) {
+        } else if (!preg_match('/^qsgrade(\d+)$/', $colname, $matches)) {
             return null;
         }
         $slot = $matches[1];
@@ -114,24 +115,27 @@ class combined_table extends attempts_table {
         return $this->make_review_link($grade, $attempt, $slot);
     }
 
-    protected function requires_latest_steps_loaded() {
-        return $this->options->slotmarks;
+    protected function requires_latest_steps_loaded()
+    {
+        return true;
     }
 
-    protected function is_latest_step_column($column) {
+    protected function is_latest_step_column($column)
+    {
         if (preg_match('/^qsgrade([0-9]+)/', $column, $matches)) {
             return $matches[1];
         }
         return false;
     }
 
-    protected function get_required_latest_state_fields($slot, $alias) {
+    protected function get_required_latest_state_fields($slot, $alias)
+    {
         return "$alias.fraction * $alias.maxmark AS qsgrade$slot";
     }
 
 
-
-    public function data_col($slot, $field, $attempt) {
+    public function data_col($slot, $field, $attempt)
+    {
         if ($attempt->usageid == 0) {
             return '-';
         }

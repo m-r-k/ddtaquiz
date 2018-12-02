@@ -149,3 +149,8 @@ $string['usesquestions'] = 'This feedback replaces the feedback of the following
 
 //TODO: ddtaquiz snippet for navigation dropdown
 $string['combinedview'] = 'Combined';
+$string['displaycorrectanswers'] = 'Display correct answers';
+$string['displayResponses'] = 'Display responses';
+$string['displayachievedpoints'] = 'Display achieved points';
+$string['displayquestionname'] = 'Display questionname';
+$string['combinedfilename'] = 'combined';
