@@ -36,10 +36,9 @@ class combined extends attempts {
     public function display($cm, $course, \ddtaquiz $quiz) {
         global $CFG, $DB, $OUTPUT, $PAGE;
 
-        list($currentgroup, $students, $groupstudents, $allowed) = $this->init('\mod_ddtaquiz\report\overview_form',
+        list($currentgroup, $students, $groupstudents, $allowed) = $this->init('\mod_ddtaquiz\report\combined_form',
             $quiz, $cm, $course);
-        $options = new overview_options($quiz, $cm, $course);
-
+        $options = new combined_options($quiz, $cm, $course);
         if ($fromform = $this->form->get_data()) {
             $options->process_settings_from_form($fromform);
 
@@ -61,9 +60,9 @@ class combined extends attempts {
         // Prepare for downloading, if applicable.
         $courseshortname = format_string($course->shortname, true,
                 array('context' => \context_course::instance($course->id)));
-        $table = new combined_table($quiz, $this->context, $this->qmsubselect,
+         $table = new combined_table($quiz, $this->context, $this->qmsubselect,
                 $options, $groupstudents, $students, $questions, $options->get_url());
-        $filename = $this->download_filename(get_string('overviewfilename', 'ddtaquiz'),
+        $filename = $this->download_filename(get_string('combinedfilename', 'ddtaquiz'),
                 $courseshortname, $quiz->get_name());
         $table->is_downloading($options->download, $filename,
                 $courseshortname . ' ' . format_string($quiz->get_name(), true));
@@ -127,23 +126,31 @@ class combined extends attempts {
 
             $this->add_grade_columns($quiz, $columns, $headers, false);
 
-            if ($options->slotmarks) {
+            //if ($options->slotmarks) {
                 foreach ($questions as $slot => $question) {
-                    $columns[] = 'question' . $slot;
-                    $headers[] = get_string('questionx', 'question', $question->number);
-
-                    $columns[] = 'response' . $slot;
-                    $headers[] = $question->name;
-
-                    $columns[] = 'right' . $slot;
-                    $headers[] = get_string('rightanswerx', 'ddtaquiz', $question->number);
-
-                    // Ignore questions of zero length.
-                    $columns[] = 'qsgrade' . $slot;
-                    $headers[] = $question->name;
+                    if($options->displayQuestionName) {
+                        $columns[] = 'question' . $slot;
+                        //$headers[] = get_string('questionx', 'question', $question->number);
+                        $headers[] = $question->name . PHP_EOL . 'Question';
+                    }
+                    if($options->displayResponses) {
+                        $columns[] = 'response' . $slot;
+                        //$headers[] = $question->name;
+                        $headers[] = $question->name . PHP_EOL . 'Response';
+                    }
+                    if($options->displayCorrectAnswers) {
+                        $columns[] = 'right' . $slot;
+                        //$headers[] = get_string('rightanswerx', 'ddtaquiz', $question->number);
+                        $headers[] = $question->name . PHP_EOL . 'Expected';
+                    }
+                    if($options->displayAchievedPoints) {
+                        // Ignore questions of zero length.
+                        $columns[] = 'qsgrade' . $slot;
+                        //$headers[] = $question->name;
+                        $headers[] = $question->name . PHP_EOL . 'Points';
+                    }
                 }
-            }
-
+           // }
 
             $this->set_up_table_columns($table, $columns, $headers, $this->get_base_url(), $options, true);
             $table->set_attribute('class', 'generaltable generalbox grades');
