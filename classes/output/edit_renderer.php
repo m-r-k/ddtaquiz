@@ -562,6 +562,20 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     *Displays a warning if a condition without possible candidates is added.
+     */
+    public function noCandidateWarning(){
+        $condition = \html_writer::tag('label', get_string('noCandidatesForCondition', 'ddtaquiz'));
+        $strdelete = get_string('delete');
+        $image = $this->pix_icon('t/delete', $strdelete);
+        $condition .= $this->action_link('#', $image, null, array('title' => $strdelete,
+            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete', 'data-action' => 'delete'));
+        $conditionspan = \html_writer::span($condition, 'conditionspan ddtaQuiz-is-warning');
+        $conditiondiv = \html_writer::div($conditionspan, 'pointscondition');
+        return $conditiondiv;
+    }
+
+    /**
      * TODO:
      * Renders the HTML for the condition over question points.
      *
@@ -572,6 +586,12 @@ class edit_renderer extends \plugin_renderer_base {
      * @throws
      */
     protected function points_condition($candidates, $index = '', $part = null) {
+        //If no candidate is available display a warning
+        if(count($candidates)==0)
+        {
+            return $this->noCandidateWarning();
+        }
+
         $preContent = \html_writer::tag('label', get_string('gradeat', 'ddtaquiz'),
             array('class' => 'conditionelement'));
 
