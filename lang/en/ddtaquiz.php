@@ -146,3 +146,6 @@ $string['summaryofattempts'] = 'Summary of your previous attempts';
 $string['timecompleted'] = 'Completed';
 $string['timetaken'] = 'Time taken';
 $string['usesquestions'] = 'This feedback replaces the feedback of the following questions';
+
+//TODO: ddtaquiz snippet for navigation dropdown
+$string['combinedview'] = 'Combined';

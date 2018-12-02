@@ -504,11 +504,18 @@ function ddtaquiz_extend_settings_navigation(settings_navigation $settingsnav, n
             null, null, new pix_icon('i/item', '')));
 
         $url = new moodle_url('/mod/ddtaquiz/report.php',
-            array('id' => $PAGE->cm->id, 'mode' => 'responses'));
-        $reportnode->add_node(navigation_node::create(get_string('responses', 'ddtaquiz'), $url,
+        array('id' => $PAGE->cm->id, 'mode' => 'responses'));
+    $reportnode->add_node(navigation_node::create(get_string('responses', 'ddtaquiz'), $url,
+        navigation_node::TYPE_SETTING,
+        null, null, new pix_icon('i/item', '')));
+
+        //TODO: Add the new dropdown entry for combined view
+        $url = new moodle_url('/mod/ddtaquiz/report.php',
+            array('id' => $PAGE->cm->id, 'mode' => 'combined'));
+        $reportnode->add_node(navigation_node::create(get_string('combinedview', 'ddtaquiz'), $url,
             navigation_node::TYPE_SETTING,
             null, null, new pix_icon('i/item', '')));
-    }
+}
 }
 
 /**
