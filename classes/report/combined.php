@@ -15,7 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * This file defines the quiz overview report class.
+ * This file defines the combined view of grades and responses in reports
  *
  * @package    mod_ddtaquiz
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
@@ -27,7 +27,7 @@ defined('MOODLE_INTERNAL') || die();
 
 
 /**
- * Quiz report subclass for the combined (grades) report.
+ * Quiz report subclass for the combined report.
  *
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
@@ -61,7 +61,7 @@ class combined extends attempts {
         // Prepare for downloading, if applicable.
         $courseshortname = format_string($course->shortname, true,
                 array('context' => \context_course::instance($course->id)));
-        $table = new overview_table($quiz, $this->context, $this->qmsubselect,
+        $table = new combined_table($quiz, $this->context, $this->qmsubselect,
                 $options, $groupstudents, $students, $questions, $options->get_url());
         $filename = $this->download_filename(get_string('overviewfilename', 'ddtaquiz'),
                 $courseshortname, $quiz->get_name());
@@ -127,7 +127,7 @@ class combined extends attempts {
 
             $this->add_grade_columns($quiz, $columns, $headers, false);
 
-            //if ($options->slotmarks) {
+            if ($options->slotmarks) {
                 foreach ($questions as $slot => $question) {
                     $columns[] = 'question' . $slot;
                     $headers[] = get_string('questionx', 'question', $question->number);
@@ -142,7 +142,7 @@ class combined extends attempts {
                     $columns[] = 'qsgrade' . $slot;
                     $headers[] = $question->name;
                 }
-            //}
+            }
 
 
             $this->set_up_table_columns($table, $columns, $headers, $this->get_base_url(), $options, true);
