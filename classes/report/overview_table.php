@@ -65,13 +65,26 @@ class overview_table extends attempts_table {
         parent::build_table();
     }
 
+
+
     /**
      * @param string $colname the name of the column.
      * @param object $attempt the row of data
      * @return string the contents of the cell.
      */
     public function other_cols($colname, $attempt) {
-        if (!preg_match('/^qsgrade(\d+)$/', $colname, $matches)) {
+        //TODO: some changes to add more information to the table
+        if (preg_match('/^question(\d+)$/', $colname, $matches)) {
+            return $this->data_col($matches[1], 'questionsummary', $attempt);
+
+        } else if (preg_match('/^response(\d+)$/', $colname, $matches)) {
+            return $this->data_col($matches[1], 'responsesummary', $attempt);
+
+        } else if (preg_match('/^right(\d+)$/', $colname, $matches)) {
+            return $this->data_col($matches[1], 'rightanswer', $attempt);
+
+        }
+        else if (!preg_match('/^qsgrade(\d+)$/', $colname, $matches)) {
             return null;
         }
         $slot = $matches[1];
@@ -99,7 +112,6 @@ class overview_table extends attempts_table {
         if ($this->is_downloading()) {
             return $grade;
         }
-
         return $this->make_review_link($grade, $attempt, $slot);
     }
 
@@ -116,5 +128,41 @@ class overview_table extends attempts_table {
 
     protected function get_required_latest_state_fields($slot, $alias) {
         return "$alias.fraction * $alias.maxmark AS qsgrade$slot";
+    }
+
+//TODO: other cols needed for filling the table info
+    public function data_col($slot, $field, $attempt) {
+        if ($attempt->usageid == 0) {
+            return '-';
+        }
+
+        if (!isset($this->lateststeps[$attempt->usageid][$slot])) {
+            return '-';
+        }
+
+        $stepdata = $this->lateststeps[$attempt->usageid][$slot];
+
+        if (property_exists($stepdata, $field . 'full')) {
+            $value = $stepdata->{$field . 'full'};
+        } else {
+            $value = $stepdata->$field;
+        }
+
+        if (is_null($value)) {
+            $summary = '-';
+        } else {
+            $summary = trim($value);
+        }
+
+        if ($this->is_downloading() && $this->is_downloading() != 'xhtml') {
+            return $summary;
+        }
+        $summary = s($summary);
+
+        if ($this->is_downloading() || $field != 'responsesummary') {
+            return $summary;
+        }
+
+        return $this->make_review_link($summary, $attempt, $slot);
     }
 }
