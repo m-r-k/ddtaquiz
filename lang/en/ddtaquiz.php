@@ -154,3 +154,4 @@ $string['displayResponses'] = 'Display responses';
 $string['displayachievedpoints'] = 'Display achieved points';
 $string['displayquestionname'] = 'Display questionname';
 $string['combinedfilename'] = 'combined';
+$string['noCandidatesForCondition'] = 'First add at least one question!';

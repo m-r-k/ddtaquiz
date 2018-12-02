@@ -218,3 +218,9 @@ input[type=number].conditionelement {
 	/* bring your own prefixes */
 	transform: translate(-50%, -50%)!important;
 }
+
+.ddtaQuiz-is-warning{
+	color: #712b29;
+	background-color: #f7dddc;
+	border-color: #f4cfce;
+}
