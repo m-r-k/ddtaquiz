@@ -42,6 +42,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class responses extends attempts {
 
+    /**
+     * @inheritdoc
+     */
     public function display($cm, $course, \ddtaquiz $quiz) {
         global $OUTPUT;
 
@@ -61,7 +64,7 @@ class responses extends attempts {
         if ($options->attempts == self::ALL_WITH) {
             // This option is only available to users who can access all groups in
             // groups mode, so setting allowed to empty (which means all quiz attempts
-            // are accessible, is not a security porblem.
+            // are accessible, is not a security problem.
             $allowed = array();
         }
 
@@ -80,8 +83,6 @@ class responses extends attempts {
         if ($table->is_downloading()) {
             raise_memory_limit(MEMORY_EXTRA);
         }
-
-        $this->process_actions($quiz, $cm, $currentgroup, $groupstudents, $allowed, $options->get_url());
 
         // Start output.
         if (!$table->is_downloading()) {
@@ -117,11 +118,9 @@ class responses extends attempts {
 
         $hasstudents = $students && (!$currentgroup || $groupstudents);
         if ($hasstudents || $options->attempts == self::ALL_WITH) {
-
             list($fields, $from, $where, $params) = $table->base_sql($allowed);
 
             $table->set_count_sql("SELECT COUNT(1) FROM $from WHERE $where", $params);
-
             $table->set_sql($fields, $from, $where, $params);
 
             // Define table columns.
@@ -135,7 +134,7 @@ class responses extends attempts {
                 $this->add_time_columns($columns, $headers);
             }
 
-            $this->add_grade_columns($quiz, $columns, $headers, false);
+            $this->add_grade_columns($quiz, $columns, $headers);
 
             foreach ($questions as $id => $question) {
                 if ($options->showqtext) {
@@ -152,7 +151,7 @@ class responses extends attempts {
                 }
             }
 
-            $this->set_up_table_columns($table, $columns, $headers, $this->get_base_url(), $options, true);
+            $this->set_up_table_columns($table, $columns, $headers, $options, true);
 
             $table->out($options->pagesize, true);
         }

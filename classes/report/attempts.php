@@ -87,6 +87,7 @@ abstract class attempts {
      * 1 => array ids of all the students in this course.
      * 2 => array ids of all the students in the current group.
      * 3 => array ids of all the students to show in the report.
+     * @throws \coding_exception
      */
     protected function init($formclass, $quiz, $cm, $course) {
         $this->context = \context_module::instance($cm->id);
@@ -106,7 +107,7 @@ abstract class attempts {
      * Initialise some parts of $PAGE and start output.
      *
      * @param object $cm the course_module information.
-     * @param object $coures the course settings.
+     * @param object $course the course settings.
      * @param \ddtaquiz $quiz the quiz.
      */
     public function print_header_and_tabs($cm, $course, $quiz) {
@@ -121,13 +122,14 @@ abstract class attempts {
     }
 
     /**
-     * Get the current group for the user user looking at the report.
+     * Get the current group for the user looking at the report.
      *
      * @param object $cm the course_module information.
-     * @param object $coures the course settings.
+     * @param object $course the course settings.
      * @param \context $context the quiz context.
      * @return int the current group id, if applicable. 0 for all users,
      *      NO_GROUPS_ALLOWED if the user cannot see any group.
+     * @throws \coding_exception
      */
     public function get_current_group($cm, $course, $context) {
         $groupmode = groups_get_activity_groupmode($cm, $course);
@@ -156,6 +158,7 @@ abstract class attempts {
      *      2 => array ids of all the students in the current group.
      *      3 => array ids of all the students to show in the report. Will be the
      *              same as either element 1 or 2.
+     * @throws \coding_exception
      */
     protected function load_relevant_students($cm, $course = null) {
         $currentgroup = $this->get_current_group($cm, $course, $this->context);
@@ -193,6 +196,7 @@ abstract class attempts {
      * @param \table_sql $table the table being constructed.
      * @param array $columns the list of columns. Added to.
      * @param array $headers the columns headings. Added to.
+     * @throws \coding_exception
      */
     protected function add_user_columns($table, &$columns, &$headers) {
         global $CFG;
@@ -253,6 +257,7 @@ abstract class attempts {
      * Add the state column to the $columns and $headers arrays.
      * @param array $columns the list of columns. Added to.
      * @param array $headers the columns headings. Added to.
+     * @throws \coding_exception
      */
     protected function add_state_column(&$columns, &$headers) {
         $columns[] = 'state';
@@ -263,6 +268,7 @@ abstract class attempts {
      * Add all the time-related columns to the $columns and $headers arrays.
      * @param array $columns the list of columns. Added to.
      * @param array $headers the columns headings. Added to.
+     * @throws \coding_exception
      */
     protected function add_time_columns(&$columns, &$headers) {
         $columns[] = 'timestart';
@@ -281,7 +287,7 @@ abstract class attempts {
      * @param \ddtaquiz $quiz the quiz.
      * @param array $columns the list of columns. Added to.
      * @param array $headers the columns headings. Added to.
-     * @param bool $includefeedback whether to include the feedbacktext columns
+     * @throws \coding_exception
      */
     protected function add_grade_columns(\ddtaquiz $quiz, &$columns, &$headers, $includefeedback = true) {
         $columns[] = 'sumgrades';
@@ -294,11 +300,10 @@ abstract class attempts {
      * @param \table_sql $table the table being constructed.
      * @param array $columns the list of columns.
      * @param array $headers the columns headings.
-     * @param \moodle_url $reporturl the URL of this report.
      * @param attempts_options $options the display options.
      * @param bool $collapsible whether to allow columns in the report to be collapsed.
      */
-    protected function set_up_table_columns($table, $columns, $headers, $reporturl,
+    protected function set_up_table_columns($table, $columns, $headers,
         attempts_options $options, $collapsible) {
             $table->define_columns($columns);
             $table->define_headers($headers);
@@ -314,13 +319,6 @@ abstract class attempts {
             $table->set_attribute('id', 'attempts');
 
             $table->collapsible($collapsible);
-    }
-
-    /**
-     * Process any submitted actions.
-     */
-    protected function process_actions($quiz, $cm, $currentgroup, $groupstudents, $allowed, $redirecturl) {
-        // Nothing to do.
     }
 
     /**
@@ -343,8 +341,6 @@ abstract class attempts {
      *      ->slot, ->id, ->maxmark, ->number, ->length.
      */
     protected function get_significant_questions() {
-        global $DB;
-
         $questionsraw = $this->quiz->get_questions();
         $questions = array();
         for ($i = 0; $i < count($questionsraw); $i++) {

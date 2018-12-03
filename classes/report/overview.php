@@ -26,7 +26,6 @@ namespace mod_ddtaquiz\report;
 
 defined('MOODLE_INTERNAL') || die();
 
-
 /**
  * Quiz report subclass for the overview (grades) report.
  *
@@ -35,8 +34,11 @@ defined('MOODLE_INTERNAL') || die();
  */
 class overview extends attempts {
 
+    /**
+     * @inheritdoc
+     */
     public function display($cm, $course, \ddtaquiz $quiz) {
-        global $CFG, $DB, $OUTPUT, $PAGE;
+        global $OUTPUT;
 
         list($currentgroup, $students, $groupstudents, $allowed) = $this->init('\mod_ddtaquiz\report\overview_form',
             $quiz, $cm, $course);
@@ -54,10 +56,11 @@ class overview extends attempts {
         if ($options->attempts == self::ALL_WITH) {
             // This option is only available to users who can access all groups in
             // groups mode, so setting allowed to empty (which means all quiz attempts
-            // are accessible, is not a security porblem.
+            // are accessible, is not a security problem.
             $allowed = array();
         }
 
+        // Load the required questions.
         $questions = $this->get_significant_questions();
 
         // Prepare for downloading, if applicable.
@@ -72,9 +75,6 @@ class overview extends attempts {
         if ($table->is_downloading()) {
             raise_memory_limit(MEMORY_EXTRA);
         }
-
-        $this->course = $course; // Hack to make this available in process_actions.
-        $this->process_actions($quiz, $cm, $currentgroup, $groupstudents, $allowed, $options->get_url());
 
         // Start output.
         if (!$table->is_downloading()) {
@@ -110,10 +110,6 @@ class overview extends attempts {
 
         $hasstudents = $students && (!$currentgroup || $groupstudents);
         if ($hasstudents || $options->attempts == self::ALL_WITH) {
-            // Construct the SQL.
-            $fields = $DB->sql_concat('u.id', "'#'", 'COALESCE(quiza.attempt, 0)') .
-                    ' AS uniqueid, ';
-
             list($fields, $from, $where, $params) = $table->base_sql($allowed);
 
             $table->set_count_sql("SELECT COUNT(1) FROM $from WHERE $where", $params);
@@ -127,7 +123,7 @@ class overview extends attempts {
             $this->add_state_column($columns, $headers);
             $this->add_time_columns($columns, $headers);
 
-            $this->add_grade_columns($quiz, $columns, $headers, false);
+            $this->add_grade_columns($quiz, $columns, $headers);
 
             if ($options->slotmarks) {
                 foreach ($questions as $slot => $question) {
@@ -137,7 +133,7 @@ class overview extends attempts {
                 }
             }
 
-            $this->set_up_table_columns($table, $columns, $headers, $this->get_base_url(), $options, false);
+            $this->set_up_table_columns($table, $columns, $headers, $options, false);
             $table->set_attribute('class', 'generaltable generalbox grades');
 
             $table->out($options->pagesize, true);
