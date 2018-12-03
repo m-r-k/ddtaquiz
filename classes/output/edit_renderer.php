@@ -202,7 +202,7 @@ class edit_renderer extends \plugin_renderer_base {
             /** @var \block $blockelem */
             $blockClass = 'blockAccordionHeader';
             $collapseId = 'collapse-'. $blockelem->get_id();
-            $newParentCounter = ($parentCounter)?++$parentCounter:$counter;
+            $newParentCounter = ($parentCounter)?$parentCounter.'.'.$counter:$counter;
             $collapseContent = $this->block_elem_desc($blockelem,$pageurl,$collapseId,$headerId,$accordionId,$newParentCounter);
         }else{
             // otherwise just show body
