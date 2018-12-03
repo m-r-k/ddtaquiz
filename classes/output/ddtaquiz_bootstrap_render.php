@@ -16,7 +16,7 @@ class ddtaquiz_bootstrap_render extends \html_writer
         $modalTileId = 'modalTile' . time();
 
         $output .= self::start_div('modal',[
-            'id'=>(array_key_exists('id',$attr))? $attr['id']:('modal'.time()),
+            'id'=>(is_array($attr) && array_key_exists('id',$attr))? $attr['id']:('modal'.time()),
             'tabindex'=>"-1",
             'role'=>"dialog",
             'aria-labelledby'=>$modalTileId,
@@ -71,8 +71,8 @@ class ddtaquiz_bootstrap_render extends \html_writer
     public static function createModalTrigger($modalId, $triggerType, $triggerText, $attr):string{
         $output = '';
         $output .= self::start_tag($triggerType,[
-            'id'=>(array_key_exists('id',$attr))? $attr['id']:('modalTrigger'.time()),
-            'class'=>(array_key_exists('class',$attr))? $attr['class']:('btn btn-primary'),
+            'id'=>(is_array($attr) && array_key_exists('id',$attr))? $attr['id']:('modalTrigger'.time()),
+            'class'=>(is_array($attr) && array_key_exists('class',$attr))? $attr['class']:('btn btn-primary'),
             'data-toggle'=>"modal",
             'data-target'=>"#". $modalId
         ]);
@@ -114,8 +114,8 @@ class ddtaquiz_bootstrap_render extends \html_writer
     public static function createAccordionHeader ($preContent, $content, $postContent, $attr = null , $collapseId = null):string {
         $output =
             self::start_div('card-header', [
-                'id' => (array_key_exists('id',$attr))?$attr['id']:'',
-                'class' => (array_key_exists('class',$attr))?$attr['class']:'',
+                'id' => (is_array($attr) && array_key_exists('id',$attr))?$attr['id']:'',
+                'class' => (is_array($attr) && array_key_exists('class',$attr))?$attr['class']:'',
             ]).
             self::start_tag('h5',['class'=>'mb-0']).
             $preContent;

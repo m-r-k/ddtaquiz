@@ -255,10 +255,24 @@ input[type=number].conditionelement {
 }
 
 /** Edit: Question Card styles */
-#addQuestionBtnContainer .dropdown-toggle{
+#addQuestionBtnContainer .dropdown-toggle, .btn-dark .addblockcondition{
     color:white !important;
 }
 
+
 .blockAccordionHeader{
     background-color: rgba(0,0,0,.2)!important;
+}
+.conditionHead{
+    background-color: #373a3c!important;
+    color:white;
+    vertical-align: middle;
+}
+
+.custom-select{
+    margin: 0 10px;
+}
+
+.mustFullFillLabel{
+    margin: 0;
 }

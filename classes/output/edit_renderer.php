@@ -137,10 +137,10 @@ class edit_renderer extends \plugin_renderer_base {
 
         if (!$block->is_main_block()) {
             $output .= $this->condition_type_chooser($block->get_condition_candidates());
-            $this->page->requires->js_call_amd('mod_ddtaquiz/blockconditions', 'init');
         }
 
         $this->page->requires->js_call_amd('mod_ddtaquiz/dragdrop', 'init');
+        $this->page->requires->js_call_amd('mod_ddtaquiz/main', 'init');
 
         return $output;
     }
@@ -440,26 +440,47 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \condition $condition the condition to be rendered.
      * @param array $candidates the block_elements the condition can depend on.
      * @return string the HTML of the condition block.
+     * @throws
      */
     public function condition_block(\condition $condition, $candidates) {
-        $header = \html_writer::tag('h3', get_string('conditions', 'ddtaquiz'), array('class' => 'conditionblockheader'));
-        $start = \html_writer::start_tag('ul', array('id' => 'condition-list'));
+        $conditionCardHeader = \html_writer::tag('h3', get_string('conditions', 'ddtaquiz'), array('class' => 'conditionblockheader'));
+
         $conjunctionchooser = $this->conjunction_chooser($condition);
+
         $conditionlist = \html_writer::div($this->condition($condition, $candidates), 'conditionpartslist');
-        $addcondition = \html_writer::tag('a', get_string('addacondition', 'ddtaquiz'),
-            array('href' => '#', 'class' => 'addblockcondition'));
-        $end = \html_writer::end_tag('ul');
-        $container = $header . $start . $conjunctionchooser . $conditionlist . $addcondition . $end;
-        return html_writer::div($container, 'conditionblock');
+
+        $container =  $conjunctionchooser . $conditionlist  ;
+
+        // build questionCard body
+        $conditionCardBody = ddtaquiz_bootstrap_render::createAccordion('condition-list',$container);
+
+        $addcondition = \html_writer::tag('div', get_string('addacondition', 'ddtaquiz'),
+            array('class' => '#', 'class' => 'addblockcondition')
+        );
+
+        $conditionCardFooter =
+            html_writer::tag('div', $addcondition,[
+                'class'=>'float-right btn btn-dark card-btn',
+                'id' => 'addConditionBtnContainer',
+                'data-toggle'=>"modal",
+                'data-target'=>"#conditiontypechoicecontainer"
+                ]
+            );
+
+
+        return  ddtaquiz_bootstrap_render::createCard($conditionCardBody,$conditionCardHeader, $conditionCardFooter);
     }
 
     /**
+     * TODO: done
      * Renders the HTML for the conjunction type chooser.
      *
      * @param \condition $condition the condition to render this chooser for.
      * @return string the HTML of the chooser.
+     * @throws
      */
     protected function conjunction_chooser(\condition $condition) {
+
         if ($condition->get_useand()) {
             $options = \html_writer::tag('option', get_string('all', 'ddtaquiz'), array('value' => 1, 'selected' => ''));
             $options .= \html_writer::tag('option', get_string('atleastone', 'ddtaquiz'), array('value' => 0));
@@ -469,32 +490,38 @@ class edit_renderer extends \plugin_renderer_base {
                 array('value' => 0, 'selected' => ''));
         }
 
-        $chooser = \html_writer::tag('select', $options, array('name' => 'use_and'));
-        $output = \html_writer::tag('label', get_string('mustfullfill', 'ddtaquiz') . ' ' .
-            $chooser . ' ' . get_string('oftheconditions', 'ddtaquiz'));
-        return \html_writer::div(\html_writer::span($output, 'conjunctionchooserspan'));
+        $chooser = \html_writer::tag('select', $options, array('name' => 'use_and','class'=>'custom-select'));
+        $content = \html_writer::tag('label', get_string('mustfullfill', 'ddtaquiz') . ' ' .
+            $chooser . ' ' . get_string('oftheconditions', 'ddtaquiz'),['class'=>'mustFullFillLabel']);
+        return ddtaquiz_bootstrap_render::createAccordionHeader(
+            '', $content, '',
+            ['class'=>'conditionHead']
+        );
     }
 
     /**
+     * TODO:done
      * Renders the HTML for the condition type chooser.
      *
      * @param array $candidates the block_elements the condition can depend on.
-     * @return string the HTML of the condtion type chooser.
+     * @return string the HTML of the condtion type chooser
+     * @throws
      */
     protected function condition_type_chooser($candidates) {
-        $output = \html_writer::start_tag('form', array('action' => new \moodle_url('/mod/ddtaquiz/view.php'),
-            'id' => 'chooserform', 'method' => 'get'));
-        $output .= \html_writer::tag('input', '',
-                array('type' => 'submit', 'name' => 'addpointscondition', 'class' => 'submitbutton',
-                    'value' => get_string('addpointscondition', 'ddtaquiz')));
-        $output .= \html_writer::end_tag('form');
-        $formdiv = \html_writer::div($output, 'choseform');
-        $header = html_writer::div(get_string('choosecondtiontypetoadd', 'ddtaquiz'), 'chooserheader hd');
-        $dialogue = $header . \html_writer::div(\html_writer::div($formdiv, 'choosercontainer'), 'chooserdialogue');
-        $container = html_writer::div($dialogue, '',
-            array('id' => 'conditiontypechoicecontainer'));
-        return html_writer::div($container, 'addcondition') .
+        $body = \html_writer::tag('button', get_string('addpointscondition', 'ddtaquiz'),
+                array('type' => 'submit','class' => 'btn btn-primary', 'id'=>'addPointsConditionBtn'));
+        $body .=
             \html_writer::div(\html_writer::div($this->points_condition($candidates), 'conditionpart'), 'pointsconditioncontainer');
+
+        $header = html_writer::div(get_string('choosecondtiontypetoadd', 'ddtaquiz'), 'chooserheader hd');
+
+
+        return ddtaquiz_bootstrap_render::createModal(
+            $header,
+            $body,
+            '',
+            ['id'=>'conditiontypechoicecontainer']
+        );
     }
 
     /**
@@ -535,35 +562,45 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * TODO:
      * Renders the HTML for the condition over question points.
      *
      * @param array $candidates the block_elements the condition can depend on.
      * @param string $index the index into the conditionparts array for this condition.
      * @param \condition_part|null $part hte condtion part to fill in or null.
      * @return string the HTML of the points condition.
+     * @throws
      */
     protected function points_condition($candidates, $index = '', $part = null) {
-        $questionspan = \html_writer::tag('span', $this->question_selector($candidates, $index, $part));
-        $condition = \html_writer::tag('label', get_string('gradeat', 'ddtaquiz') . ' ' . $questionspan,
+        $preContent = \html_writer::tag('label', get_string('gradeat', 'ddtaquiz'),
             array('class' => 'conditionelement'));
-        $comparatorspan = \html_writer::tag('span', $this->comparator_selector($index, $part));
-        $condition .= ' ' . \html_writer::tag('label', get_string('mustbe', 'ddtaquiz') . ' ' . $comparatorspan,
+
+        $content = \html_writer::tag('span', $this->question_selector($candidates, $index, $part));
+        $content .= ' ' . \html_writer::tag('label', get_string('mustbe', 'ddtaquiz'),
             array('class' => 'conditionelement'));
+
+
+        $postContent = \html_writer::tag('span', $this->comparator_selector($index, $part));
         $value = 0;
         if ($part) {
             $value = $part->get_grade();
         }
-        $condition .= ' ' . \html_writer::tag('input', '',
-            array('class' => 'conditionelement conditionpoints', 'name' => 'conditionparts[' . $index . '][points]',
+        $postContent .= ' ' . \html_writer::tag('input', '',
+            array('class' => 'conditionelement conditionpoints form-control inline', 'name' => 'conditionparts[' . $index . '][points]',
                 'type' => 'number', 'value' => $value));
+
 
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
-        $condition .= $this->action_link('#', $image, null, array('title' => $strdelete,
-            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete', 'data-action' => 'delete'));
-        $conditionspan = \html_writer::span($condition, 'conditionspan');
-        $conditiondiv = \html_writer::div($conditionspan, 'pointscondition');
-        return $conditiondiv;
+        $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
+            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger float-right', 'data-action' => 'delete'));
+//        $conditionspan = \html_writer::span($condition, 'conditionspan');
+//        $conditiondiv = \html_writer::div($conditionspan, 'pointscondition');
+        return ddtaquiz_bootstrap_render::createAccordionHeader(
+            $preContent,
+            $content,
+            $postContent
+        );
     }
 
     /**
@@ -584,7 +621,7 @@ class edit_renderer extends \plugin_renderer_base {
             $options .= \html_writer::tag('option', $element->get_name(), $attributes);
         }
         return \html_writer::tag('select', $options,
-            array('class' => 'conditionquestion', 'name' => 'conditionparts[' . $index . '][question]'));
+            array('class' => 'conditionquestion custom-select', 'name' => 'conditionparts[' . $index . '][question]'));
     }
 
     /**
@@ -621,7 +658,7 @@ class edit_renderer extends \plugin_renderer_base {
             $options .= \html_writer::tag('option', '&ne;', array('value' => \condition_part::NOT_EQUAL));
         }
         return \html_writer::tag('select', $options,
-            array('class' => 'conditiontype', 'name' => 'conditionparts[' . $index . '][type]'));
+            array('class' => 'conditiontype custom-select', 'name' => 'conditionparts[' . $index . '][type]'));
     }
 
     /**
