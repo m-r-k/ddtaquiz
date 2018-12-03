@@ -156,4 +156,17 @@ class ddtaquiz_bootstrap_render extends \html_writer
 
         return $output;
     }
+
+    public static function createAlert($type,$content){
+        $output = '';
+        $output .=
+            self::start_div('alert ddtaquiz-alerts alert-'. $type.' alert-dismissible fade show',['role' => 'alert']).
+                $content.
+                self::start_tag('button',['type'=>"button", 'class'=>"close", 'data-dismiss'=>"alert", 'aria-label'=>"Close"]).
+                    self::span('x','',['aria-hidden'=>'true']).
+                self::end_tag('button').
+            self::end_div();
+
+        return $output;
+    }
 }

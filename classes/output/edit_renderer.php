@@ -561,6 +561,7 @@ class edit_renderer extends \plugin_renderer_base {
         return \html_writer::div($conditionpart, 'conditionpart');
     }
 
+
     /**
      * TODO:
      * Renders the HTML for the condition over question points.
@@ -572,6 +573,15 @@ class edit_renderer extends \plugin_renderer_base {
      * @throws
      */
     protected function points_condition($candidates, $index = '', $part = null) {
+        //If no candidate is available display a warning
+        if(count($candidates)==0)
+        {
+
+            $this->page->requires->js_call_amd('mod_ddtaquiz/main', 'cleanAlerts');
+            $content = \html_writer::tag('label', get_string('noCandidatesForCondition', 'ddtaquiz'));
+            return ddtaquiz_bootstrap_render::createAlert('danger',$content);
+        }
+
         $preContent = \html_writer::tag('label', get_string('gradeat', 'ddtaquiz'),
             array('class' => 'conditionelement'));
 

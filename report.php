@@ -47,9 +47,12 @@ $PAGE->set_pagelayout('report');
 $PAGE->set_title($ddtaquiz->get_name());
 $PAGE->set_heading($course->fullname);
 
+//TODO: get modes to display the grade/response overview
 if ($mode == 'responses') {
     $report = new mod_ddtaquiz\report\responses();
-} else {
+} else if($mode='combined') {
+    $report = new mod_ddtaquiz\report\combined();
+}else{
     // ... $mode = 'overview' as default.
     $report = new mod_ddtaquiz\report\overview();
 }

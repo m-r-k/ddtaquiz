@@ -42,6 +42,10 @@ define(['jquery'], function($) {
                     condition.addcondition(e);
                 });
             });
+
+        },
+        cleanAlerts: function () {
+            $('.ddtaquiz-alerts:not(:first)').remove();
         }
     };
 });
