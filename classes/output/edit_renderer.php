@@ -842,6 +842,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \feedback_block $feedbackelem An element of a block.
      * @param \moodle_url $pageurl The URL of the page.
      * @return string HTML to display this element.
+     * @throws
      */
     public function feedback_block_elem(\feedback_block $feedbackelem, $pageurl,$counter) {
         // constants
@@ -894,7 +895,7 @@ class edit_renderer extends \plugin_renderer_base {
         $namefield = html_writer::tag('input', '', array('type' => 'text', 'name' => 'blockname', 'value' => $block->get_name()));
         $output .= $this->heading(get_string('editingfeedback', 'ddtaquiz') . ' ' . $namefield);
 
-        $output .= \html_writer::div($this->uses_block($block), 'feedbackblock');
+        $output .= $this->uses_block($block);
 
         $output .= $this->condition_block($block->get_condition(), $candidates);
 
@@ -917,23 +918,25 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     public function uses_block(\feedback_block $block) {
-        $output = '';
+        $header = \html_writer::tag('h3', get_string('usesquestions', 'ddtaquiz'));
 
-        $output .= \html_writer::tag('h3', get_string('usesquestions', 'ddtaquiz'),
-            array('class' => 'usesquestionblockheader'));
-
-        $output .= \html_writer::start_div('usedquestions');
+        $body = \html_writer::start_div('usedquestions');
         foreach ($block->get_used_question_instances() as $instance) {
-            $output .= $this->uses_element($block, $instance);
+            $body .= $this->uses_element($block, $instance);
         }
-        $output .= \html_writer::end_div();
+        $body .=
+            \html_writer::div($this->uses_element($block), 'usesquestioncontainer').
+            \html_writer::end_div();
+        $footer = \html_writer::tag('button', get_string('addusedquestion', 'ddtaquiz'), array('class' => 'addusedquestion btn btn-dark float-right card-btn'));
 
-        $output .= \html_writer::link('#', get_string('addusedquestion', 'ddtaquiz'), array('class' => 'addusedquestion'));
-
-        $output .= \html_writer::div($this->uses_element($block), 'usesquestioncontainer');
+       // $output .= ;
 
         $this->page->requires->js_call_amd('mod_ddtaquiz/feedback', 'init');
-        return $output;
+        return ddtaquiz_bootstrap_render::createCard(
+            $body,
+            $header,
+            $footer
+        );
     }
 
     /**
@@ -947,15 +950,22 @@ class edit_renderer extends \plugin_renderer_base {
         static $index = 64; // ... 'A' - 1.
         $index += 1;
 
-        $content = '';
-        $content .= \html_writer::div(chr($index), 'usesquestionletter');
-        $content .= $this->uses_selector($block, $question);
+        $preContent = \html_writer::span(html_writer::tag('b',chr($index)), 'usesquestionletter');
+        $content = $this->uses_selector($block, $question);
 
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
-        $content .= $this->action_link('#', $image, null, array('title' => $strdelete,
-            'class' => 'cm-edit-action editing_delete element-remove-button usesdelete', 'data-action' => 'delete'));
-        return \html_writer::div($content, 'usesquestion');
+        $postContent = $this->action_link('#', $image, null, array('title' => $strdelete,
+            'class' => 'cm-edit-action editing_delete element-remove-button usesdelete btn btn-danger float-right', 'data-action' => 'delete'));
+
+        return ddtaquiz_bootstrap_render::createAccordionHeader(
+            $preContent,
+            $content,
+            $postContent,
+            [
+                'class' => 'usesquestion'
+            ]
+        );
     }
 
     /**
@@ -976,14 +986,15 @@ class edit_renderer extends \plugin_renderer_base {
             if ($selected && $selected->get_id() == $element->get_id()) {
                 $attributes['selected'] = '';
             }
-            $options .= \html_writer::tag('option', $element->get_name(), $attributes);
+            $options .=
+                \html_writer::tag('option', $element->get_name(), $attributes);
         }
         if ($selected) {
             return \html_writer::tag('select', $options,
-                array('class' => 'usesquestionselector', 'name' => 'usesquestions[' . $index . ']'));
+                array('class' => 'usesquestionselector custom-select', 'name' => 'usesquestions[' . $index . ']'));
         } else {
             return \html_writer::tag('select', $options,
-                array('class' => 'usesquestionselector'));
+                array('class' => 'usesquestionselector custom-select'));
         }
     }
 

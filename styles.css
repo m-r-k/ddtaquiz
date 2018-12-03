@@ -148,19 +148,6 @@ input[type=number].conditionelement {
 	display: none;
 }
 
-.usesquestioncontainer {
-	display: none;
-}
-
-.usesquestionletter {
-	display: inline-block;
-	padding: 14px;
-	font-weight: bold;
-}
-
-.usesquestionselector {
-	display: inline-block;
-}
 
 .feedbacktext {
 	margin: 20px;
