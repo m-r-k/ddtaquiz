@@ -45,10 +45,12 @@ class edit_renderer extends \plugin_renderer_base {
      * @param array $pagevars the variables from {@link question_edit_setup()}.
      * @param \feedback $feedback object containing all the feedback information.
      * @return string HTML to output.
+     * @throws
      */
     public function edit_page(\block $block, \moodle_url $pageurl, array $pagevars, $feedback) {
         $output = '';
 
+        /********************** Initializing  *****************************************/
         $output .= html_writer::start_tag('form',
             array('method' => 'POST', 'id' => 'blockeditingform', 'action' => $pageurl->out()));
         $output .= html_writer::tag('input', '',
@@ -73,88 +75,161 @@ class edit_renderer extends \plugin_renderer_base {
             }
         }
 
-        $container = '';
 
-        $container .= \html_writer::tag('h3', get_string('questions', 'ddtaquiz'), array('class' => 'questionheader'));
-        $container .= html_writer::start_tag('ul', array('id' => 'block-children-list'));
+        /********************** Questions Card  *****************************************/
+        $questionCardHeader = \html_writer::tag('h3', get_string('questions', 'ddtaquiz'), array('class' => 'questionheader'));
 
+        // children of Accordion
+        $accordionChildren = '';
         $children = $block->get_children();
+        $counter = 1;
         foreach ($children as $child) {
-            $container .= $this->block_elem($child, $pageurl);
+            $accordionChildren .= html_writer::start_div('card');
+            $accordionChildren .= $this->block_elem(
+                $child,
+                $pageurl,
+                'block-children-list',
+                null,
+                $counter,
+                true
+            );
+            $accordionChildren .= html_writer::end_div();
+            $counter++;
         }
+        // build questionCard body
+        $questionCardBody = ddtaquiz_bootstrap_render::createAccordion('block-children-list',$accordionChildren);
 
+        $questionCardFooter = null;
         $category = question_get_category_id_from_pagevars($pagevars);
-
         if (!$block->get_quiz()->has_attempts()) {
             $addmenu = $this->add_menu($block, $pageurl, $category);
-            $container .= html_writer::tag('li', $addmenu);
+            $questionCardFooter = html_writer::tag('div', $addmenu,['class'=>'float-right btn btn-dark card-btn', 'id' => 'addQuestionBtnContainer']);
         }
-        $container .= html_writer::end_tag('ul');
 
-        $output .= \html_writer::div($container, 'questionblock');
+        $output .= ddtaquiz_bootstrap_render::createCard($questionCardBody,$questionCardHeader, $questionCardFooter);
 
+        /********************** FeedBack Card  *****************************************/
         if ($block->is_main_block()) {
             $output .= $this->feedback_block($feedback, $pageurl);
         }
 
-        $output .= html_writer::tag('button', get_string('done', 'ddtaquiz'),
-            array('type' => 'submit', 'name' => 'done', 'value' => 1));
+        /********************** close tags, load scripts *****************************************/
+        $output .=
+            html_writer::start_div('card-footer text-right').
+            html_writer::tag('button', get_string('done', 'ddtaquiz'),
+                array('class'=>'btn btn-primary card-btn','type' => 'submit', 'name' => 'done', 'value' => 1)).
+            html_writer::end_div();
+
         $output .= html_writer::end_tag('form');
 
         $output .= $this->question_chooser($pageurl, $category);
-        $this->page->requires->js_call_amd('mod_ddtaquiz/questionchooser', 'init');
+        $this->page->requires->js_call_amd('mod_ddtaquiz/questionChooserInitializer', 'init');
 
+        $output .= $this->question_bank_modal();
         $output .= $this->questionbank_loading();
-        $this->page->requires->js_call_amd('mod_ddtaquiz/questionbank', 'init');
+        $this->page->requires->js_call_amd('mod_ddtaquiz/questionbank', 'init',[
+            'panelId'=>'qbankChoiceModal',
+            'addButtonId'=> 'qbankAddButton',
+            'loadingId' => 'qbankLoading'
+        ]);
 
         $this->page->requires->js_call_amd('mod_ddtaquiz/addnewblock', 'init');
 
         if (!$block->is_main_block()) {
             $output .= $this->condition_type_chooser($block->get_condition_candidates());
-            $this->page->requires->js_call_amd('mod_ddtaquiz/blockconditions', 'init');
         }
 
         $this->page->requires->js_call_amd('mod_ddtaquiz/dragdrop', 'init');
+        $this->page->requires->js_call_amd('mod_ddtaquiz/main', 'init');
 
         return $output;
     }
 
     /**
-     * Render one element of a block.
+     * TODO: done
      *
-     * @param \block_element $blockelem An element of a block.
-     * @param \moodle_url $pageurl The URL of the page.
-     * @return string HTML to display this element.
+     *
+     * @param \block_element $blockelem
+     * @param $pageurl
+     * @param $accordionId
+     * @param $parentCounter
+     * @param $counter
+     * @param bool $isMain
+     * @return string
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
-    public function block_elem(\block_element $blockelem, $pageurl) {
-        // Description of the element.
-        $elementhtml = '';
-        $edithtml = '';
-        $removehtml = '';
+    public function block_elem(\block_element $blockelem, $pageurl,$accordionId,$parentCounter , $counter, $isMain = false) {
+        // constants
+        $headerId = 'block-element-'. $blockelem->get_id(). '-'.time();
+        $nr = \html_writer::tag('b',($parentCounter)?$parentCounter.'.'.$counter:$counter);
+        $collapseId = null;
 
-        if (!$blockelem->get_quiz()->has_attempts()) {
-            $elementhtml .= $this->question_move_icon();
+        // elements
+        $preContent = '';
+        $content = '';
+        $postContent = '';
+        $collapseContent = '';
+
+        // add only if main block
+        if ($isMain){
+            //mover
+            if(!$blockelem->get_quiz()->has_attempts()) {
+                $preContent .= $this->question_move_icon();
+            }
+            //number to count questions/blocks
+            $preContent .=
+                html_writer::tag('input', '',
+                    array('type' => 'hidden', 'name' => 'elementsorder[]', 'value' => $blockelem->get_id()));
+
+            // edit/delete buttons
+            $edithtml = '';
+            $removehtml = '';
+            if (!$blockelem->get_quiz()->has_attempts()) {
+                $edithtml .= $this->element_edit_button($blockelem, $pageurl);
+                $removehtml = $this->element_remove_button($blockelem, $pageurl);
+            } else if ($blockelem->is_block()) {
+                $edithtml .= $this->element_edit_button($blockelem, $pageurl);
+            }
+
+            $postContent .= \html_writer::div($edithtml . $removehtml, 'blockelementbuttons');
         }
-        $elementhtml .= html_writer::tag('input', '',
-            array('type' => 'hidden', 'name' => 'elementsorder[]', 'value' => $blockelem->get_id()));
-        $elementhtml .= \html_writer::div($this->block_elem_desc($blockelem), 'blockelement');
 
-        if (!$blockelem->get_quiz()->has_attempts()) {
-            $edithtml .= $this->element_edit_button($blockelem, $pageurl);
-            $removehtml = $this->element_remove_button($blockelem, $pageurl);
-        } else if ($blockelem->is_block()) {
-            $edithtml .= $this->element_edit_button($blockelem, $pageurl);
+        $blockClass='';
+        // render collapsible body if block, with block elements
+        if($blockelem->is_block()){
+            $content .= html_writer::span($nr.' '. $blockelem->get_name(), 'blockelementblock');
+            /** @var \block $blockelem */
+            $blockClass = 'blockAccordionHeader';
+            $collapseId = 'collapse-'. $blockelem->get_id();
+            $newParentCounter = ($parentCounter)?++$parentCounter:$counter;
+            $collapseContent = $this->block_elem_desc($blockelem,$pageurl,$collapseId,$headerId,$accordionId,$newParentCounter);
+        }else{
+            // otherwise just show body
+            $content .= html_writer::span($nr.' '. $blockelem->get_name(), 'blockelementdescriptionname');
         }
+        // return as accordion header + accordion body , expected to be part of an accordion
+        $container = ddtaquiz_bootstrap_render::createAccordionHeader(
+            $preContent,
+            $content,
+            $postContent,
+            ['id'=>$headerId,'class'=>$blockClass],
+            $collapseId
+        ).
+        $collapseContent;
 
-        $buttons = \html_writer::div($edithtml . $removehtml, 'blockelementbuttons');
 
-        return html_writer::tag('li', html_writer::div($elementhtml . $buttons, 'blockelementline'));
+        return $container;
     }
 
     /**
+     * TODO: done
+     *
      * Renders the icon to move questions and blocks.
      *
      * @return string the HTML of the move icon.
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
     public function question_move_icon() {
         return html_writer::link(new \moodle_url('#'),
@@ -164,23 +239,38 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * TODO: done
+     *
      * Render the description.
      *
-     * @param \block_element $blockelem the element to get the description for.
-     * @return string HTML to output.
+     * @param \block_element $blockelem
+     * @param $pageurl
+     * @param $id
+     * @param $triggerId
+     * @param $parentAccordionId
+     * @return string
+     * @throws
      */
-    protected function block_elem_desc(\block_element $blockelem) {
-        $output = \html_writer::div($blockelem->get_name(), 'blockelementdescriptionname');
-        if ($blockelem->is_block()) {
-            $childrendescription = '';
-            foreach ($blockelem->get_element()->get_children() as $child) {
-                $childrendescription .= $this->block_elem_desc($child);
-            }
-            $output .= \html_writer::div($childrendescription, 'blockelementchildrendescription');
-            return html_writer::div($output, 'blockelementdescription blockelementblock');
-        } else {
-            return html_writer::div($output, 'blockelementdescription');
+    protected function block_elem_desc(\block_element $blockelem,$pageurl,$id,$triggerId,$parentAccordionId,$parentCounter) {
+        $accordionId = 'block-element-accordion-'. $blockelem->get_id();
+        $accordionChildren = '';
+        $children = $blockelem->get_element()->get_children();
+        $counter = 1;
+        foreach ($children as $child) {
+            $accordionChildren .= html_writer::start_div('card');
+            $accordionChildren .= $this->block_elem($child, $pageurl,$accordionId, $parentCounter,$counter,false);
+            $accordionChildren .= html_writer::end_div();
+            $counter++;
         }
+        $elementDescrp = ddtaquiz_bootstrap_render::createAccordionCollapsible(
+            $id,
+            $triggerId,
+            $parentAccordionId,
+            ddtaquiz_bootstrap_render::createAccordion($accordionId,$accordionChildren)
+        );
+
+
+        return $elementDescrp;
     }
 
     /**
@@ -189,6 +279,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \block_element $element the element to get the button for.
      * @param \moodle_url $returnurl the URL of the page.
      * @return string HTML to output.
+     * @throws
      */
     public function element_edit_button($element, $returnurl) {
         global $OUTPUT, $CFG;
@@ -213,19 +304,23 @@ class edit_renderer extends \plugin_renderer_base {
         // Build the icon.
         if ($action) {
             return html_writer::tag('button',
-                '<img src="' . $OUTPUT->pix_url($icon) . '" alt="' . $action . '" />',
-                array('type' => 'submit', 'name' => 'edit', 'value' => $element->get_id()));
+                '<img src="' . $OUTPUT->image_url($icon) . '" alt="' . $action . '" />',
+                array('class'=>'btn btn-warning','type' => 'submit', 'name' => 'edit', 'value' => $element->get_id()));
         } else {
             return '';
         }
     }
 
     /**
+     * TODO: done
+     *
      * Outputs the edit button HTML for a feedbackelement.
      *
      * @param \feedback_block $element the element to get the button for.
      * @param \moodle_url $returnurl the URL of the page.
      * @return string HTML to output.
+     *
+     * @throws \coding_exception
      */
     public function feedback_edit_button($element, $returnurl) {
         global $OUTPUT, $CFG;
@@ -239,43 +334,52 @@ class edit_renderer extends \plugin_renderer_base {
 
         // Build the icon.
         return html_writer::tag('button',
-            '<img src="' . $OUTPUT->pix_url($icon) . '" alt="' . $stredit . '" />',
-            array('type' => 'submit', 'name' => 'feedbackedit', 'value' => $element->get_id()));
+            '<img src="' . $OUTPUT->image_url($icon) . '" alt="' . $stredit . '" />',
+            array('class'=>'btn btn-warning','type' => 'submit', 'name' => 'feedbackedit', 'value' => $element->get_id()));
     }
 
     /**
+     * TODO: done
+     *
      * Outputs the remove button HTML for an element.
      *
      * @param \block_element $element the element to get the button for.
      * @param \moodle_url $pageurl The URL of the page.
      * @return string HTML to output.
+     * @throws
      */
     public function element_remove_button($element, $pageurl) {
         $image = $this->pix_icon('t/delete', get_string('delete'));
         return html_writer::tag('button', $image,
-            array('type' => 'submit', 'name' => 'delete', 'value' => $element->get_id()));
+            array('class'=>'btn btn-danger','type' => 'submit', 'name' => 'delete', 'value' => $element->get_id()));
     }
 
     /**
+     * TODO: done
+     *
      * Outputs the remove button HTML for a feedbackelement.
      *
      * @param \feedback_block $element the element to get the button for.
      * @param \moodle_url $pageurl The URL of the page.
      * @return string HTML to output.
+     * @throws
      */
     public function feedback_element_remove_button($element, $pageurl) {
         $image = $this->pix_icon('t/delete', get_string('delete'));
         return html_writer::tag('button', $image,
-            array('type' => 'submit', 'name' => 'feedbackdelete', 'value' => $element->get_id()));
+            array('class'=>'btn btn-danger','type' => 'submit', 'name' => 'feedbackdelete', 'value' => $element->get_id()));
     }
 
     /**
+     * TODO: done
+     *
      * Outputs the add menu HTML.
      *
      * @param \block $block object containing all the block information.
      * @param \moodle_url $pageurl The URL of the page.
      * @param int $category the id of the category for new questions.
      * @return string HTML to output.
+     * @throws
      */
     protected function add_menu(\block $block, \moodle_url $pageurl, $category) {
         $menu = new \action_menu();
@@ -294,16 +398,27 @@ class edit_renderer extends \plugin_renderer_base {
             new \moodle_url('/question/addquestion.php', $params),
             new \pix_icon('t/add', get_string('addaquestion', 'ddtaquiz'),
                 'moodle', array('class' => 'iconsmall', 'title' => '')), get_string('addaquestion', 'ddtaquiz'),
-            array('class' => 'cm-edit-action addquestion', 'data-action' => 'addquestion')
-            );
+            array(
+                'class' => 'cm-edit-action',
+                'data-toggle'=>"modal",
+                'data-target'=>"#qtypeChoiceModal"
+            )
+        );
         $menu->add($addaquestion);
 
         // Button to add question from question bank.
         $questionbank = new \action_menu_link_secondary($pageurl,
             new \pix_icon('t/add', get_string('questionbank', 'ddtaquiz'), 'moodle',
                 array('class' => 'iconsmall', 'title' => '')), get_string('questionbank', 'ddtaquiz'),
-            array('class' => 'cm-edit-action questionbank', 'data-action' => 'questionbank',
-                'data-cmid' => $block->get_quiz()->get_cmid(), 'data-bid' => $block->get_id()));
+            array(
+                'class' => 'cm-edit-action questionbank',
+                'data-action' => 'questionbank',
+                'data-cmid' => $block->get_quiz()->get_cmid(),
+                'data-bid' => $block->get_id(),
+                'data-toggle'=>"modal",
+                'data-target'=>"#qbankChoiceModal"
+            )
+        );
         $menu->add($questionbank);
         $menu->prioritise = true;
 
@@ -325,26 +440,47 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \condition $condition the condition to be rendered.
      * @param array $candidates the block_elements the condition can depend on.
      * @return string the HTML of the condition block.
+     * @throws
      */
     public function condition_block(\condition $condition, $candidates) {
-        $header = \html_writer::tag('h3', get_string('conditions', 'ddtaquiz'), array('class' => 'conditionblockheader'));
-        $start = \html_writer::start_tag('ul', array('id' => 'condition-list'));
+        $conditionCardHeader = \html_writer::tag('h3', get_string('conditions', 'ddtaquiz'), array('class' => 'conditionblockheader'));
+
         $conjunctionchooser = $this->conjunction_chooser($condition);
+
         $conditionlist = \html_writer::div($this->condition($condition, $candidates), 'conditionpartslist');
-        $addcondition = \html_writer::tag('a', get_string('addacondition', 'ddtaquiz'),
-            array('href' => '#', 'class' => 'addblockcondition'));
-        $end = \html_writer::end_tag('ul');
-        $container = $header . $start . $conjunctionchooser . $conditionlist . $addcondition . $end;
-        return html_writer::div($container, 'conditionblock');
+
+        $container =  $conjunctionchooser . $conditionlist  ;
+
+        // build questionCard body
+        $conditionCardBody = ddtaquiz_bootstrap_render::createAccordion('condition-list',$container);
+
+        $addcondition = \html_writer::tag('div', get_string('addacondition', 'ddtaquiz'),
+            array('class' => '#', 'class' => 'addblockcondition')
+        );
+
+        $conditionCardFooter =
+            html_writer::tag('div', $addcondition,[
+                'class'=>'float-right btn btn-dark card-btn',
+                'id' => 'addConditionBtnContainer',
+                'data-toggle'=>"modal",
+                'data-target'=>"#conditiontypechoicecontainer"
+                ]
+            );
+
+
+        return  ddtaquiz_bootstrap_render::createCard($conditionCardBody,$conditionCardHeader, $conditionCardFooter);
     }
 
     /**
+     * TODO: done
      * Renders the HTML for the conjunction type chooser.
      *
      * @param \condition $condition the condition to render this chooser for.
      * @return string the HTML of the chooser.
+     * @throws
      */
     protected function conjunction_chooser(\condition $condition) {
+
         if ($condition->get_useand()) {
             $options = \html_writer::tag('option', get_string('all', 'ddtaquiz'), array('value' => 1, 'selected' => ''));
             $options .= \html_writer::tag('option', get_string('atleastone', 'ddtaquiz'), array('value' => 0));
@@ -354,32 +490,38 @@ class edit_renderer extends \plugin_renderer_base {
                 array('value' => 0, 'selected' => ''));
         }
 
-        $chooser = \html_writer::tag('select', $options, array('name' => 'use_and'));
-        $output = \html_writer::tag('label', get_string('mustfullfill', 'ddtaquiz') . ' ' .
-            $chooser . ' ' . get_string('oftheconditions', 'ddtaquiz'));
-        return \html_writer::div(\html_writer::span($output, 'conjunctionchooserspan'));
+        $chooser = \html_writer::tag('select', $options, array('name' => 'use_and','class'=>'custom-select'));
+        $content = \html_writer::tag('label', get_string('mustfullfill', 'ddtaquiz') . ' ' .
+            $chooser . ' ' . get_string('oftheconditions', 'ddtaquiz'),['class'=>'mustFullFillLabel']);
+        return ddtaquiz_bootstrap_render::createAccordionHeader(
+            '', $content, '',
+            ['class'=>'conditionHead']
+        );
     }
 
     /**
+     * TODO:done
      * Renders the HTML for the condition type chooser.
      *
      * @param array $candidates the block_elements the condition can depend on.
-     * @return string the HTML of the condtion type chooser.
+     * @return string the HTML of the condtion type chooser
+     * @throws
      */
     protected function condition_type_chooser($candidates) {
-        $output = \html_writer::start_tag('form', array('action' => new \moodle_url('/mod/ddtaquiz/view.php'),
-            'id' => 'chooserform', 'method' => 'get'));
-        $output .= \html_writer::tag('input', '',
-                array('type' => 'submit', 'name' => 'addpointscondition', 'class' => 'submitbutton',
-                    'value' => get_string('addpointscondition', 'ddtaquiz')));
-        $output .= \html_writer::end_tag('form');
-        $formdiv = \html_writer::div($output, 'choseform');
-        $header = html_writer::div(get_string('choosecondtiontypetoadd', 'ddtaquiz'), 'chooserheader hd');
-        $dialogue = $header . \html_writer::div(\html_writer::div($formdiv, 'choosercontainer'), 'chooserdialogue');
-        $container = html_writer::div($dialogue, '',
-            array('id' => 'conditiontypechoicecontainer'));
-        return html_writer::div($container, 'addcondition') .
+        $body = \html_writer::tag('button', get_string('addpointscondition', 'ddtaquiz'),
+                array('type' => 'submit','class' => 'btn btn-primary', 'id'=>'addPointsConditionBtn'));
+        $body .=
             \html_writer::div(\html_writer::div($this->points_condition($candidates), 'conditionpart'), 'pointsconditioncontainer');
+
+        $header = html_writer::div(get_string('choosecondtiontypetoadd', 'ddtaquiz'), 'chooserheader hd');
+
+
+        return ddtaquiz_bootstrap_render::createModal(
+            $header,
+            $body,
+            '',
+            ['id'=>'conditiontypechoicecontainer']
+        );
     }
 
     /**
@@ -420,35 +562,45 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * TODO:
      * Renders the HTML for the condition over question points.
      *
      * @param array $candidates the block_elements the condition can depend on.
      * @param string $index the index into the conditionparts array for this condition.
      * @param \condition_part|null $part hte condtion part to fill in or null.
      * @return string the HTML of the points condition.
+     * @throws
      */
     protected function points_condition($candidates, $index = '', $part = null) {
-        $questionspan = \html_writer::tag('span', $this->question_selector($candidates, $index, $part));
-        $condition = \html_writer::tag('label', get_string('gradeat', 'ddtaquiz') . ' ' . $questionspan,
+        $preContent = \html_writer::tag('label', get_string('gradeat', 'ddtaquiz'),
             array('class' => 'conditionelement'));
-        $comparatorspan = \html_writer::tag('span', $this->comparator_selector($index, $part));
-        $condition .= ' ' . \html_writer::tag('label', get_string('mustbe', 'ddtaquiz') . ' ' . $comparatorspan,
+
+        $content = \html_writer::tag('span', $this->question_selector($candidates, $index, $part));
+        $content .= ' ' . \html_writer::tag('label', get_string('mustbe', 'ddtaquiz'),
             array('class' => 'conditionelement'));
+
+
+        $postContent = \html_writer::tag('span', $this->comparator_selector($index, $part));
         $value = 0;
         if ($part) {
             $value = $part->get_grade();
         }
-        $condition .= ' ' . \html_writer::tag('input', '',
-            array('class' => 'conditionelement conditionpoints', 'name' => 'conditionparts[' . $index . '][points]',
+        $postContent .= ' ' . \html_writer::tag('input', '',
+            array('class' => 'conditionelement conditionpoints form-control inline', 'name' => 'conditionparts[' . $index . '][points]',
                 'type' => 'number', 'value' => $value));
+
 
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
-        $condition .= $this->action_link('#', $image, null, array('title' => $strdelete,
-            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete', 'data-action' => 'delete'));
-        $conditionspan = \html_writer::span($condition, 'conditionspan');
-        $conditiondiv = \html_writer::div($conditionspan, 'pointscondition');
-        return $conditiondiv;
+        $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
+            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger float-right', 'data-action' => 'delete'));
+//        $conditionspan = \html_writer::span($condition, 'conditionspan');
+//        $conditiondiv = \html_writer::div($conditionspan, 'pointscondition');
+        return ddtaquiz_bootstrap_render::createAccordionHeader(
+            $preContent,
+            $content,
+            $postContent
+        );
     }
 
     /**
@@ -469,7 +621,7 @@ class edit_renderer extends \plugin_renderer_base {
             $options .= \html_writer::tag('option', $element->get_name(), $attributes);
         }
         return \html_writer::tag('select', $options,
-            array('class' => 'conditionquestion', 'name' => 'conditionparts[' . $index . '][question]'));
+            array('class' => 'conditionquestion custom-select', 'name' => 'conditionparts[' . $index . '][question]'));
     }
 
     /**
@@ -506,7 +658,7 @@ class edit_renderer extends \plugin_renderer_base {
             $options .= \html_writer::tag('option', '&ne;', array('value' => \condition_part::NOT_EQUAL));
         }
         return \html_writer::tag('select', $options,
-            array('class' => 'conditiontype', 'name' => 'conditionparts[' . $index . '][type]'));
+            array('class' => 'conditiontype custom-select', 'name' => 'conditionparts[' . $index . '][type]'));
     }
 
     /**
@@ -515,12 +667,23 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \moodle_url $returnurl the url to return to after creating the question.
      * @param int $category the id of the category for the question.
      * @return string the HTML of the dialogue.
+     * @throws
      */
     public function question_chooser(\moodle_url $returnurl, $category) {
-        $container = html_writer::div(print_choose_qtype_to_add_form(array('returnurl' => $returnurl->out_as_local_url(false),
+        $body = html_writer::div(print_choose_qtype_to_add_form(array('returnurl' => $returnurl->out_as_local_url(false),
             'cmid' => $returnurl->get_param('cmid'), 'appendqnumstring' => 'addquestion', 'category' => $category),
-            null, false), '', array('id' => 'qtypechoicecontainer'));
-        return html_writer::div($container, 'createnewquestion');
+            null, false), '', array('id' => 'qtypeChoiceBody'));
+        $addButton =
+            html_writer::start_tag('button',['class'=> 'btn btn-primary', 'id'=>'addQuestionBtn']).
+            'Add'.
+            html_writer::end_tag('button');
+
+        return  ddtaquiz_bootstrap_render::createModal(
+            '',
+            $body,
+            $addButton,
+            ['id'=>'qtypeChoiceModal']
+        );
     }
 
     /**
@@ -529,13 +692,23 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string the HTML div of the icon.
      */
     public function questionbank_loading() {
-        return html_writer::div(html_writer::div(html_writer::empty_tag('img',
-            array('alt' => 'loading', 'class' => 'loading-icon', 'src' => $this->pix_url('i/loading'))),
-            'questionbankloading'), 'questionbankloadingcontainer',
-            array('data-title' => get_string('addfromquestionbank', 'ddtaquiz')));
+        return html_writer::div(html_writer::empty_tag('img',
+            array('alt' => 'loading', 'class' => 'loading-icon', 'src' => $this->image_url('i/loading'))),
+            'questionbankloading', ['id'=>'qbankLoading']);
     }
 
+    public function question_bank_modal(){
+        $buttons =
+            html_writer::tag('button','Add Selected Questions',
+                ['class'=> 'btn btn-primary', 'id'=>'qbankAddButton']);
 
+        return  ddtaquiz_bootstrap_render::createModal(
+            get_string('addfromquestionbank', 'ddtaquiz'),
+            '',
+            $buttons,
+            ['id'=>'qbankChoiceModal']
+        );
+    }
 
     /**
      * Return the contents of the question bank, to be displayed in the question-bank pop-up.
@@ -627,45 +800,77 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * TODO: done
+     *
      * Render the feedback block.
      *
      * @param \feedback $feedback the feedback for which to render the block.
      * @param \moodle_url $pageurl the url of this page.
      * @return string the HTML of the feedback block.
+     *
+     * @throws \coding_exception
      */
     public function feedback_block($feedback, $pageurl) {
-        $header = html_writer::tag('h3', get_string('feedback', 'ddtaquiz'), array('class' => 'feedbackheader'));
+        $questionCardHeader = html_writer::tag('h3', get_string('feedback', 'ddtaquiz'), array('class' => 'feedbackheader'));
         $output = '';
 
-        $output .= html_writer::start_tag('ul', array('id' => 'feedbackblock-children-list'));
-
+        // children of Accordion
+        $accordionChildren = '';
         $blocks = $feedback->get_blocks();
+        $counter = 1;
         foreach ($blocks as $block) {
-            $output .= $this->feedback_block_elem($block, $pageurl);
+            $accordionChildren .= html_writer::start_div('card');
+            $accordionChildren .= $this->feedback_block_elem($block, $pageurl,$counter);
+            $accordionChildren .= html_writer::end_div();
+            $counter++;
         }
-        $addbutton = html_writer::tag('button', get_string('addfeedback', 'ddtaquiz'),
-            array('type' => 'submit', 'name' => 'addfeedback', 'value' => 1));
-        $container = $header . $output . $addbutton;
-        return html_writer::div($container, 'feedbackblock');
+        // build questionCard body
+        $questionCardBody = ddtaquiz_bootstrap_render::createAccordion('feedbackblock-children-list',$accordionChildren);
+
+        $questionCardFooter = html_writer::tag('button', get_string('addfeedback', 'ddtaquiz'),
+            array('type' => 'submit', 'name' => 'addfeedback', 'value' => 1,'class'=>'btn btn-dark card-btn float-right'));
+
+        return ddtaquiz_bootstrap_render::createCard($questionCardBody,$questionCardHeader, $questionCardFooter);
+        //return html_writer::div($output, 'feedbackblock');
     }
 
     /**
+     * TODO: done
+     *
      * Render one element of a feedbackbblock.
      *
      * @param \feedback_block $feedbackelem An element of a block.
      * @param \moodle_url $pageurl The URL of the page.
      * @return string HTML to display this element.
+     * @throws
      */
-    public function feedback_block_elem(\feedback_block $feedbackelem, $pageurl) {
-        // Description of the element.
-        $elementhtml = '';
-        $edithtml = '';
+    public function feedback_block_elem(\feedback_block $feedbackelem, $pageurl,$counter) {
+        // constants
+        $headerId = 'feedback-element-'. $feedbackelem->get_id(). '-'.time();
+        $nr = \html_writer::tag('b',$counter);
 
-        $elementhtml = \html_writer::div($feedbackelem->get_name(), 'blockelement');
+        // elements
+        $preContent = '';
+        $content = '';
+        $postContent = '';
+
+        // Description of the element.
+        $content = \html_writer::div($nr.' '.$feedbackelem->get_name(), 'blockelement');
         $edithtml = $this->feedback_edit_button($feedbackelem, $pageurl);
         $removehtml = $this->feedback_element_remove_button($feedbackelem, $pageurl);
-        $buttons = \html_writer::div($edithtml . $removehtml, 'blockelementbuttons');
-        return html_writer::tag('li', html_writer::div($elementhtml . $buttons, 'blockelementline'));
+        $postContent = \html_writer::div($edithtml . $removehtml, 'blockelementbuttons');
+
+
+        // return as accordion header + accordion body , expected to be part of an accordion
+        $container = ddtaquiz_bootstrap_render::createAccordionHeader(
+                $preContent,
+                $content,
+                $postContent,
+                ['id'=>$headerId]
+        );
+
+
+        return $container;
     }
 
     /**
@@ -690,7 +895,7 @@ class edit_renderer extends \plugin_renderer_base {
         $namefield = html_writer::tag('input', '', array('type' => 'text', 'name' => 'blockname', 'value' => $block->get_name()));
         $output .= $this->heading(get_string('editingfeedback', 'ddtaquiz') . ' ' . $namefield);
 
-        $output .= \html_writer::div($this->uses_block($block), 'feedbackblock');
+        $output .= $this->uses_block($block);
 
         $output .= $this->condition_block($block->get_condition(), $candidates);
 
@@ -713,23 +918,25 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      */
     public function uses_block(\feedback_block $block) {
-        $output = '';
+        $header = \html_writer::tag('h3', get_string('usesquestions', 'ddtaquiz'));
 
-        $output .= \html_writer::tag('h3', get_string('usesquestions', 'ddtaquiz'),
-            array('class' => 'usesquestionblockheader'));
-
-        $output .= \html_writer::start_div('usedquestions');
+        $body = \html_writer::start_div('usedquestions');
         foreach ($block->get_used_question_instances() as $instance) {
-            $output .= $this->uses_element($block, $instance);
+            $body .= $this->uses_element($block, $instance);
         }
-        $output .= \html_writer::end_div();
+        $body .=
+            \html_writer::div($this->uses_element($block), 'usesquestioncontainer').
+            \html_writer::end_div();
+        $footer = \html_writer::tag('button', get_string('addusedquestion', 'ddtaquiz'), array('class' => 'addusedquestion btn btn-dark float-right card-btn'));
 
-        $output .= \html_writer::link('#', get_string('addusedquestion', 'ddtaquiz'), array('class' => 'addusedquestion'));
-
-        $output .= \html_writer::div($this->uses_element($block), 'usesquestioncontainer');
+       // $output .= ;
 
         $this->page->requires->js_call_amd('mod_ddtaquiz/feedback', 'init');
-        return $output;
+        return ddtaquiz_bootstrap_render::createCard(
+            $body,
+            $header,
+            $footer
+        );
     }
 
     /**
@@ -743,15 +950,22 @@ class edit_renderer extends \plugin_renderer_base {
         static $index = 64; // ... 'A' - 1.
         $index += 1;
 
-        $content = '';
-        $content .= \html_writer::div(chr($index), 'usesquestionletter');
-        $content .= $this->uses_selector($block, $question);
+        $preContent = \html_writer::span(html_writer::tag('b',chr($index)), 'usesquestionletter');
+        $content = $this->uses_selector($block, $question);
 
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
-        $content .= $this->action_link('#', $image, null, array('title' => $strdelete,
-            'class' => 'cm-edit-action editing_delete element-remove-button usesdelete', 'data-action' => 'delete'));
-        return \html_writer::div($content, 'usesquestion');
+        $postContent = $this->action_link('#', $image, null, array('title' => $strdelete,
+            'class' => 'cm-edit-action editing_delete element-remove-button usesdelete btn btn-danger float-right', 'data-action' => 'delete'));
+
+        return ddtaquiz_bootstrap_render::createAccordionHeader(
+            $preContent,
+            $content,
+            $postContent,
+            [
+                'class' => 'usesquestion'
+            ]
+        );
     }
 
     /**
@@ -772,14 +986,15 @@ class edit_renderer extends \plugin_renderer_base {
             if ($selected && $selected->get_id() == $element->get_id()) {
                 $attributes['selected'] = '';
             }
-            $options .= \html_writer::tag('option', $element->get_name(), $attributes);
+            $options .=
+                \html_writer::tag('option', $element->get_name(), $attributes);
         }
         if ($selected) {
             return \html_writer::tag('select', $options,
-                array('class' => 'usesquestionselector', 'name' => 'usesquestions[' . $index . ']'));
+                array('class' => 'usesquestionselector custom-select', 'name' => 'usesquestions[' . $index . ']'));
         } else {
             return \html_writer::tag('select', $options,
-                array('class' => 'usesquestionselector'));
+                array('class' => 'usesquestionselector custom-select'));
         }
     }
 

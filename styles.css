@@ -20,14 +20,13 @@
 
 .blockelementdescription {
 	margin-right: 50px;
+    font-size: 15px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .blockelementline {
-	background-color: #f5f5f5;
-	border: 1px solid;
-	border-color: #eee;
-	border-radius: 8px;
-	margin: 10px;
 	padding: 10px;
 	min-height: 40px;
 }
@@ -37,12 +36,7 @@
 }
 
 .blockelementblock {
-	margin: 7px;
-	margin-left: 0;
-	padding: 7px;
-	border: 3px solid;
-	border-color: #c8c8c8;
-	border-radius: 6px;
+    cursor: pointer;
 }
 
 .blockelementbuttons {
@@ -154,19 +148,6 @@ input[type=number].conditionelement {
 	display: none;
 }
 
-.usesquestioncontainer {
-	display: none;
-}
-
-.usesquestionletter {
-	display: inline-block;
-	padding: 14px;
-	font-weight: bold;
-}
-
-.usesquestionselector {
-	display: inline-block;
-}
 
 .feedbacktext {
 	margin: 20px;
@@ -217,4 +198,68 @@ input[type=number].conditionelement {
 	left: 50%!important;
 	/* bring your own prefixes */
 	transform: translate(-50%, -50%)!important;
+}
+
+
+.chooserdialoguebody, .choosertitle {
+	display: inline !important;
+}
+
+.card-btn{
+    width:150px;
+    text-align: center;
+    margin-right:22px;
+}
+.card-btn .menubar{
+    display: inline!important;
+}
+/** Modal Styles */
+.modal, .modal-dialog{
+    height: 100% !important;
+}
+.modal-content{
+	max-height: 80% !important;
+    position: fixed !important;
+}
+.modal-content .modal-header{
+    height : 10%;
+}
+.modal-content .modal-body{
+    height : 80%;
+    overflow-y: scroll;
+
+}
+.modal-content .modal-footer{
+    height : 10%;
+}
+
+/** Question Bank Styles */
+#qbankChoiceModal .header.qtype {
+    margin: 0 .2rem;
+}
+#qbankChoiceModal .header.qtype .icon{
+    margin:0;
+}
+
+/** Edit: Question Card styles */
+#addQuestionBtnContainer .dropdown-toggle, .btn-dark .addblockcondition{
+    color:white !important;
+}
+
+
+.blockAccordionHeader{
+    background-color: rgba(0,0,0,.2)!important;
+}
+.conditionHead{
+    background-color: #373a3c!important;
+    color:white;
+    vertical-align: middle;
+}
+
+.custom-select{
+    margin: 0 10px;
+}
+
+.mustFullFillLabel{
+    margin: 0;
 }
