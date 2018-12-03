@@ -35,9 +35,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class overview_form extends attempts_form {
 
-    protected function other_attempt_fields(\MoodleQuickForm $mform) {
-    }
-
+    /**
+     * @inheritdoc
+     */
     protected function other_preference_fields(\MoodleQuickForm $mform) {
         $mform->addElement('selectyesno', 'slotmarks',
                 get_string('showdetailedmarks', 'ddtaquiz'));

@@ -38,6 +38,10 @@ require_once($CFG->libdir . '/formslib.php');
  */
 abstract class attempts_form extends \moodleform {
 
+    /**
+     * TODO
+     * @throws \coding_exception
+     */
     protected function definition() {
         $mform = $this->_form;
 
@@ -57,6 +61,11 @@ abstract class attempts_form extends \moodleform {
             get_string('showreport', 'ddtaquiz'));
     }
 
+    /**
+     * TODO (aus mod/quiz)
+     * @param \MoodleQuickForm $mform
+     * @throws \coding_exception
+     */
     protected function standard_attempt_fields(\MoodleQuickForm $mform) {
 
         $mform->addElement('select', 'attempts', get_string('reportattemptsfrom', 'ddtaquiz'), array(
@@ -80,17 +89,37 @@ abstract class attempts_form extends \moodleform {
         $mform->disabledIf('statefinished',   'attempts', 'eq', attempts::ENROLLED_WITHOUT);
     }
 
+    /**
+     * TODO (aus mod/quiz)
+     * @param \MoodleQuickForm $mform
+     */
     protected function other_attempt_fields(\MoodleQuickForm $mform) {
     }
 
+    /**
+     * TODO (aus mod/quiz)
+     * @param \MoodleQuickForm $mform
+     * @throws \coding_exception
+     */
     protected function standard_preference_fields(\MoodleQuickForm $mform) {
         $mform->addElement('text', 'pagesize', get_string('pagesize', 'ddtaquiz'));
         $mform->setType('pagesize', PARAM_INT);
     }
 
+    /**
+     * TODO (aus mod/quiz)
+     * @param \MoodleQuickForm $mform
+     */
     protected function other_preference_fields(\MoodleQuickForm $mform) {
     }
 
+    /**
+     * TODO (aus mod/quiz)
+     * @param array $data
+     * @param array $files
+     * @return array
+     * @throws \coding_exception
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 

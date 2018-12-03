@@ -70,9 +70,6 @@ class combined extends attempts {
             raise_memory_limit(MEMORY_EXTRA);
         }
 
-        $this->course = $course; // Hack to make this available in process_actions.
-        $this->process_actions($quiz, $cm, $currentgroup, $groupstudents, $allowed, $options->get_url());
-
         // Start output.
         if (!$table->is_downloading()) {
             // Only print headers if not asked to download data.
@@ -124,7 +121,7 @@ class combined extends attempts {
             $this->add_state_column($columns, $headers);
             $this->add_time_columns($columns, $headers);
 
-            $this->add_grade_columns($quiz, $columns, $headers, false);
+            $this->add_grade_columns($quiz, $columns, $headers);
 
             //if ($options->slotmarks) {
                 foreach ($questions as $slot => $question) {
@@ -152,7 +149,7 @@ class combined extends attempts {
                 }
            // }
 
-            $this->set_up_table_columns($table, $columns, $headers, $this->get_base_url(), $options, true);
+            $this->set_up_table_columns($table, $columns, $headers, $options, true);
             $table->set_attribute('class', 'generaltable generalbox grades');
 
             $table->out($options->pagesize, true);
