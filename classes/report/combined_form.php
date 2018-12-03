@@ -35,7 +35,7 @@ defined('MOODLE_INTERNAL') || die();
 class combined_form extends attempts_form {
 
     /**
-     * In this area it's possible to add elements to select attempts wich should be displayed
+     * In this area it's possible to add elements to select attempts which should be displayed
      * @param \MoodleQuickForm $mform
      */
     protected function other_attempt_fields(\MoodleQuickForm $mform) {
@@ -44,6 +44,7 @@ class combined_form extends attempts_form {
     /**
      * In this area add elements to set up additional display options.
      * @param \MoodleQuickForm $mform
+     * @throws \coding_exception
      */
     protected function other_preference_fields(\MoodleQuickForm $mform) {
         $mform->addElement('selectyesno', 'displayCorrectAnswers',

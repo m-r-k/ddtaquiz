@@ -35,6 +35,9 @@ defined('MOODLE_INTERNAL') || die();
  */
 class responses_form extends attempts_form {
 
+    /**
+     * @inheritdoc
+     */
     protected function other_preference_fields(\MoodleQuickForm $mform) {
         $mform->addGroup(array(
             $mform->createElement('advcheckbox', 'qtext', '',
@@ -49,6 +52,9 @@ class responses_form extends attempts_form {
         $mform->disabledIf('right', 'attempts', 'eq', attempts::ENROLLED_WITHOUT);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function validation($data, $files) {
         $errors = parent::validation($data, $files);
 
