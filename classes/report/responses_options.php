@@ -47,6 +47,9 @@ class responses_options extends attempts_options {
     /** @var bool which try/tries to show responses from. */
     public $whichtries = \question_attempt::LAST_TRY;
 
+    /**
+     * @inheritdoc
+     */
     protected function get_url_params() {
         $params = parent::get_url_params();
         $params['mode']     = 'responses';
@@ -57,6 +60,9 @@ class responses_options extends attempts_options {
         return $params;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function get_initial_form_data() {
         $toform = parent::get_initial_form_data();
         $toform->qtext      = $this->showqtext;
@@ -66,6 +72,9 @@ class responses_options extends attempts_options {
         return $toform;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function setup_from_form_data($fromform) {
         parent::setup_from_form_data($fromform);
 
@@ -74,6 +83,9 @@ class responses_options extends attempts_options {
         $this->showright     = $fromform->right;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function setup_from_params() {
         parent::setup_from_params();
 
@@ -82,6 +94,9 @@ class responses_options extends attempts_options {
         $this->showright     = optional_param('right', $this->showright,     PARAM_BOOL);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function setup_from_user_preferences() {
         parent::setup_from_user_preferences();
 
@@ -90,6 +105,9 @@ class responses_options extends attempts_options {
         $this->showright     = get_user_preferences('ddtaquiz_report_responses_right', $this->showright);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function update_user_preferences() {
         parent::update_user_preferences();
 
@@ -98,6 +116,9 @@ class responses_options extends attempts_options {
         set_user_preference('ddtaquiz_report_responses_right', $this->showright);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function resolve_dependencies() {
         parent::resolve_dependencies();
 

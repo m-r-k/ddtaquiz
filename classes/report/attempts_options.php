@@ -69,7 +69,7 @@ class attempts_options {
     public $states = array(\attempt::IN_PROGRESS, \attempt::FINISHED);
 
     /**
-     * @var bool whether to show all finished attmepts, or just the one that gave
+     * @var bool whether to show all finished attempts, or just the one that gave
      *      the final grade for the user.
      */
     public $onlygraded = false;
@@ -116,6 +116,7 @@ class attempts_options {
     /**
      * Get the URL to show the report with these options.
      * @return \moodle_url the URL.
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url('/mod/ddtaquiz/report.php', $this->get_url_params());
@@ -146,7 +147,7 @@ class attempts_options {
     /**
      * Get the current value of the settings to pass to the settings form.
      *
-     * @return array $toform the initial form data.
+     * @return \stdClass $toform the initial form data.
      */
     public function get_initial_form_data() {
         $toform = new \stdClass();

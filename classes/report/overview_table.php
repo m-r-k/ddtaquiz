@@ -39,15 +39,7 @@ class overview_table extends attempts_table {
     protected $regradedqs = array();
 
     /**
-     * Constructor
-     * @param \ddtaquiz $quiz
-     * @param \context $context
-     * @param string $qmsubselect
-     * @param overview_options $options
-     * @param array $groupstudents
-     * @param array $students
-     * @param array $questions
-     * @param \moodle_url $reporturl
+     * @inheritdoc
      */
     public function __construct(\ddtaquiz $quiz, $context, $qmsubselect,
         overview_options $options, $groupstudents, $students, $questions, $reporturl) {
@@ -55,9 +47,10 @@ class overview_table extends attempts_table {
                 $qmsubselect, $options, $groupstudents, $students, $questions, $reporturl);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function build_table() {
-        global $DB;
-
         if (!$this->rawdata) {
             return;
         }
@@ -66,9 +59,7 @@ class overview_table extends attempts_table {
     }
 
     /**
-     * @param string $colname the name of the column.
-     * @param object $attempt the row of data
-     * @return string the contents of the cell.
+     * @inheritdoc
      */
     public function other_cols($colname, $attempt) {
         if (!preg_match('/^qsgrade(\d+)$/', $colname, $matches)) {
@@ -103,10 +94,16 @@ class overview_table extends attempts_table {
         return $this->make_review_link($grade, $attempt, $slot);
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function requires_latest_steps_loaded() {
         return $this->options->slotmarks;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function is_latest_step_column($column) {
         if (preg_match('/^qsgrade([0-9]+)/', $column, $matches)) {
             return $matches[1];
@@ -114,6 +111,9 @@ class overview_table extends attempts_table {
         return false;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function get_required_latest_state_fields($slot, $alias) {
         return "$alias.fraction * $alias.maxmark AS qsgrade$slot";
     }

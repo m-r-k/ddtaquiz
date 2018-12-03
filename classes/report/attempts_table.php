@@ -116,6 +116,8 @@ abstract class attempts_table extends \table_sql {
      *
      * @param object $attempt the table row being output.
      * @return string HTML content to go inside the td.
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
     public function col_fullname($attempt) {
         $html = parent::col_fullname($attempt);
@@ -133,6 +135,7 @@ abstract class attempts_table extends \table_sql {
      *
      * @param object $attempt the table row being output.
      * @return string HTML content to go inside the td.
+     * @throws \coding_exception
      */
     public function col_state($attempt) {
         if (!is_null($attempt->attempt)) {
@@ -194,16 +197,7 @@ abstract class attempts_table extends \table_sql {
         if ($attempt->state != \attempt::FINISHED) {
             return '-';
         }
-        return '-';/* TODO
-        $feedback = quiz_report_feedback_for_grade(
-            quiz_rescale_grade($attempt->sumgrades, $this->quiz, false),
-            $this->quiz->id, $this->context);
-
-        if ($this->is_downloading()) {
-            $feedback = strip_tags($feedback);
-        }*/
-
-        return $feedback;
+        return '-'; // Hier hatte die 17/18 Gruppe etwas angefangen, aber nicht fertig bekommen
     }
 
     public function get_row_class($attempt) {
@@ -220,7 +214,9 @@ abstract class attempts_table extends \table_sql {
      * @param string $data HTML fragment. The text to make into the link.
      * @param object $attempt data for the row of the table being output.
      * @param int $slot the number used to identify this question within this usage.
-     * @return $output html data.
+     * @return string $output html data.
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
     public function make_review_link($data, $attempt, $slot) {
         global $OUTPUT;
@@ -285,6 +281,7 @@ abstract class attempts_table extends \table_sql {
      * Return an appropriate icon (green tick, red cross, etc.) for a grade.
      * @param float $fraction grade on a scale 0..1.
      * @return string html fragment.
+     * @throws \coding_exception
      */
     protected function icon_for_fraction($fraction) {
         global $OUTPUT;
@@ -311,6 +308,7 @@ abstract class attempts_table extends \table_sql {
      * @param \qubaid_condition|null $qubaids used to restrict which usages are included
      * in the query. See {@link qubaid_condition}.
      * @return array of records. See the SQL in this function to see the fields available.
+     * @throws \coding_exception
      */
     protected function load_question_latest_steps(\qubaid_condition $qubaids = null) {
         if ($qubaids === null) {
@@ -355,18 +353,15 @@ abstract class attempts_table extends \table_sql {
      * @param string $column a column name
      * @return int false if no, else a slot.
      */
-    protected function is_latest_step_column($column) {
-        return false;
-    }
+    protected abstract function is_latest_step_column($column);
 
     /**
      * Get any fields that might be needed when sorting on date for a particular slot.
      * @param int $slot the slot for the column we want.
      * @param string $alias the table alias for latest state information relating to that slot.
+     * @return string
      */
-    protected function get_required_latest_state_fields($slot, $alias) {
-        return '';
-    }
+    protected abstract function get_required_latest_state_fields($slot, $alias);
 
     /**
      * Contruct all the parts of the main database query.
@@ -374,6 +369,8 @@ abstract class attempts_table extends \table_sql {
      * @param array $reportstudents list if userids of users to include in the report.
      * @return array with 4 elements ($fields, $from, $where, $params) that can be used to
      *      build the actual database query.
+     * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function base_sql($reportstudents) {
         global $DB;
@@ -497,6 +494,7 @@ abstract class attempts_table extends \table_sql {
      * attempts we are displaying.
      *
      * @return \qubaid_condition
+     * @throws \coding_exception
      */
     protected function get_qubaids_condition() {
         if (is_null($this->rawdata)) {
