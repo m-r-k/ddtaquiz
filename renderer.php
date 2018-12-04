@@ -25,7 +25,7 @@
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
 
-
+use mod_ddtaquiz\output\ddtaquiz_bootstrap_render;
 /**
  * The renderer for the ddtaquiz module.
  *
@@ -245,6 +245,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
     }
 
     /**
+     * TODO: done
      * Generates the page of the attempt.
      *
      * @param attempt $attempt the attempt.
@@ -252,58 +253,69 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param question_display_options $options options that control how a question is displayed.
      * @param int $cmid the course module id.
      * @return string HTML fragment.
+     * @throws
      *
      */
     public function attempt_page(attempt $attempt, $slot, $options, $cmid) {
-        $output = '';
 
         $processurl = new \moodle_url('/mod/ddtaquiz/processslot.php');
+        // The progress bar.
+        $progress = floor(($slot - 1) * 100 / $attempt->get_quiz()->get_slotcount());
+        $progressbar = \html_writer::div('', 'bar',
+            array('role' => 'progressbar', 'style' => 'width: ' . $progress . '%;', 'class'=>'bg-primary'));
+        $header = \html_writer::div($progressbar, 'progress');
 
-        $output .= html_writer::start_tag('form',
+        $body = html_writer::start_tag('form',
            array('action' => $processurl, 'method' => 'post',
                'enctype' => 'multipart/form-data', 'accept-charset' => 'utf-8',
                'id' => 'responseform'));
 
-        // The progress bar.
-        $progress = floor(($slot - 1) * 100 / $attempt->get_quiz()->get_slotcount());
-        $progressbar = \html_writer::div('', 'bar',
-            array('role' => 'progressbar', 'style' => 'width: ' . $progress . '%;'));
-        $output .= \html_writer::div($progressbar, 'progress');
 
-        $output .= html_writer::start_tag('div');
 
-        $output .= $attempt->get_quba()->render_question($slot, $options);
+        $body .= html_writer::start_tag('div');
 
-        $output .= $this->attempt_navigation_buttons();
+        $body .= $attempt->get_quba()->render_question($slot, $options);
 
         // Some hidden fields to track what is going on.
-        $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'attempt',
+        $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'attempt',
            'value' => $attempt->get_id()));
-        $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'slot',
+        $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'slot',
            'value' => $slot));
-        $output .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'cmid',
+        $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'cmid',
            'value' => $cmid));
 
-        $output .= html_writer::end_tag('div');
-        $output .= html_writer::end_tag('form');
+        $body .= html_writer::end_tag('div');
+        $body .= html_writer::end_tag('form');
 
-        return $output;
+
+        $footer = $this->attempt_navigation_buttons();
+
+        $this->page->requires->js_call_amd('mod_ddtaquiz/attempt', 'init');
+
+        return ddtaquiz_bootstrap_render::createCard(
+            $body,
+            $header,
+            $footer
+        );
     }
 
     /**
+     * TODO:
      * Generates the attempt navigation buttons.
      *
      * @return string HTML fragment.
+     *
+     * @throws
      */
     public function attempt_navigation_buttons() {
         $output = '';
 
-        $output .= html_writer::start_tag('div');
+        $output .= html_writer::start_div('text-right');
 
         $nextlabel = get_string('nextpage', 'ddtaquiz');
         $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'next',
-            'value' => $nextlabel));
-        $output .= html_writer::end_tag('div');
+            'value' => $nextlabel, 'class'=>'btn btn-primary', 'id'=>'attemptNextBtn'));
+        $output .= html_writer::end_div();
 
         return $output;
     }
