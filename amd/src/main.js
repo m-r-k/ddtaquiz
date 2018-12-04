@@ -23,10 +23,12 @@
 
 define(['jquery'], function($) {
     var condition = {
+        index : 0,
         addcondition : function(e) {
             e.preventDefault();
             e.stopImmediatePropagation();
             var newcondition = $('.pointsconditioncontainer').find('.conditionpart').clone(true);
+            this.index++;
             newcondition.find('.conditionpoints').attr('name', 'conditionparts[newparts' + this.index + '][points]');
             newcondition.find('.conditiontype').attr('name', 'conditionparts[newparts' + this.index + '][type]');
             newcondition.find('.conditionquestion').attr('name', 'conditionparts[newparts' + this.index + '][question]');
@@ -41,6 +43,13 @@ define(['jquery'], function($) {
                 $('#addPointsConditionBtn').click(function(e){
                     condition.addcondition(e);
                 });
+
+                $('.conditionpartdelete').click(function(e) {
+                    e.preventDefault();
+                    e.stopImmediatePropagation();
+                    $(this).parents('.conditionpart').remove();
+                });
+
             });
 
         },
