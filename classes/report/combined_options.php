@@ -54,8 +54,10 @@ class combined_options extends attempts_options
     /** @var bool whether to show marks for each question (slot). */
     public $displayQuestionName = true;
 
-    protected function get_url_params()
-    {
+    /**
+     * @inheritdoc
+     */
+    protected function get_url_params() {
         $params = parent::get_url_params();
         $params['mode'] = 'combined';
         $params['onlyregraded'] = $this->onlyregraded;
@@ -67,8 +69,10 @@ class combined_options extends attempts_options
         return $params;
     }
 
-    public function get_initial_form_data()
-    {
+    /**
+     * @inheritdoc
+     */
+    public function get_initial_form_data() {
         $toform = parent::get_initial_form_data();
         $toform->onlyregraded = $this->onlyregraded;
         $toform->slotmarks = $this->slotmarks;
@@ -80,8 +84,10 @@ class combined_options extends attempts_options
         return $toform;
     }
 
-    public function setup_from_form_data($fromform)
-    {
+    /**
+     * @inheritdoc
+     */
+    public function setup_from_form_data($fromform) {
         parent::setup_from_form_data($fromform);
 
         $this->onlyregraded = !empty($fromform->onlyregraded);
@@ -92,8 +98,10 @@ class combined_options extends attempts_options
         $this->displayQuestionName = $fromform->displayQuestionName;
     }
 
-    public function setup_from_params()
-    {
+    /**
+     * @inheritdoc
+     */
+    public function setup_from_params() {
         parent::setup_from_params();
 
         $this->onlyregraded = optional_param('onlyregraded', $this->onlyregraded, PARAM_BOOL);
@@ -104,8 +112,10 @@ class combined_options extends attempts_options
         $this->displayQuestionName = optional_param('displayQuestionName', $this->displayQuestionName, PARAM_BOOL);
     }
 
-    public function setup_from_user_preferences()
-    {
+    /**
+     * @inheritdoc
+     */
+    public function setup_from_user_preferences() {
         parent::setup_from_user_preferences();
 
         $this->slotmarks = get_user_preferences('ddtaquiz_combined_slotmarks', $this->slotmarks);
@@ -115,8 +125,10 @@ class combined_options extends attempts_options
         $this->displayQuestionName = get_user_preferences('ddtaquiz_combined_displayQuestionName', $this->displayQuestionName);
     }
 
-    public function update_user_preferences()
-    {
+    /**
+     * @inheritdoc
+     */
+    public function update_user_preferences() {
         parent::update_user_preferences();
 
         set_user_preference('ddtaquiz_combined_slotmarks', $this->slotmarks);
@@ -126,8 +138,10 @@ class combined_options extends attempts_options
         get_user_preferences('ddtaquiz_combined_displayQuestionName', $this->displayQuestionName);
     }
 
-    public function resolve_dependencies()
-    {
+    /**
+     * @inheritdoc
+     */
+    public function resolve_dependencies() {
         parent::resolve_dependencies();
 
         if ($this->attempts == attempts::ENROLLED_WITHOUT) {

@@ -36,31 +36,28 @@ defined('MOODLE_INTERNAL') || die();
 class responses_table extends attempts_table {
 
     /**
-     * Constructor
-     * @param \ddtaquiz $quiz
-     * @param \context $context
-     * @param string $qmsubselect
-     * @param responses_options $options
-     * @param array $groupstudents
-     * @param array $students
-     * @param array $questions
-     * @param \moodle_url $reporturl
+     * @inheritdoc
      */
     public function __construct(\ddtaquiz $quiz, $context, $qmsubselect, responses_options $options,
-            $groupstudents, $students, $questions, $reporturl) {
+                                $groupstudents, $students, $questions, $reporturl) {
         parent::__construct('mod-ddtaquiz-report-responses', $quiz, $context,
-                $qmsubselect, $options, $groupstudents, $students, $questions, $reporturl);
+            $qmsubselect, $options, $groupstudents, $students, $questions, $reporturl);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function build_table() {
         if (!$this->rawdata) {
             return;
         }
-
         $this->strtimeformat = str_replace(',', ' ', get_string('strftimedatetime'));
         parent::build_table();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function col_sumgrades($attempt) {
         if ($attempt->state != \attempt::FINISHED) {
             return '-';
@@ -75,6 +72,9 @@ class responses_table extends attempts_table {
             $grade, array('class' => 'reviewlink'));
     }
 
+    /**
+     * @inheritdoc
+     */
     public function data_col($slot, $field, $attempt) {
         if ($attempt->usageid == 0) {
             return '-';
@@ -110,6 +110,9 @@ class responses_table extends attempts_table {
         return $this->make_review_link($summary, $attempt, $slot);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function other_cols($colname, $attempt) {
         if (preg_match('/^question(\d+)$/', $colname, $matches)) {
             return $this->data_col($matches[1], 'questionsummary', $attempt);
@@ -125,10 +128,16 @@ class responses_table extends attempts_table {
         }
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function requires_latest_steps_loaded() {
         return true;
     }
 
+    /**
+     * @inheritdoc
+     */
     protected function is_latest_step_column($column) {
         if (preg_match('/^(?:question|response|right)([0-9]+)/', $column, $matches)) {
             return $matches[1];

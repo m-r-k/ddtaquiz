@@ -41,6 +41,9 @@ class overview_options extends attempts_options {
     /** @var bool whether to show marks for each question (slot). */
     public $slotmarks = true;
 
+    /**
+     * @inheritdoc
+     */
     protected function get_url_params() {
         $params = parent::get_url_params();
         $params['mode'] = 'overview';
@@ -49,6 +52,9 @@ class overview_options extends attempts_options {
         return $params;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function get_initial_form_data() {
         $toform = parent::get_initial_form_data();
         $toform->onlyregraded = $this->onlyregraded;
@@ -57,6 +63,9 @@ class overview_options extends attempts_options {
         return $toform;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function setup_from_form_data($fromform) {
         parent::setup_from_form_data($fromform);
 
@@ -64,6 +73,9 @@ class overview_options extends attempts_options {
         $this->slotmarks    = $fromform->slotmarks;
     }
 
+    /**
+     * @inheritdoc
+     */
     public function setup_from_params() {
         parent::setup_from_params();
 
@@ -71,18 +83,27 @@ class overview_options extends attempts_options {
         $this->slotmarks    = optional_param('slotmarks', $this->slotmarks, PARAM_BOOL);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function setup_from_user_preferences() {
         parent::setup_from_user_preferences();
 
         $this->slotmarks = get_user_preferences('ddtaquiz_overview_slotmarks', $this->slotmarks);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function update_user_preferences() {
         parent::update_user_preferences();
 
         set_user_preference('ddtaquiz_overview_slotmarks', $this->slotmarks);
     }
 
+    /**
+     * @inheritdoc
+     */
     public function resolve_dependencies() {
         parent::resolve_dependencies();
 
