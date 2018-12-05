@@ -22,39 +22,18 @@
  */
 
 define(['jquery'], function($) {
-    var condition = {
-        index : 0,
-        addcondition : function(e) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            var newcondition = $('.pointsconditioncontainer').find('.conditionpart').clone(true);
-            this.index++;
-            newcondition.find('.conditionpoints').attr('name', 'conditionparts[newparts' + this.index + '][points]');
-            newcondition.find('.conditiontype').attr('name', 'conditionparts[newparts' + this.index + '][type]');
-            newcondition.find('.conditionquestion').attr('name', 'conditionparts[newparts' + this.index + '][question]');
-            newcondition.appendTo('.conditionpartslist');
-        }
-    };
     return {
 
     
         init: function() {
             $(document).ready(function(){
-                $('#addPointsConditionBtn').click(function(e){
-                    condition.addcondition(e);
+                $('#attemptNextBtn').click(function(e){
+                    $('#responseform').submit();
                 });
 
-                $('.conditionpartdelete').click(function(e) {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
-                    $(this).parents('.conditionpart').remove();
-                });
 
             });
 
-        },
-        cleanAlerts: function () {
-            $('.ddtaquiz-alerts:not(:first)').remove();
         }
     };
 });

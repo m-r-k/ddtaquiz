@@ -251,8 +251,8 @@ input[type=number].conditionelement {
     background-color: rgba(0,0,0,.2)!important;
 }
 .conditionHead{
-    background-color: #373a3c!important;
-    color:white;
+    background-color: rgba(0,0,0,.2)!important;
+    color:black;
     vertical-align: middle;
 }
 

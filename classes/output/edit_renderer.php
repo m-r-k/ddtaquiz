@@ -58,13 +58,27 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'bid', 'value' => $block->get_id()));
         $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'save', 'value' => 1));
         if ($block->is_main_block()) {
-            $output .= $this->heading(get_string('editingquizx', 'ddtaquiz', format_string($block->get_name())));
-            $output .= html_writer::empty_tag('input', array('type' => 'hidden',
+            $headingContent = $this->heading(get_string('editingquizx', 'ddtaquiz', format_string($block->get_name())));
+            $headingContent .= html_writer::empty_tag('input', array('type' => 'hidden',
                 'name' => 'blockname', 'value' => $block->get_name()));
+            $headingIcon = ''; //TODO: add icons
+            $output .= $this->heading(
+                ddtaquiz_bootstrap_render::createHeading(
+                    $headingIcon,
+                    $headingContent
+                )
+            );
         } else {
-            $namefield = html_writer::tag('input', '', array('type' => 'text',
-                'name' => 'blockname', 'value' => $block->get_name()));
-            $output .= $this->heading(get_string('editingblock', 'ddtaquiz') . ' ' . $namefield);
+            $headingContent = get_string('editingblock', 'ddtaquiz');
+            $headingContent .= html_writer::tag('input', '', array('type' => 'text',
+                'name' => 'blockname', 'value' => $block->get_name(), 'class'=>'col-3 form-control inline rounded ml-3 '));
+            $headingIcon = ''; //TODO: add icons
+            $output .= $this->heading(
+                ddtaquiz_bootstrap_render::createHeading(
+                    $headingIcon,
+                    $headingContent
+                )
+            );
         }
 
         if (!$block->is_main_block()) {
@@ -884,17 +898,20 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * TODO:
      * Render the feedback edit page.
      *
      * @param \feedback_block $block object containing all the feedback block information.
      * @param \moodle_url $pageurl The URL of the page.
      * @param array $pagevars the variables from {@link question_edit_setup()}.
      * @return string HTML to output.
+     * @throws
      */
     public function edit_feedback_page(\feedback_block $block, \moodle_url $pageurl, array $pagevars) {
         $candidates = $block->get_quiz()->get_elements();
         $output = '';
 
+        //hidden inputs
         $output .= html_writer::start_tag('form',
             array('method' => 'POST', 'id' => 'blockeditingform', 'action' => $pageurl->out()));
         $output .= html_writer::tag('input', '',
@@ -902,21 +919,35 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'bid', 'value' => $block->get_id()));
         $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'save', 'value' => 1));
 
-        $namefield = html_writer::tag('input', '', array('type' => 'text', 'name' => 'blockname', 'value' => $block->get_name()));
-        $output .= $this->heading(get_string('editingfeedback', 'ddtaquiz') . ' ' . $namefield);
+        //header
+        $headingContent = get_string('editingfeedback', 'ddtaquiz');
+        $headingContent .= html_writer::tag('input', '', array('class'=>' col-3 form-control inline rounded ml-3 ','type' => 'text', 'name' => 'blockname', 'value' => $block->get_name()));
+        $headingIcon = ''; //TODO: add icons
+        $output .= $this->heading(
+            ddtaquiz_bootstrap_render::createHeading(
+                $headingIcon,
+                $headingContent
+            )
+        );
 
+        //
         $output .= $this->uses_block($block);
 
         $output .= $this->condition_block($block->get_condition(), $candidates);
 
         $output .= $this->feedback_editor($block->get_feedback_text());
 
-        $output .= html_writer::tag('button', get_string('done', 'ddtaquiz'),
-            array('type' => 'submit', 'name' => 'done', 'value' => 1));
+        $output .=
+            html_writer::start_div('card-footer text-right').
+            html_writer::tag('button', get_string('done', 'ddtaquiz'),
+                array('class'=>'btn btn-primary card-btn','type' => 'submit', 'name' => 'done', 'value' => 1)).
+            html_writer::end_div();
+
         $output .= html_writer::end_tag('form');
 
         $output .= $this->condition_type_chooser($candidates);
-        $this->page->requires->js_call_amd('mod_ddtaquiz/blockconditions', 'init');
+
+        $this->page->requires->js_call_amd('mod_ddtaquiz/main', 'init');
 
         return $output;
     }
@@ -1009,18 +1040,26 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * TODO: done
      * Generates the HTML for the feeback text editor.
      *
      * @param string $feedbacktext the feedback text to put in at the start.
      * @return string the HTML output.
+     * @throws
      */
     public function feedback_editor($feedbacktext = '') {
         $heading = $this->heading_with_help(get_string('feedbacktext', 'ddtaquiz'), 'feedbackquestion', 'ddtaquiz');
+
         $editor = editors_get_preferred_editor();
         $editor->set_text($feedbacktext);
-        $editor->use_editor('feedbacktext');
+        $editor->use_editor('feedbacktext',[]);
         $editorhtml = \html_writer::tag('textarea', s($feedbacktext),
             array('id' => 'feedbacktext', 'name' => 'feedbacktext', 'rows' => 15, 'cols' => 80));
-        return \html_writer::div($heading . \html_writer::div($editorhtml), 'feedbackblock');
+        $body = \html_writer::div($editorhtml);
+
+        return ddtaquiz_bootstrap_render::createCard(
+            $body,
+            $heading
+        );
     }
 }

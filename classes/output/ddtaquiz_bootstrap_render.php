@@ -157,7 +157,7 @@ class ddtaquiz_bootstrap_render extends \html_writer
         return $output;
     }
 
-    public static function createAlert($type,$content){
+    public static function createAlert($type,$content): string{
         $output = '';
         $output .=
             self::start_div('alert ddtaquiz-alerts alert-'. $type.' alert-dismissible fade show',['role' => 'alert']).
@@ -166,6 +166,15 @@ class ddtaquiz_bootstrap_render extends \html_writer
                     self::span('x','',['aria-hidden'=>'true']).
                 self::end_tag('button').
             self::end_div();
+
+        return $output;
+    }
+
+    public static function createHeading($icon, $content):string {
+
+        $output = self::start_div('p-3  mt-3 align-items-center my-3 shadow-sm bg-dark rounded text-white');
+        $output .= self::tag('h3',$icon . $content);
+        $output .= self::end_div();
 
         return $output;
     }
