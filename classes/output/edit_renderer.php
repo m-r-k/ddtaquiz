@@ -175,7 +175,7 @@ class edit_renderer extends \plugin_renderer_base {
      */
     public function block_elem(\block_element $blockelem, $pageurl,$accordionId,$parentCounter , $counter, $isMain = false) {
         // constants
-        $headerId = 'block-element-'. $blockelem->get_id(). '-'.time();
+        $headerId = 'block-element-'. $blockelem->get_id(). '-'.microtime();
         $nr = \html_writer::tag('b',($parentCounter)?$parentCounter.'.'.$counter:$counter);
         $collapseId = null;
 
@@ -449,6 +449,7 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * TODO:
      * Renders the HTML for the condition block.
      *
      * @param \condition $condition the condition to be rendered.
@@ -468,16 +469,16 @@ class edit_renderer extends \plugin_renderer_base {
         // build questionCard body
         $conditionCardBody = ddtaquiz_bootstrap_render::createAccordion('condition-list',$container);
 
-        $addcondition = \html_writer::tag('div', get_string('addacondition', 'ddtaquiz'),
-            array('class' => '#', 'class' => 'addblockcondition')
-        );
+        //footer part to add condition for single question
+        $pointsConditionBtn = \html_writer::tag('button', get_string('addpointscondition', 'ddtaquiz'),
+            array('type' => 'submit','class' => 'btn btn-primary', 'id'=>'addPointsConditionBtn'));
+        //TODO: string ?
+        $mqPointsConditionBtn = \html_writer::tag('button', 'Add MQ Condition',
+            array('type' => 'submit','class' => 'btn btn-primary mr-3', 'id'=>'addMQPointsConditionBtn'));
 
         $conditionCardFooter =
-            html_writer::tag('div', $addcondition,[
-                'class'=>'float-right btn btn-dark card-btn',
-                'id' => 'addConditionBtnContainer',
-                'data-toggle'=>"modal",
-                'data-target'=>"#conditiontypechoicecontainer"
+            html_writer::tag('div', $mqPointsConditionBtn.$pointsConditionBtn,[
+                'class'=>'text-right'
                 ]
             );
 
@@ -522,14 +523,13 @@ class edit_renderer extends \plugin_renderer_base {
      * @throws
      */
     protected function condition_type_chooser($candidates) {
-        $body = \html_writer::tag('button', get_string('addpointscondition', 'ddtaquiz'),
-                array('type' => 'submit','class' => 'btn btn-primary', 'id'=>'addPointsConditionBtn'));
-        $body .=
-            \html_writer::div(\html_writer::div($this->points_condition($candidates), 'conditionpart'), 'pointsconditioncontainer');
+        $body =
+            \html_writer::div(\html_writer::div($this->points_condition($candidates), 'conditionpart'), 'pointsconditioncontainer').
+            \html_writer::div(\html_writer::div($this->mq_points_condition($candidates,'condition-list'), 'mq-conditionpart'), 'mq-pointsconditioncontainer').
 
         $header = html_writer::div(get_string('choosecondtiontypetoadd', 'ddtaquiz'), 'chooserheader hd');
 
-
+        //this modal will not be opened, it will just save the conditions templates
         return ddtaquiz_bootstrap_render::createModal(
             $header,
             $body,
@@ -539,45 +539,74 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * Renders the HTML for a condition.
-     *
-     * @param \condition $condition the condition to render.
-     * @param array $candidates the block_elements the condition can depend on.
-     * @return string the HTML of the condition.
+     * TODO: done
+     * @param \condition $condition
+     * @param $candidates
+     * @return string
+     * @throws \coding_exception
      */
     protected function condition(\condition $condition, $candidates) {
         $output = '';
         foreach ($condition->get_parts() as $part) {
             $output .= $this->condition_part($candidates, $part);
         }
+
+        foreach ($condition->get_mqParts() as $part) {
+            $output .= $this->condition_mq_part($candidates, $part);
+        }
         return $output;
     }
 
     /**
-     * Renders the HTML for a condition part.
-     *
-     * @param array $candidates the block_elements the condition can depend on.
-     * @param \condition_part $part the part of the condition to render.
-     * @return string the HTML of the condition part.
+     * TODO: done
+     * @param $candidates
+     * @param $part
+     * @return string
      */
-    protected function condition_part($candidates, \condition_part $part) {
+    protected function condition_part($candidates, $part) {
         static $index = 0;
         $index += 1;
         $conditionpart = '';
+
         switch ($part->get_type()) {
             case \condition_part::WAS_DISPLAYED:
                 break;
             default:
                 $conditionpart = $this->points_condition($candidates, 'part' . $index, $part);
         }
+
         $conditionpart .= \html_writer::tag('input', '',
             array('class' => 'conditionid', 'name' => 'conditionparts[part' . $index . '][id]', 'value' => $part->get_id()));
+
         return \html_writer::div($conditionpart, 'conditionpart');
     }
 
+    /**
+     * TODO: done
+     * @param $candidates
+     * @param $part
+     * @return string
+     * @throws \coding_exception
+     */
+    protected function condition_mq_part($candidates, $part) {
+        static $mqIndex = 0;
+        $mqIndex += 1;
+        $conditionpart = '';
+        switch ($part->get_type()) {
+            case \condition_part::WAS_DISPLAYED:
+                break;
+            default:
+                $conditionpart = $this->mq_points_condition($candidates, 'condition-list','part' . $mqIndex, $part);
+        }
+
+        $conditionpart .= \html_writer::tag('input', '',
+            array('class' => 'conditionid', 'name' => 'conditionMQParts[part' . $mqIndex . '][id]', 'value' => $part->get_id()));
+
+        return \html_writer::div($conditionpart, 'mq-conditionpart');
+    }
 
     /**
-     * TODO:
+     * TODO: done
      * Renders the HTML for the condition over question points.
      *
      * @param array $candidates the block_elements the condition can depend on.
@@ -618,8 +647,7 @@ class edit_renderer extends \plugin_renderer_base {
         $image = $this->pix_icon('t/delete', $strdelete);
         $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
             'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger float-right', 'data-action' => 'delete'));
-//        $conditionspan = \html_writer::span($condition, 'conditionspan');
-//        $conditiondiv = \html_writer::div($conditionspan, 'pointscondition');
+
         return ddtaquiz_bootstrap_render::createAccordionHeader(
             $preContent,
             $content,
@@ -627,6 +655,65 @@ class edit_renderer extends \plugin_renderer_base {
         );
     }
 
+    /**
+     * TODO: done
+     * @param $candidates
+     * @param $accordionId
+     * @param string $mqIndex
+     * @param \multiquestions_condition_part|null $part
+     * @return string
+     * @throws \coding_exception
+     */
+    protected function mq_points_condition($candidates, $accordionId, $mqIndex = '', ?\multiquestions_condition_part $part = null) {
+        //If no candidate is available display a warning
+        if(count($candidates)==0)
+        {
+
+            $this->page->requires->js_call_amd('mod_ddtaquiz/main', 'cleanAlerts');
+            $content = \html_writer::tag('label', get_string('noCandidatesForCondition', 'ddtaquiz'));
+            return ddtaquiz_bootstrap_render::createAlert('danger',$content);
+        }
+
+        //TODO: string add
+        $preContent = \html_writer::tag('label', 'Grade of all ',
+            array('class' => 'conditionelement'));
+
+        $content = \html_writer::link('#', 'Selected Questions',
+            array('class' => 'conditionelement', ));
+
+        $postContent = ' ' . \html_writer::tag('label', get_string('mustbe', 'ddtaquiz'),
+                array('class' => 'conditionelement'));
+
+
+        $postContent .= \html_writer::tag('span', $this->comparator_mq_selector($mqIndex, $part));
+        $value = 0;
+        if ($part) {
+            $value = $part->get_grade();
+        }
+        $postContent .= ' ' . \html_writer::tag('input', '',
+                array('class' => 'conditionelement conditionpoints form-control inline', 'name' => 'conditionMQParts[' . $mqIndex . '][points]',
+                    'type' => 'number', 'value' => $value));
+
+
+        $strdelete = get_string('delete');
+        $image = $this->pix_icon('t/delete', $strdelete);
+        $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
+            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger float-right', 'data-action' => 'delete'));
+
+        $collapseId = 'mq-collapse-'. $mqIndex.'-'.microtime();
+        $headingId = 'mq-heading-'.$mqIndex.'-'.microtime();
+        return
+            ddtaquiz_bootstrap_render::createAccordionHeader(
+                $preContent,
+                $content,
+                $postContent,
+                ['id'=>$headingId],
+                $collapseId
+            ).
+            ddtaquiz_bootstrap_render::createAccordionCollapsible($collapseId,$headingId,$accordionId,
+                $this->mq_question_checkboxes($candidates,$mqIndex,$part)
+            );
+    }
     /**
      * Renders the HTML for a dropdownbox of all questions, that this block can have conditions on.
      *
@@ -649,6 +736,29 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * TODO: done
+     * @param $candidates
+     * @param $mqIndex
+     * @param $part
+     * @return string
+     */
+    protected function mq_question_checkboxes($candidates, $mqIndex, ?\multiquestions_condition_part $part = null) {
+        $elements = [];
+        foreach ($candidates as $question) {
+            $element['id'] =  $question->get_id();
+            if ($part && in_array($question->get_id(),$part->get_elements())) {
+                $element['checked'] = '';
+            }else{
+                unset($element['checked']);
+            }
+            $element['name']  = $question->get_name();
+            $elements[] = $element;
+        }
+        return ddtaquiz_bootstrap_render::createMQCheckBoxes($elements, ['name' => 'conditionMQParts[' . $mqIndex . '][questions]']);
+    }
+
+
+    /**
      * Renders the HTML for a dropdownbox of all comparators that can be used in conditions.
      *
      * @param string $index the index into the conditionparts array for this condition.
@@ -656,6 +766,29 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string the HTML of the dropdownbox.
      */
     protected function comparator_selector($index, $part = null) {
+        $options = $this->comparator_attributes($part);
+        return \html_writer::tag('select', $options,
+            array('class' => 'conditiontype custom-select', 'name' => 'conditionparts[' . $index . '][type]'));
+    }
+
+    /**
+     * TODO:done
+     * @param $mqIndex
+     * @param null $part
+     * @return string
+     */
+    protected function comparator_mq_selector($mqIndex, $part = null) {
+        $options = $this->comparator_attributes($part);
+        return \html_writer::tag('select', $options,
+            array('class' => 'conditiontype custom-select', 'name' => 'conditionMQParts[' . $mqIndex . '][type]'));
+    }
+
+    /**
+     * TODO:done
+     * @param null $part
+     * @return string
+     */
+    private function comparator_attributes($part = null){
         if ($part) {
             $attributes = array();
             $attributes[\condition_part::LESS] = array('value' => \condition_part::LESS);
@@ -681,8 +814,8 @@ class edit_renderer extends \plugin_renderer_base {
             $options .= \html_writer::tag('option', '=', array('value' => \condition_part::EQUAL));
             $options .= \html_writer::tag('option', '&ne;', array('value' => \condition_part::NOT_EQUAL));
         }
-        return \html_writer::tag('select', $options,
-            array('class' => 'conditiontype custom-select', 'name' => 'conditionparts[' . $index . '][type]'));
+
+        return $options;
     }
 
     /**
@@ -870,7 +1003,7 @@ class edit_renderer extends \plugin_renderer_base {
      */
     public function feedback_block_elem(\feedback_block $feedbackelem, $pageurl,$counter) {
         // constants
-        $headerId = 'feedback-element-'. $feedbackelem->get_id(). '-'.time();
+        $headerId = 'feedback-element-'. $feedbackelem->get_id(). '-'.microtime();
         $nr = \html_writer::tag('b',$counter);
 
         // elements
