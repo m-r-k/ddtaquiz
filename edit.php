@@ -67,7 +67,11 @@ if ($save) {
 
     // Save the condition.
     if (array_key_exists('conditionparts', $_POST)) {
-        $block->get_condition()->update($_POST['conditionparts']);
+        $block->get_condition()->updateSingleParts($_POST['conditionparts']);
+    }
+    if (array_key_exists('conditionMQParts', $_POST)) {
+
+        $block->get_condition()->updateMQParts($_POST['conditionMQParts']);
     }
     $useand = optional_param('use_and', null, PARAM_INT);
     if (!is_null($useand)) {
