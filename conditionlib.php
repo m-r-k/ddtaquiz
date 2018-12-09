@@ -37,6 +37,8 @@ class condition {
     protected $id = 0;
     /** @var array the parts this condition is made from. */
     protected $parts = null;
+    /** @var null  */
+    protected $mqParts = null;
     /** @var bool whether the parts are connected with and. Otherwise they are connected with or. */
     protected $useand = true;
 
@@ -48,9 +50,10 @@ class condition {
      * @param array $parts the parts this condition is made from.
      * @param bool $useand whether the parts are connected with and. Otherwise they are connected with or.
      */
-    public function __construct($id, $parts, $useand) {
+    public function __construct($id, $parts,$mqParts, $useand) {
         $this->id = $id;
         $this->parts = $parts;
+        $this->mqParts = $mqParts;
         $this->useand = $useand;
     }
 
@@ -67,15 +70,33 @@ class condition {
             $useand = $DB->get_field('ddtaquiz_condition', 'useand', array('id' => $id), MUST_EXIST);
 
             $parts = $DB->get_records('ddtaquiz_condition_part', array('conditionid' => $id));
-            $partobjs = array_map(function($part) {
-                return new condition_part($part->id, $part->type, $part->on_qinstance, $part->grade);
-            },
-            array_values($parts));
+            $mqParts = $DB->get_records('ddtaquiz_mq_condition_part', array('conditionid' => $id));
+            $partobjs = array_map(
+                function($part) {
+                    return new condition_part($part->id, $part->type, $part->on_qinstance, $part->grade);
+                },
+                array_values($parts)
+            );
+            $mqPartobjs = array_map(
+                function($part) {
+                    global $DB;
+                    $elements = $DB->get_records('ddtaquiz_mq_questions', array('condition_id' => $part->id));
+                    $elements = array_map(
+                        function($element) {
+                            return $element->question_id;
+                        },
+                        array_values($elements)
+                    );
+                    return new \multiquestions_condition_part($part->id, $part->type, $elements, $part->grade);
+                },
+                array_values($mqParts)
+            );
         } else {
             $partobjs = array();
+            $mqPartobjs = array();
             $useand = true;
         }
-        return new condition($id, $partobjs, $useand);
+        return new condition($id, $partobjs,$mqPartobjs, $useand);
     }
 
     /**
@@ -91,7 +112,7 @@ class condition {
 
         $id = $DB->insert_record('ddtaquiz_condition', $record);
 
-        return new condition($id, array(), $record->useand);
+        return new condition($id, [], [], $record->useand);
     }
 
     /**
@@ -104,6 +125,17 @@ class condition {
     public function add_part($type, $elementid, $grade) {
         $part = condition_part::create($this, $type, $elementid, $grade);
         array_push($this->parts, $part);
+    }
+
+    /**
+     * @param $type
+     * @param $elements
+     * @param $grade
+     * @throws dml_exception
+     */
+    public function add_multiquestions_part($type, $elements, $grade){
+        $part = multiquestions_condition_part::create($this, $type, $elements, $grade);
+        array_push($this->mqParts, $part);
     }
 
     /**
@@ -177,11 +209,18 @@ class condition {
     }
 
     /**
+     * @return null
+     */
+    public function get_mqParts() {
+        return $this->mqParts;
+    }
+
+    /**
      * Updates the condition using the submitted array.
      *
      * @param array $conditionparts the array from the form.
      */
-    public function update($conditionparts) {
+    public function updateSingleParts($conditionparts) {
         foreach ($this->parts as $existingpart) {
             $deleted = true;
             foreach ($conditionparts as $part) {
@@ -206,6 +245,46 @@ class condition {
                 }
             } else { // Insert new condition parts.
                 $this->add_part($part['type'], $part['question'], $part['points']);
+            }
+        }
+    }
+
+    /**
+     * Updates MultiQuestions Parts only
+     * @param $conditionparts
+     * @throws dml_exception
+     */
+    public function updateMQParts($conditionparts) {
+        /** @var multiquestions_condition_part $existingpart */
+        foreach ($this->mqParts as $existingpart) {
+            //if some part was deleted remove it from database
+            $deleted = true;
+            foreach ($conditionparts as $part) {
+                if (array_key_exists('id', $part) && $part['id'] == $existingpart->get_id()) {
+                    $deleted = false;
+                    break;
+                }
+            }
+            if ($deleted) {
+                global $DB;
+                //delete condition questions firstly so conflicts, from foreign keys, can be avoided
+                $DB->delete_records('ddtaquiz_mq_questions', array('condition_id' => $existingpart->get_id()));
+                // after we delete the condition part
+                $DB->delete_records('ddtaquiz_mq_condition_part', array('id' => $existingpart->get_id()));
+            }
+        }
+        foreach ($conditionparts as $part) {
+            // Update existing condition parts.
+            if (array_key_exists('id', $part)) {
+                /** @var multiquestions_condition_part $existingpart */
+                foreach ($this->mqParts as $existingpart) {
+                    if ($existingpart->get_id() == $part['id']) {
+                        $existingpart->update($part['type'], $part['questions'], $part['points']);
+                        break;
+                    }
+                }
+            } else { // Insert new condition parts.
+                $this->add_multiquestions_part($part['type'], $part['questions'], $part['points']);
             }
         }
     }
@@ -379,5 +458,192 @@ class condition_part {
 
             $DB->update_record('ddtaquiz_condition_part', $record);
         }
+    }
+}
+
+class multiquestions_condition_part {
+    // Block_condition type.
+    /** */
+    const WAS_DISPLAYED     = 0;
+    /** condition that student has less points than a set amount */
+    const LESS              = 1;
+    /** condition that student has less or more points than a set amount */
+    const LESS_OR_EQUAL     = 2;
+    /** condition that student has more points than a set amount */
+    const GREATER           = 3;
+    /** condition that student has more or the same points than a set amount */
+    const GREATER_OR_EQUAL  = 4;
+    /** condition that student has the same points than a set amount */
+    const EQUAL             = 5;
+    /** condition that student has not the same points than a set amount */
+    const NOT_EQUAL         = 6;
+
+    /** @var int the id of the block_condition. */
+    protected $id = 0;
+    /**
+     * @var int the type of the block_condition. One of WAS_DISPLAYED, LESS, LESS_OR_EQUAL,
+     * GREATER, GREATER_OR_EQUAL or EQUAL.
+     */
+    protected $type = 0;
+    /** @var array the ids of the elements this condition references. */
+    protected $elements = [];
+    /** @var int the grade this condition is relative to. */
+    protected $grade = 0;
+
+    // Constructor =============================================================
+
+    /**
+     * multiquestions_condition_part constructor.
+     * @param $id
+     * @param $type
+     * @param $elements
+     * @param $grade
+     */
+    public function __construct($id, $type, $elements, $grade) {
+        $this->id = $id;
+        $this->type = $type;
+        $this->elements = $elements;
+        $this->grade = $grade;
+    }
+
+    /**
+     * @param condition $condition
+     * @param $type
+     * @param $elements
+     * @param $grade
+     * @return multiquestions_condition_part
+     * @throws dml_exception
+     */
+    public static function create(condition $condition, $type, $elements, $grade) {
+        global $DB;
+
+        // conditions of this type consists of id, type and grade
+        $record = new stdClass();
+        $record->conditionid = $condition->get_id();
+        $record->type = $type;
+        $record->grade = $grade;
+
+        // the id returned when its inserted into database, will be used for relation tables
+        $partId = $DB->insert_record('ddtaquiz_mq_condition_part', $record);
+        foreach ($elements as $id){
+            // questions consists of conditon id they are related to, and id of the question
+            $record = new stdClass();
+            $record->condition_id = $partId;
+            $record->question_id = $id;
+            $DB->insert_record('ddtaquiz_mq_questions', $record);
+         }
+
+        return new multiquestions_condition_part($partId, $type, $elements, $grade);
+    }
+
+    /**
+     * @param attempt $attempt
+     * @return bool
+     */
+    public function is_fullfilled(attempt $attempt) {
+        // total grade of questions of interest
+        $achievedGrade = 0;
+        foreach ($this->elements as $questionId){
+            $referencedElement = block_element::load($attempt->get_quiz(), $questionId);
+            if (is_null($referencedElement)) {
+                continue;
+            }
+            $achievedGrade += $referencedElement->get_grade($attempt);
+        }
+
+        // basing on type return if the condition is fullfilled
+        switch ($this->type) {
+            case self::LESS:
+                return $achievedGrade < $this->grade;
+            case self::LESS_OR_EQUAL:
+                return $achievedGrade <= $this->grade;
+            case self::GREATER:
+                return $achievedGrade > $this->grade;
+            case self::GREATER_OR_EQUAL:
+                return $achievedGrade >= $this->grade;
+            case self::EQUAL:
+                return $achievedGrade == $this->grade;
+            case self::NOT_EQUAL:
+                return $achievedGrade != $this->grade;
+            default:
+                debugging('Unsupported condition part type: ' . $this->type);
+                return true;
+        }
+    }
+
+    /**
+     * @return int
+     */
+    public function get_id() {
+        return $this->id;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_type() {
+        return $this->type;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_grade() {
+        return $this->grade;
+    }
+
+    /**
+     * @return array
+     */
+    public function get_elements() {
+        return $this->elements;
+    }
+
+    /**
+     * @param $type
+     * @param $elements
+     * @param $grade
+     * @throws dml_exception
+     */
+    public function update($type, $elements, $grade) {
+        global $DB;
+        // if type or grade has changed update condition
+        if ($this->type != $type || $this->grade != $grade) {
+
+            $this->type = $type;
+            $this->grade = $grade;
+
+            $record = new stdClass();
+            $record->id = $this->id;
+            $record->type = $this->type;
+            $record->grade = $this->grade;
+
+            $DB->update_record('ddtaquiz_mq_condition_part', $record);
+        }
+
+        // for each question
+        $currentElements = $this->get_elements();
+        foreach ($elements as $elementId) {
+            $record = new stdClass();
+            $record->condition_id = $this->id;
+            $record->question_id = $elementId;
+            //if new , add to database
+            if(!in_array($elementId,$currentElements)){
+                $id = $DB->insert_record('ddtaquiz_mq_questions', $record);
+            }else{
+                // if not new remove from array, so it will not be deleted
+                unset($currentElements[array_search($elementId,$currentElements)]);
+            }
+        }
+        // what is left in array, must have been deselected, so it has to be removed from database
+        if(isset($currentElements)){
+            foreach ($currentElements as $elementId){
+                $DB->delete_records('ddtaquiz_mq_questions', [
+                    'question_id'=>$elementId,
+                    'condition_id' => $this->id]);
+            }
+
+        }
+
     }
 }
