@@ -178,4 +178,34 @@ class ddtaquiz_bootstrap_render extends \html_writer
 
         return $output;
     }
+
+    public static function createMQCheckBoxes($elements,$attr):string {
+
+        $output = self::start_div('custom-control custom-checkbox');
+        foreach ($elements as $element){
+            $id = 'mq-checkbox-'. $element['id'].'-'.microtime();
+            $checkboxAttr = [
+                'type'=>'checkbox',
+                'class'=>'custom-control-input',
+                'name'=> $attr['name'].'['.$element['id'].']',
+                'value'=> $element['id'],
+                'id' => $id
+            ];
+            if(key_exists('checked',$element))
+                $checkboxAttr['checked'] = '';
+
+            $output .=
+                self::start_div('col-6 pl-4').
+                self::tag('input','',$checkboxAttr
+                ).
+                self::tag('label',$element['name'],[
+                    'class'=>"custom-control-label",
+                    'for'=>$id
+                ]).
+                self::end_div();
+        }
+        $output .= self::end_div();
+
+        return $output;
+    }
 }
