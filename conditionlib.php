@@ -146,14 +146,14 @@ class condition {
      */
     public function is_fullfilled($attempt) {
         if ($this->useand) {
-            foreach ($this->parts as $part) {
+            foreach (array_merge($this->parts,$this->mqParts) as $part) {
                 if (!$part->is_fullfilled($attempt)) {
                     return false;
                 }
             }
             return true;
         } else {
-            foreach ($this->parts as $part) {
+            foreach (array_merge($this->parts,$this->mqParts) as $part) {
                 if ($part->is_fullfilled($attempt)) {
                     return true;
                 }
