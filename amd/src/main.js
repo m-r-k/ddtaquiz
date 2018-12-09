@@ -23,15 +23,43 @@
 
 define(['jquery'], function($) {
     var condition = {
-        index : 0,
+        singleConditionIndex : 0,
+        mqConditionIndex : 0,
         addcondition : function(e) {
             e.preventDefault();
             e.stopImmediatePropagation();
             var newcondition = $('.pointsconditioncontainer').find('.conditionpart').clone(true);
-            this.index++;
-            newcondition.find('.conditionpoints').attr('name', 'conditionparts[newparts' + this.index + '][points]');
-            newcondition.find('.conditiontype').attr('name', 'conditionparts[newparts' + this.index + '][type]');
-            newcondition.find('.conditionquestion').attr('name', 'conditionparts[newparts' + this.index + '][question]');
+            this.singleConditionIndex++;
+            newcondition.find('.conditionpoints').attr('name', 'conditionparts[newparts' + this.singleConditionIndex + '][points]');
+            newcondition.find('.conditiontype').attr('name', 'conditionparts[newparts' + this.singleConditionIndex + '][type]');
+            newcondition.find('.conditionquestion').attr('name', 'conditionparts[newparts' + this.singleConditionIndex + '][question]');
+            newcondition.appendTo('.conditionpartslist');
+        },
+        addMQCondition : function(e) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            var newcondition = $('.mq-pointsconditioncontainer').find('.mq-conditionpart').clone(true);
+            var index = ++this.mqConditionIndex;
+            var headingId = 'mq-heading-newpart'+index+'-'+$.now();
+            var collapseId = 'mq-collapse-newpart'+index+'-'+$.now();
+            newcondition.find('.card-header').first().attr('id',headingId);
+            newcondition.find('.collapse').first().attr({
+                'id' : collapseId,
+                'aria-labelledby':headingId,
+            });
+            newcondition.find('span[data-toggle="collapse"]').first().attr({
+                'data-target':"#" + collapseId,
+                'aria-controls':collapseId
+            });
+            newcondition.find('.conditionpoints').attr('name', 'conditionMQParts[newparts' + index + '][points]');
+            newcondition.find('.conditiontype').attr('name', 'conditionMQParts[newparts' + index + '][type]');
+            newcondition.find('.custom-control-input').each(function(){
+                var id = 'mq-checkbox-'+$(this).val()+'-'+ $.now();
+                newcondition.find("label[for='"+$(this).attr('id')+"']").attr('for',id);
+                $(this).attr('name', 'conditionMQParts[newparts' + index + '][questions]['+$(this).val()+']');
+                $(this).attr('id', id);
+            });
+
             newcondition.appendTo('.conditionpartslist');
         }
     };
@@ -43,11 +71,15 @@ define(['jquery'], function($) {
                 $('#addPointsConditionBtn').click(function(e){
                     condition.addcondition(e);
                 });
+                $('#addMQPointsConditionBtn').click(function(e){
+                    condition.addMQCondition(e);
+                });
 
                 $('.conditionpartdelete').click(function(e) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     $(this).parents('.conditionpart').remove();
+                    $(this).parents('.mq-conditionpart').remove();
                 });
 
             });
