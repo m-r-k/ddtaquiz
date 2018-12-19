@@ -746,7 +746,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param $part
      * @return string
      */
-    protected function mq_question_checkboxes($candidates, $mqIndex, ?\multiquestions_condition_part $part = null) {
+    protected function mq_question_checkboxes($candidates, $mqIndex, \multiquestions_condition_part $part = null) {
         $elements = [];
         foreach ($candidates as $question) {
             $element['id'] =  $question->get_id();
