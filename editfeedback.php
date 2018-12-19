@@ -54,15 +54,19 @@ if (optional_param('save', 0, PARAM_INT)) {
     $feedbackblock->update($name, $feedbacktext, $uses);
 
     // Condition.
-    if (array_key_exists('conditionparts', $_POST)) {
-        $feedbackblock->get_condition()->updateSingleParts($_POST['conditionparts']);
-    }
-    if (array_key_exists('conditionMQParts', $_POST)) {
-        $feedbackblock->get_condition()->updateMQParts($_POST['conditionMQParts']);
-    }
-    $useand = optional_param('use_and', null, PARAM_INT);
-    if (!is_null($useand)) {
-        $feedbackblock->get_condition()->set_use_and($useand);
+    try{
+        if (array_key_exists('conditionparts', $_POST)) {
+            $feedbackblock->get_condition()->updateSingleParts($_POST['conditionparts']);
+        }
+        if (array_key_exists('conditionMQParts', $_POST)) {
+            $feedbackblock->get_condition()->updateMQParts($_POST['conditionMQParts']);
+        }
+        $useand = optional_param('use_and', null, PARAM_INT);
+        if (!is_null($useand)) {
+            $feedbackblock->get_condition()->set_use_and($useand);
+        }
+    }catch(Exception $e){
+        $_SESSION['edit-error'] .= \mod_ddtaquiz\output\ddtaquiz_bootstrap_render::createAlert('danger',$e->getMessage());
     }
     if (optional_param('done', 0, PARAM_INT)) {
         $nexturl = new moodle_url('/mod/ddtaquiz/edit.php', array('cmid' => $cmid));
@@ -77,6 +81,6 @@ $output = $PAGE->get_renderer('mod_ddtaquiz', 'edit');
 
 echo $OUTPUT->header();
 
-echo $output->edit_feedback_page($feedbackblock, $thispageurl, $pagevars);
-
+echo $output->edit_feedback_page($_SESSION['edit-error'], $feedbackblock, $thispageurl, $pagevars);
+$_SESSION['edit-error'] = '';
 echo $OUTPUT->footer();

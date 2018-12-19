@@ -216,9 +216,9 @@ class condition {
     }
 
     /**
-     * Updates the condition using the submitted array.
-     *
-     * @param array $conditionparts the array from the form.
+     * @param $conditionparts
+     * @throws Exception
+     * @throws dml_exception
      */
     public function updateSingleParts($conditionparts) {
         foreach ($this->parts as $existingpart) {
@@ -243,15 +243,15 @@ class condition {
                         break;
                     }
                 }
-            } else { // Insert new condition parts.
+            } else {
                 $this->add_part($part['type'], $part['question'], $part['points']);
             }
         }
     }
 
     /**
-     * Updates MultiQuestions Parts only
      * @param $conditionparts
+     * @throws Exception
      * @throws dml_exception
      */
     public function updateMQParts($conditionparts) {
@@ -274,8 +274,12 @@ class condition {
             }
         }
         foreach ($conditionparts as $part) {
+            if(!array_key_exists('questions',$part))
+                throw new Exception('You must select at least one question, before adding condition!');
+
             // Update existing condition parts.
             if (array_key_exists('id', $part)) {
+                // Insert new condition parts.
                 /** @var multiquestions_condition_part $existingpart */
                 foreach ($this->mqParts as $existingpart) {
                     if ($existingpart->get_id() == $part['id']) {

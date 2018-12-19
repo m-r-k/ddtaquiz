@@ -47,7 +47,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string HTML to output.
      * @throws
      */
-    public function edit_page(\block $block, \moodle_url $pageurl, array $pagevars, $feedback) {
+    public function edit_page($errorOutput, \block $block, \moodle_url $pageurl, array $pagevars, $feedback) {
         $output = '';
 
         /********************** Initializing  *****************************************/
@@ -80,6 +80,10 @@ class edit_renderer extends \plugin_renderer_base {
                 )
             );
         }
+        /************************ Output error ******************/
+        $output .= html_writer::div($errorOutput,'errors');
+
+
 
         if (!$block->is_main_block()) {
             if (!$block->get_quiz()->has_attempts()) {
@@ -1031,16 +1035,14 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO:
-     * Render the feedback edit page.
-     *
-     * @param \feedback_block $block object containing all the feedback block information.
-     * @param \moodle_url $pageurl The URL of the page.
-     * @param array $pagevars the variables from {@link question_edit_setup()}.
-     * @return string HTML to output.
-     * @throws
+     * @param $errorOutput
+     * @param \feedback_block $block
+     * @param \moodle_url $pageurl
+     * @param array $pagevars
+     * @return string
+     * @throws \coding_exception
      */
-    public function edit_feedback_page(\feedback_block $block, \moodle_url $pageurl, array $pagevars) {
+    public function edit_feedback_page($errorOutput, \feedback_block $block, \moodle_url $pageurl, array $pagevars) {
         $candidates = $block->get_quiz()->get_elements();
         $output = '';
 
@@ -1062,6 +1064,8 @@ class edit_renderer extends \plugin_renderer_base {
                 $headingContent
             )
         );
+
+        $output .= html_writer::div($errorOutput,'errors');
 
         //
         $output .= $this->uses_block($block);
@@ -1098,12 +1102,10 @@ class edit_renderer extends \plugin_renderer_base {
         foreach ($block->get_used_question_instances() as $instance) {
             $body .= $this->uses_element($block, $instance);
         }
-        $body .=
-            \html_writer::div($this->uses_element($block), 'usesquestioncontainer').
-            \html_writer::end_div();
+        $body .= html_writer::end_div();
         $footer = \html_writer::tag('button', get_string('addusedquestion', 'ddtaquiz'), array('class' => 'addusedquestion btn btn-dark float-right card-btn'));
-
-       // $output .= ;
+        $footer .=
+            \html_writer::div($this->uses_element($block), 'usesquestioncontainer',['hidden'=>'true']);
 
         $this->page->requires->js_call_amd('mod_ddtaquiz/feedback', 'init');
         return ddtaquiz_bootstrap_render::createCard(
