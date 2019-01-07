@@ -409,7 +409,9 @@ class block {
         }
 
         $questions = $this->quiz->get_questions();
-        $count = $this->quiz->get_slot_for_element($thisblockelement->get_id());
+        //slot for element return the current slot for the block, this means that the number of previous questions is
+        // block slot - 1
+        $count = $this->quiz->get_slot_for_element($thisblockelement->get_id()) - 1;
         return array_slice($questions, 0, $count, true);
     }
 
