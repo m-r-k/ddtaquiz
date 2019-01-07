@@ -67,6 +67,10 @@ if ($save) {
     $name = required_param('blockname', PARAM_TEXT);
     $block->set_name($name);
 
+    if($block->is_main_block())
+        $block->get_quiz()->update_name($name);
+
+
     // Save the condition.
     try{
         if (array_key_exists('conditionparts', $_POST)) {
