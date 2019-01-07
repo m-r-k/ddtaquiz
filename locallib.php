@@ -88,6 +88,22 @@ class ddtaquiz {
     }
 
     /**
+     * Updates quiz name
+     * @param string $name
+     * @throws Exception
+     * @throws dml_exception
+     */
+    public function update_name(string $name){
+        if(empty($name))
+            throw new Exception('Quiz name cannot be empty');
+        global $DB;
+
+        $quiz = $DB->get_record('ddtaquiz', array('id' => $this->id), '*', MUST_EXIST);
+        $quiz->name = $name;
+
+        $DB->update_record('ddtaquiz', $quiz);
+    }
+    /**
      * Get the main block of the quiz.
      *
      * @return block the main block of the quiz.
