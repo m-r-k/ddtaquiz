@@ -58,9 +58,9 @@ class edit_renderer extends \plugin_renderer_base {
         $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'bid', 'value' => $block->get_id()));
         $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'save', 'value' => 1));
         if ($block->is_main_block()) {
-            $headingContent = $this->heading(get_string('editingquizx', 'ddtaquiz', format_string($block->get_name())));
-            $headingContent .= html_writer::empty_tag('input', array('type' => 'hidden',
-                'name' => 'blockname', 'value' => $block->get_name()));
+            $headingContent = get_string('editingquizx', 'ddtaquiz', format_string($block->get_name()));
+            $headingContent .= html_writer::tag('input', '', array('type' => 'text',
+                'name' => 'blockname', 'value' => $block->get_name(), 'class'=>'col-3 form-control inline rounded ml-3 '));
             $headingIcon = ''; //TODO: add icons
             $output .= $this->heading(
                 ddtaquiz_bootstrap_render::createHeading(
