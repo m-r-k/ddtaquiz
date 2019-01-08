@@ -63,16 +63,18 @@ $feedback = feedback::get_feedback($ddtaquiz);
 $errorOutput = '';
 
 if ($save) {
-    // Save the name.
-    $name = required_param('blockname', PARAM_TEXT);
-    $block->set_name($name);
 
-    if($block->is_main_block())
-        $block->get_quiz()->update_name($name);
-
-
-    // Save the condition.
     try{
+
+        // Save the name.
+        $name = required_param('blockname', PARAM_TEXT);
+        $block->set_name($name);
+
+        if($block->is_main_block())
+            $block->get_quiz()->update_name($name);
+
+
+        // Save the condition.
         if (array_key_exists('conditionparts', $_POST)) {
             $block->get_condition()->updateSingleParts($_POST['conditionparts']);
         }else{
