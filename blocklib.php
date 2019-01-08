@@ -146,7 +146,11 @@ class block {
      *
      * @param string $name new name of the block.
      */
-    public function set_name($name) {
+    public function set_name(string $name) {
+
+        if(empty($name))
+            throw new Exception('Block name cannot be empty');
+
         global $DB;
 
         $this->name = $name;
