@@ -274,7 +274,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
 
         $body .= html_writer::start_tag('div');
 
-        $body .= $attempt->get_quba()->render_question($slot, $options);
+        $body .=
+            $attempt->get_quba()->render_question($slot, $options);
 
         // Some hidden fields to track what is going on.
         $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'attempt',
