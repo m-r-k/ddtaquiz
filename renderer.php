@@ -24,7 +24,6 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
-
 use mod_ddtaquiz\output\ddtaquiz_bootstrap_render;
 /**
  * The renderer for the ddtaquiz module.
@@ -257,7 +256,6 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      *
      */
     public function attempt_page(attempt $attempt, $slot, $options, $cmid) {
-
         $processurl = new \moodle_url('/mod/ddtaquiz/processslot.php');
         // The progress bar.
         $progress = floor(($slot - 1) * 100 / $attempt->get_quiz()->get_slotcount());
@@ -275,6 +273,14 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
         $body .= html_writer::start_tag('div');
 
         $body .= $attempt->get_quba()->render_question($slot, $options);
+
+        //block for direct feedback
+        $body .= html_writer::start_div('',array('id'=>'directFeedbackID'));
+        $directFeedbackHeader = \html_writer::tag('h3', get_string('directFeedBackHeader', 'ddtaquiz'), array('class' => 'questionheader'));
+        //TODO: FIX Body
+        $directFeedbackBody='Body';
+        $body .= ddtaquiz_bootstrap_render::createCard($directFeedbackBody,$directFeedbackHeader);
+        $body .= html_writer::end_div();
 
         // Some hidden fields to track what is going on.
         $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'attempt',
