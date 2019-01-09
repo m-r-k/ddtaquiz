@@ -50,6 +50,9 @@ class ddtaquiz {
     protected $mainblockid = 0;
     /** @var int the method used for grading. 0: one attempt, 1: best attempt, 2: last attempt */
     protected $grademethod = 0;
+
+    /** @var int if to display grades to user or not */
+    protected $showgrade = 1;
     /** @var int the total sum of the max grades of the main questions instances
      * (that is without any questions inside blocks) in the ddta quiz */
     protected $maxgrade = 0;
@@ -63,13 +66,14 @@ class ddtaquiz {
      * @param int $grademethod the method used for grading.
      * @param int $maxgrade the best attainable grade of this quiz.
      */
-    public function __construct($id, $cmid, $mainblockid, $grademethod, $maxgrade) {
+    public function __construct($id, $cmid, $mainblockid, $grademethod, $maxgrade, $showgrade) {
         $this->id = $id;
         $this->cmid = $cmid;
         $this->mainblock = null;
         $this->mainblockid = $mainblockid;
         $this->grademethod = $grademethod;
         $this->maxgrade = $maxgrade;
+        $this->showgrade = $showgrade;
     }
 
     /**
@@ -84,7 +88,7 @@ class ddtaquiz {
         $quiz = $DB->get_record('ddtaquiz', array('id' => $quizid), '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('ddtaquiz', $quizid, $quiz->course, false, MUST_EXIST);
 
-        return new ddtaquiz($quizid, $cm->id, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade);
+        return new ddtaquiz($quizid, $cm->id, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade,$quiz->showgrade);
     }
 
     /**
@@ -358,5 +362,13 @@ class ddtaquiz {
      */
     public function multiple_attempts_allowed() {
         return $this->grademethod == 1 || $this->grademethod == 2;
+    }
+
+    /**
+     * Returns true if grades are to be shown to user, false otherwise
+     * @return bool
+     */
+    public function show_grades():bool{
+        return $this->showgrade == 1;
     }
 }

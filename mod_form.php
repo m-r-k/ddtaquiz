@@ -78,6 +78,16 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
         $mform->addElement('select', 'grademethod', get_string('grademethod', 'ddtaquiz'), $gradingoptions);
         $mform->setDefault('grademethod', 0);
 
+        //TODO: language
+
+        $showGradeOptions = array(
+            0 => "Don't show",
+            1 => "Show",
+        );
+        $mform->addElement('select', 'showgrade','Show grades during attempt: ', $showGradeOptions);
+        $mform->setDefault('grademethod', 0);
+
+
         // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
 
