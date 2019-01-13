@@ -54,6 +54,8 @@ class ddtaquiz {
      * (that is without any questions inside blocks) in the ddta quiz */
     protected $maxgrade = 0;
 
+    protected $name;
+
     // Constructor =============================================================
     /**
      * Constructor assuming we already have the necessary data loaded.
@@ -63,8 +65,9 @@ class ddtaquiz {
      * @param int $grademethod the method used for grading.
      * @param int $maxgrade the best attainable grade of this quiz.
      */
-    public function __construct($id, $cmid, $mainblockid, $grademethod, $maxgrade) {
+    public function __construct($id, $cmid, $name, $mainblockid, $grademethod, $maxgrade) {
         $this->id = $id;
+        $this->name = $name;
         $this->cmid = $cmid;
         $this->mainblock = null;
         $this->mainblockid = $mainblockid;
@@ -84,7 +87,13 @@ class ddtaquiz {
         $quiz = $DB->get_record('ddtaquiz', array('id' => $quizid), '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('ddtaquiz', $quizid, $quiz->course, false, MUST_EXIST);
 
-        return new ddtaquiz($quizid, $cm->id, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade);
+        $ddtaquiz =  new ddtaquiz($quizid, $cm->id, $quiz->name, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade);
+        if($ddtaquiz->get_main_block()->get_name() != $ddtaquiz->get_name()) {
+            $ddtaquiz->get_main_block()->set_name($ddtaquiz->get_name());
+
+        }
+
+        return $ddtaquiz;
     }
 
     /**
@@ -168,7 +177,7 @@ class ddtaquiz {
      * @return string the name.
      */
     public function get_name() {
-        return $this->get_main_block()->get_name();
+        return $this->name;
     }
 
     /**
