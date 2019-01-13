@@ -55,10 +55,14 @@ $params = array(
 $event = \mod_ddtaquiz\event\attempt_reviewed::create($params);
 $event->trigger();
 
+$ddtaquiz = ddtaquiz::load($cm->instance);
+
+
 $options = new question_display_options();
 $options->flags = question_display_options::HIDDEN;
+if(!$ddtaquiz->show_grades())
+    $options->marks = question_display_options::HIDDEN;
 
-$ddtaquiz = ddtaquiz::load($cm->instance);
 $PAGE->set_url($attempt->review_url());
 $PAGE->set_pagelayout('incourse');
 $PAGE->set_title(format_string($ddtaquiz->get_main_block()->get_name()));
