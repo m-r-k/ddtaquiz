@@ -60,20 +60,41 @@ $PAGE->set_url($thispageurl);
 $ddtaquiz = ddtaquiz::load($quiz->id);
 $block = block::load($ddtaquiz, $blockid);
 $feedback = feedback::get_feedback($ddtaquiz);
+$errorOutput = '';
+
 if ($save) {
-    // Save the name.
-    $name = required_param('blockname', PARAM_TEXT);
-    $block->set_name($name);
 
-    // Save the condition.
-    if (array_key_exists('conditionparts', $_POST)) {
-        $block->get_condition()->update($_POST['conditionparts']);
-    }
-    $useand = optional_param('use_and', null, PARAM_INT);
-    if (!is_null($useand)) {
-        $block->get_condition()->set_use_and($useand);
-    }
+    try{
 
+        // Save the name.
+        $name = required_param('blockname', PARAM_TEXT);
+        $block->set_name($name);
+
+        if($block->is_main_block())
+            $block->get_quiz()->update_name($name);
+
+
+        // Save the condition.
+        if (array_key_exists('conditionparts', $_POST)) {
+            $block->get_condition()->updateSingleParts($_POST['conditionparts']);
+        }else{
+            $block->get_condition()->updateSingleParts([]);
+
+        }
+        if (array_key_exists('conditionMQParts', $_POST)) {
+
+            $block->get_condition()->updateMQParts($_POST['conditionMQParts']);
+        }else{
+            $block->get_condition()->updateMQParts([]);
+
+        }
+        $useand = optional_param('use_and', null, PARAM_INT);
+        if (!is_null($useand)) {
+            $block->get_condition()->set_use_and($useand);
+        }
+    }catch(Exception $e){
+        $errorOutput .= \mod_ddtaquiz\output\ddtaquiz_bootstrap_render::createAlert('danger',$e->getMessage());
+    }
     // Update the order of the elements.
     $order = optional_param_array('elementsorder', array(), PARAM_INT);
     $block->update_order($order);
@@ -135,6 +156,8 @@ if ($save) {
     } else {
         $nexturl = new moodle_url('/mod/ddtaquiz/view.php', array('id' => $cmid));
     }
+    //TODO: should i leave it as session variable
+    $_SESSION['edit-error'] = $errorOutput;
     redirect($nexturl);
 }
 
@@ -149,10 +172,11 @@ if ($block->is_main_block()) {
     $PAGE->set_title(get_string('editingblockx', 'ddtaquiz', format_string($block->get_name())));
 }
 
+$errorOutput = $_SESSION['edit-error'];
+$_SESSION['edit-error'] = '';
+
 $output = $PAGE->get_renderer('mod_ddtaquiz', 'edit');
-
 echo $OUTPUT->header();
-
-echo $output->edit_page($block, $thispageurl, $pagevars, $feedback);
+echo $output->edit_page($errorOutput, $block, $thispageurl, $pagevars, $feedback);
 
 echo $OUTPUT->footer();

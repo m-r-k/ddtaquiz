@@ -56,18 +56,23 @@ class ddtaquiz {
 
     protected $directfeedback=0;
 
+    protected $name;
+
     // Constructor =============================================================
+
     /**
      * Constructor assuming we already have the necessary data loaded.
      * @param int $id the id of this quiz.
      * @param int $cmid the course module id for this quiz.
+     * @param $name
      * @param int $mainblockid the id of the main block of this ddta quiz.
      * @param int $grademethod the method used for grading.
      * @param int $maxgrade the best attainable grade of this quiz.
      * @param int $directfeedback the best attainable grade of this quiz.
      */
-    public function __construct($id, $cmid, $mainblockid, $grademethod, $maxgrade,$directfeedback) {
+    public function __construct($id, $cmid, $name, $mainblockid, $grademethod, $maxgrade,$directfeedback) {
         $this->id = $id;
+        $this->name = $name;
         $this->cmid = $cmid;
         $this->mainblock = null;
         $this->mainblockid = $mainblockid;
@@ -88,9 +93,31 @@ class ddtaquiz {
         $quiz = $DB->get_record('ddtaquiz', array('id' => $quizid), '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('ddtaquiz', $quizid, $quiz->course, false, MUST_EXIST);
 
-        return new ddtaquiz($quizid, $cm->id, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade,$quiz->directfeedback);
+        $ddtaquiz =  new ddtaquiz($quizid, $cm->id, $quiz->name, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade,$quiz->directfeedback);
+        if($ddtaquiz->get_main_block()->get_name() != $ddtaquiz->get_name()) {
+            $ddtaquiz->get_main_block()->set_name($ddtaquiz->get_name());
+
+        }
+
+        return $ddtaquiz;
     }
 
+    /**
+     * Updates quiz name
+     * @param string $name
+     * @throws Exception
+     * @throws dml_exception
+     */
+    public function update_name( $name){
+        if(empty($name))
+            throw new Exception('Quiz name cannot be empty');
+        global $DB;
+
+        $quiz = $DB->get_record('ddtaquiz', array('id' => $this->id), '*', MUST_EXIST);
+        $quiz->name = $name;
+
+        $DB->update_record('ddtaquiz', $quiz);
+    }
     /**
      * Get the main block of the quiz.
      *
@@ -156,7 +183,7 @@ class ddtaquiz {
      * @return string the name.
      */
     public function get_name() {
-        return $this->get_main_block()->get_name();
+        return $this->name;
     }
 
     /**

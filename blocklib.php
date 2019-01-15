@@ -146,7 +146,11 @@ class block {
      *
      * @param string $name new name of the block.
      */
-    public function set_name($name) {
+    public function set_name(string $name) {
+
+        if(empty($name))
+            throw new Exception('Block name cannot be empty');
+
         global $DB;
 
         $this->name = $name;
@@ -409,7 +413,9 @@ class block {
         }
 
         $questions = $this->quiz->get_questions();
-        $count = $this->quiz->get_slot_for_element($thisblockelement->get_id());
+        //slot for element return the current slot for the block, this means that the number of previous questions is
+        // block slot - 1
+        $count = $this->quiz->get_slot_for_element($thisblockelement->get_id()) - 1;
         return array_slice($questions, 0, $count, true);
     }
 
