@@ -80,7 +80,8 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
         $mform->setDefault('grademethod', 0);
 
         //Direct Feedback
-        $mform->addElement('select', 'directfeedback',  get_string('directfeedback', 'ddtaquiz'),
+        $mform->addElement('header', 'directFeedback', get_string('directFeedback', 'ddtaquiz'));
+        $mform->addElement('select', 'directfeedback',  get_string('directFeedback', 'ddtaquiz'),
             array(1 => 'Show',
                 0=>'Dont show'));
         $mform->setDefault('directfeedback', $quizconfig->directfeedback);
