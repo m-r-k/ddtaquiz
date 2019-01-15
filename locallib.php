@@ -54,6 +54,8 @@ class ddtaquiz {
      * (that is without any questions inside blocks) in the ddta quiz */
     protected $maxgrade = 0;
 
+    protected $directfeedback=0;
+
     // Constructor =============================================================
     /**
      * Constructor assuming we already have the necessary data loaded.
@@ -62,14 +64,16 @@ class ddtaquiz {
      * @param int $mainblockid the id of the main block of this ddta quiz.
      * @param int $grademethod the method used for grading.
      * @param int $maxgrade the best attainable grade of this quiz.
+     * @param int $directfeedback the best attainable grade of this quiz.
      */
-    public function __construct($id, $cmid, $mainblockid, $grademethod, $maxgrade) {
+    public function __construct($id, $cmid, $mainblockid, $grademethod, $maxgrade,$directfeedback) {
         $this->id = $id;
         $this->cmid = $cmid;
         $this->mainblock = null;
         $this->mainblockid = $mainblockid;
         $this->grademethod = $grademethod;
         $this->maxgrade = $maxgrade;
+        $this->directfeedback = $directfeedback;
     }
 
     /**
@@ -84,7 +88,7 @@ class ddtaquiz {
         $quiz = $DB->get_record('ddtaquiz', array('id' => $quizid), '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('ddtaquiz', $quizid, $quiz->course, false, MUST_EXIST);
 
-        return new ddtaquiz($quizid, $cm->id, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade);
+        return new ddtaquiz($quizid, $cm->id, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade,$quiz->directfeedback);
     }
 
     /**
@@ -358,5 +362,9 @@ class ddtaquiz {
      */
     public function multiple_attempts_allowed() {
         return $this->grademethod == 1 || $this->grademethod == 2;
+    }
+
+    public function showDirectFeedback(){
+        return $this->directfeedback == 1;
     }
 }

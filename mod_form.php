@@ -43,7 +43,8 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
      */
     public function definition() {
         global $CFG;
-
+        //global quiz config
+        $quizconfig = get_config('ddtaquiz');
         $mform = $this->_form;
 
         // Adding the "general" fieldset, where all the common settings are showed.
@@ -78,10 +79,19 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
         $mform->addElement('select', 'grademethod', get_string('grademethod', 'ddtaquiz'), $gradingoptions);
         $mform->setDefault('grademethod', 0);
 
+        //Direct Feedback
+        $mform->addElement('header', 'directFeedback', get_string('directFeedback', 'ddtaquiz'));
+        $mform->addElement('select', 'directfeedback',  get_string('directFeedback', 'ddtaquiz'),
+            array(1 => 'Show',
+                0=>'Dont show'));
+        $mform->setDefault('directfeedback', $quizconfig->directfeedback);
+
         // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
 
         // Add standard buttons, common to all modules.
         $this->add_action_buttons();
+
+
     }
 }

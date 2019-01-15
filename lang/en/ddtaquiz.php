@@ -155,3 +155,9 @@ $string['displayachievedpoints'] = 'Display achieved points';
 $string['displayquestionname'] = 'Display questionname';
 $string['combinedfilename'] = 'combined';
 $string['noCandidatesForCondition'] = 'First add at least one question!';
+
+//Direct Feedback
+$string['directFeedBackHeader']='Feedback';
+$string['directFeedBackCorrectAnswer']='The correct answer is ';
+$string['directFeedback']='Direct Feedback';
+$string['directFeedbackDesc']='If activated a button is shown to display a direct feedback during each questionattempt';

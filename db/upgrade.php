@@ -42,5 +42,18 @@ function xmldb_ddtaquiz_upgrade($oldversion) {
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
+    if ($oldversion < 2019011506) {
+            try{
+            // Update all records in 'course_modules' for labels to have showdescription = 1.
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz ADD directfeedback INT(1) NOT NULL DEFAULT 1 AFTER mainblock");
+
+            // Label savepoint reached.
+            upgrade_mod_savepoint(true, 2019011506, 'ddtaquiz');
+            }
+            catch(Exception $e){
+
+            }
+    }
     return true;
 }

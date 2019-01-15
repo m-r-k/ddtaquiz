@@ -21,16 +21,17 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery'], function($) {
+define(['jquery'], function ($) {
     return {
-
-    
-        init: function() {
-            $(document).ready(function(){
-                $('#attemptNextBtn').click(function(e){
+        init: function () {
+            $(document).ready(function () {
+                $('#attemptNextBtn').click(function (e) {
                     $('#responseform').submit();
                 });
-
+                $('#directFeedbackBtn').click(function (e) {
+                    var feedBack=$('#directFeedbackID');
+                    feedBack.css("display", feedBack.css("display") === 'none' ? 'block' : 'none');
+                });
 
             });
 

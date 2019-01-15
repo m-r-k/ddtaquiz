@@ -17,6 +17,7 @@
         <FIELD NAME="maxgrade" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="the total sum of the max grades of the main questions instances (that is without any questions inside blocks) in the ddta quiz"/>
         <FIELD NAME="grademethod" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="the method used for grading"/>
         <FIELD NAME="mainblock" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="points to the main block of this quiz"/>
+        <FIELD NAME="directfeedback" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="show the direct feedback or not"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
