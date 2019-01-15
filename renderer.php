@@ -24,14 +24,17 @@
 
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
+
 use mod_ddtaquiz\output\ddtaquiz_bootstrap_render;
+
 /**
  * The renderer for the ddtaquiz module.
  *
  * @copyright  2017 Jana Vatter <jana.vatter@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_ddtaquiz_renderer extends plugin_renderer_base {
+class mod_ddtaquiz_renderer extends plugin_renderer_base
+{
     /**
      * Generates the view page.
      *
@@ -39,7 +42,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param mod_ddtaquiz_view_object $viewobj the information required to display the view page.
      * @return $output html data.
      */
-    public function view_page($quiz, $viewobj) {
+    public function view_page($quiz, $viewobj)
+    {
         $output = '';
         $output .= $this->heading($quiz->get_name());
         $output .= $this->view_table($quiz, $viewobj);
@@ -56,7 +60,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param array $summarydata contains all table data.
      * @return $output containing html data.
      */
-    public function review_question_page(attempt $attempt, $slot, question_display_options $options, $summarydata) {
+    public function review_question_page(attempt $attempt, $slot, question_display_options $options, $summarydata)
+    {
         $output = '';
         $output .= $this->heading($attempt->get_quiz()->get_name());
         $output .= $this->review_summary_table($summarydata);
@@ -74,7 +79,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param array $summarydata contains all table data.
      * @return $output containing html data.
      */
-    public function grade_question_page(attempt $attempt, $slot, question_display_options $options, $summarydata) {
+    public function grade_question_page(attempt $attempt, $slot, question_display_options $options, $summarydata)
+    {
         $output = '';
         $output .= $this->heading($attempt->get_quiz()->get_name());
         $output .= $this->review_summary_table($summarydata);
@@ -86,7 +92,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
         $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
         $output .= $attempt->get_quba()->render_question($slot, $options);
         $output .= \html_writer::tag('input', '', array('type' => 'submit', 'id' => 'id_submitbutton',
-                'name' => 'submit', 'value' => get_string('save', 'ddtaquiz')));
+            'name' => 'submit', 'value' => get_string('save', 'ddtaquiz')));
         $output .= \html_writer::end_tag('form');
         return $output;
     }
@@ -98,7 +104,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param mod_ddtaquiz_view_object $viewobj the information required to display the view page.
      * @return $output html data.
      */
-    public function view_table($quiz, $viewobj) {
+    public function view_table($quiz, $viewobj)
+    {
         if (!$viewobj->attempts) {
             return '';
         }
@@ -164,7 +171,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      *
      * @return string the table heading.
      */
-    public function view_table_heading() {
+    public function view_table_heading()
+    {
         return $this->heading(get_string('summaryofattempts', 'ddtaquiz'), 3);
     }
 
@@ -174,16 +182,17 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param attempt $attempt the attempt.
      * @return string the appropriate lang string to describe the state.
      */
-    public function attempt_state(attempt $attempt) {
+    public function attempt_state(attempt $attempt)
+    {
         switch ($attempt->get_state()) {
             case attempt::IN_PROGRESS:
                 return get_string('stateinprogress', 'ddtaquiz');
 
             case attempt::FINISHED:
                 return get_string('statefinished', 'ddtaquiz') . html_writer::tag('span',
-                get_string('statefinisheddetails', 'ddtaquiz',
-                userdate($attempt->get_finish_time())),
-                array('class' => 'statedetails'));
+                        get_string('statefinisheddetails', 'ddtaquiz',
+                            userdate($attempt->get_finish_time())),
+                        array('class' => 'statedetails'));
         }
     }
 
@@ -194,7 +203,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param mod_ddtaquiz_view_object $viewobj the information required to display the view page.
      * @return string HTML to output.
      */
-    public function view_page_buttons($viewobj) {
+    public function view_page_buttons($viewobj)
+    {
         global $CFG;
         $output = '';
         $url = new \moodle_url('/mod/ddtaquiz/startattempt.php', array('cmid' => $viewobj->cmid));
@@ -223,7 +233,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param moodle_url $url The URL to POST to in order to start the attempt.
      * @return string HTML fragment.
      */
-    public function start_attempt_button($buttontext, $url) {
+    public function start_attempt_button($buttontext, $url)
+    {
         $button = new single_button($url, $buttontext);
         $button->class .= ' quizstartbuttondiv';
         return $this->render($button);
@@ -235,7 +246,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param mod_ddtaquiz_view_object $viewobj the information required to display the view page.
      * @return string HTML fragment.
      */
-    public function edit_quiz_button($viewobj) {
+    public function edit_quiz_button($viewobj)
+    {
         $url = new \moodle_url('/mod/ddtaquiz/edit.php', array('cmid' => $viewobj->cmid));
         $buttontext = get_string('editquiz', 'ddtaquiz');
         $button = new single_button($url, $buttontext);
@@ -255,19 +267,19 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @throws
      *
      */
-    public function attempt_page(attempt $attempt, $slot, $options, $cmid) {
+    public function attempt_page(attempt $attempt, $slot, $options, $cmid)
+    {
         $processurl = new \moodle_url('/mod/ddtaquiz/processslot.php');
         // The progress bar.
         $progress = floor(($slot - 1) * 100 / $attempt->get_quiz()->get_slotcount());
         $progressbar = \html_writer::div('', 'bar',
-            array('role' => 'progressbar', 'style' => 'width: ' . $progress . '%;', 'class'=>'bg-primary'));
+            array('role' => 'progressbar', 'style' => 'width: ' . $progress . '%;', 'class' => 'bg-primary'));
         $header = \html_writer::div($progressbar, 'progress');
 
         $body = html_writer::start_tag('form',
-           array('action' => $processurl, 'method' => 'post',
-               'enctype' => 'multipart/form-data', 'accept-charset' => 'utf-8',
-               'id' => 'responseform'));
-
+            array('action' => $processurl, 'method' => 'post',
+                'enctype' => 'multipart/form-data', 'accept-charset' => 'utf-8',
+                'id' => 'responseform'));
 
 
         $body .= html_writer::start_tag('div');
@@ -275,26 +287,29 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
         $body .= $attempt->get_quba()->render_question($slot, $options);
 
         //block for direct feedback
-        $body .= html_writer::start_div('',array('id'=>'directFeedbackID'));
+        $body .= html_writer::start_div('', array('id' => 'directFeedbackID'));
         $directFeedbackHeader = \html_writer::tag('h3', get_string('directFeedBackHeader', 'ddtaquiz'), array('class' => 'questionheader'));
         //TODO: FIX Body
-        $directFeedbackBody='Body';
-        $body .= ddtaquiz_bootstrap_render::createCard($directFeedbackBody,$directFeedbackHeader);
+        $directFeedbackBody = $attempt->get_quba()->get_question($slot)->generalfeedback;
+        $correctResponses = $attempt->get_quba()->get_question($slot)->get_correct_response();
+        foreach ($correctResponses as $response)
+            $directFeedbackBody .= get_string('directFeedBackCorrectAnswer', 'ddtaquiz') . $response;
+        $body .= ddtaquiz_bootstrap_render::createCard($directFeedbackBody, $directFeedbackHeader);
         $body .= html_writer::end_div();
 
         // Some hidden fields to track what is going on.
         $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'attempt',
-           'value' => $attempt->get_id()));
+            'value' => $attempt->get_id()));
         $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'slot',
-           'value' => $slot));
+            'value' => $slot));
         $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'cmid',
-           'value' => $cmid));
+            'value' => $cmid));
 
         $body .= html_writer::end_tag('div');
         $body .= html_writer::end_tag('form');
 
 
-        $footer = $this->attempt_navigation_buttons();
+        $footer = $this->attempt_navigation_buttons($attempt);
 
         $this->page->requires->js_call_amd('mod_ddtaquiz/attempt', 'init');
 
@@ -309,18 +324,22 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * TODO:
      * Generates the attempt navigation buttons.
      *
+     * @param attempt $attempt
      * @return string HTML fragment.
      *
-     * @throws
+     * @throws coding_exception
      */
-    public function attempt_navigation_buttons() {
+    public function attempt_navigation_buttons(attempt $attempt)
+    {
+        $ddtaquiz = $attempt->get_quiz();
         $output = '';
         $output .= html_writer::start_div('container-fluid');
         $output .= html_writer::start_div('row');
         $output .= html_writer::start_div('col-md-6 text-left');
-        $config = get_config('ddtaquiz');
-        if ($config->directFeedback) {
-            $directFeedbackLabel = get_string('directFeedBack', 'ddtaquiz');
+
+        //Direct feedback button
+        if ($ddtaquiz->showDirectFeedback()) {
+            $directFeedbackLabel = get_string('directFeedback', 'ddtaquiz');
             $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'directFeedback',
                 'value' => $directFeedbackLabel, 'class' => 'btn btn-primary text-left', 'id' => 'directFeedbackBtn'));
         }
@@ -345,7 +364,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param feedback $feedback the feedback for the quiz.
      * @return $output containing HTML data.
      */
-    public function review_page(attempt $attempt, $options, $summarydata, $feedback) {
+    public function review_page(attempt $attempt, $options, $summarydata, $feedback)
+    {
         $output = '';
         $output .= $this->heading(get_string('quizfinished', 'ddtaquiz'));
         $output .= $this->review_summary_table($summarydata);
@@ -361,7 +381,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param array $summarydata contains row data for table.
      * @return $output containing HTML data.
      */
-    public function review_summary_table($summarydata) {
+    public function review_summary_table($summarydata)
+    {
         if (empty($summarydata)) {
             return '';
         }
@@ -386,7 +407,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
             $output .= html_writer::tag('tr',
                 html_writer::tag('th', $title, array('class' => 'cell', 'scope' => 'row')) .
                 html_writer::tag('td', $content, array('class' => 'cell'))
-                );
+            );
         }
 
         $output .= html_writer::end_tag('tbody');
@@ -403,7 +424,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param feedback $feedback the specialized feedback.
      * @return string HTML to output.
      */
-    protected function review_block(block $block, attempt $attempt, $options, $feedback) {
+    protected function review_block(block $block, attempt $attempt, $options, $feedback)
+    {
         $output = '';
         foreach ($block->get_children() as $child) {
             $output .= $this->review_block_element($block, $child, $attempt, $options, $feedback);
@@ -422,7 +444,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param feedback $feedback the specialized feedback.
      * @return string HTML to output.
      */
-    protected function review_block_element($block, $blockelem, $attempt, $options, $feedback) {
+    protected function review_block_element($block, $blockelem, $attempt, $options, $feedback)
+    {
         $output = '';
         if ($feedback->has_specialized_feedback($blockelem, $attempt)) {
             $specialfeedback = $feedback->get_specialized_feedback_at_element($blockelem, $attempt);
@@ -447,7 +470,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param feedback $feedback the specialized feedback.
      * @return string HTML to output.
      */
-    protected function review_block_element_render($block, $blockelem, $attempt, $options, $feedback) {
+    protected function review_block_element_render($block, $blockelem, $attempt, $options, $feedback)
+    {
         $output = '';
         if ($blockelem->is_block()) {
             $childblock = $blockelem->get_element();
@@ -481,7 +505,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param feedback $feedback the specialized feedback.
      * @return string HTML to output.
      */
-    protected function review_parts($parts, $block, $attempt, $options, $feedback) {
+    protected function review_parts($parts, $block, $attempt, $options, $feedback)
+    {
         $output = '';
         foreach ($parts as $part) {
             if (is_string($part)) {
@@ -499,7 +524,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
      * @param int $cmid the course module id.
      * @return string HTML fragment.
      */
-    public function finish_review_button($cmid) {
+    public function finish_review_button($cmid)
+    {
         $url = new moodle_url('/mod/ddtaquiz/view.php', array('id' => $cmid));
         $buttontext = get_string('finishreview', 'ddtaquiz');
         $button = new single_button($url, $buttontext);
@@ -513,7 +539,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base {
  * @copyright  2017 Jana Vatter <jana.vatter@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class mod_ddtaquiz_view_object {
+class mod_ddtaquiz_view_object
+{
     /** @var bool $quizhasquestions whether the quiz has any questions. */
     public $quizhasquestions;
     /** @var string $buttontext caption for the start attempt button. If this is null, show no
