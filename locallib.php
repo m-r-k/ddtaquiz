@@ -50,6 +50,9 @@ class ddtaquiz {
     protected $mainblockid = 0;
     /** @var int the method used for grading. 0: one attempt, 1: best attempt, 2: last attempt */
     protected $grademethod = 0;
+
+    /** @var int if to display grades to user or not */
+    protected $showgrade = 1;
     /** @var int the total sum of the max grades of the main questions instances
      * (that is without any questions inside blocks) in the ddta quiz */
     protected $maxgrade = 0;
@@ -69,8 +72,9 @@ class ddtaquiz {
      * @param int $grademethod the method used for grading.
      * @param int $maxgrade the best attainable grade of this quiz.
      * @param int $directfeedback the best attainable grade of this quiz.
+     * @param $showgrade
      */
-    public function __construct($id, $cmid, $name, $mainblockid, $grademethod, $maxgrade,$directfeedback) {
+    public function __construct($id, $cmid, $name, $mainblockid, $grademethod, $maxgrade,$directfeedback,$showgrade) {
         $this->id = $id;
         $this->name = $name;
         $this->cmid = $cmid;
@@ -78,6 +82,7 @@ class ddtaquiz {
         $this->mainblockid = $mainblockid;
         $this->grademethod = $grademethod;
         $this->maxgrade = $maxgrade;
+        $this->showgrade = $showgrade;
         $this->directfeedback = $directfeedback;
     }
 
@@ -93,7 +98,7 @@ class ddtaquiz {
         $quiz = $DB->get_record('ddtaquiz', array('id' => $quizid), '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('ddtaquiz', $quizid, $quiz->course, false, MUST_EXIST);
 
-        $ddtaquiz =  new ddtaquiz($quizid, $cm->id, $quiz->name, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade,$quiz->directfeedback);
+        $ddtaquiz =  new ddtaquiz($quizid, $cm->id, $quiz->name, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade,$quiz->directfeedback,$quiz->showgrade);
         if($ddtaquiz->get_main_block()->get_name() != $ddtaquiz->get_name()) {
             $ddtaquiz->get_main_block()->set_name($ddtaquiz->get_name());
 
@@ -389,6 +394,14 @@ class ddtaquiz {
      */
     public function multiple_attempts_allowed() {
         return $this->grademethod == 1 || $this->grademethod == 2;
+    }
+
+    /**
+     * Returns true if grades are to be shown to user, false otherwise
+     * @return bool
+     */
+    public function show_grades(){
+        return $this->showgrade == 1;
     }
 
     public function showDirectFeedback(){
