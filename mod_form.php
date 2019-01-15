@@ -83,5 +83,13 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
 
         // Add standard buttons, common to all modules.
         $this->add_action_buttons();
+
+        //Add Files from config
+        $quizconfig = get_config('ddtaquiz');
+
+        $mform->addElement('select', 'directfeedback',  get_string('directfeedback', 'ddtaquiz'),
+            array(1 => 'show',
+                0=>'dont show'));
+        $mform->setDefault('directfeedback', $quizconfig->directfeedback);
     }
 }
