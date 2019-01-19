@@ -59,6 +59,8 @@ class ddtaquiz {
 
     protected $directfeedback=0;
 
+    protected  $timing = null;
+
     protected $name;
 
     // Constructor =============================================================
@@ -73,6 +75,8 @@ class ddtaquiz {
      * @param int $maxgrade the best attainable grade of this quiz.
      * @param int $directfeedback the best attainable grade of this quiz.
      * @param $showgrade
+     *
+     * @throws
      */
     public function __construct($id, $cmid, $name, $mainblockid, $grademethod, $maxgrade,$directfeedback,$showgrade) {
         $this->id = $id;
@@ -84,6 +88,7 @@ class ddtaquiz {
         $this->maxgrade = $maxgrade;
         $this->showgrade = $showgrade;
         $this->directfeedback = $directfeedback;
+        $this->timing = ddtaquiz_timing::create();
     }
 
     /**
@@ -91,6 +96,8 @@ class ddtaquiz {
      *
      * @param int $quizid the id of this ddta quiz.
      * @return ddtaquiz the new ddtaquiz object.
+     *
+     * @throws
      */
     public static function load($quizid) {
         global $DB;
@@ -99,6 +106,8 @@ class ddtaquiz {
         $cm = get_coursemodule_from_instance('ddtaquiz', $quizid, $quiz->course, false, MUST_EXIST);
 
         $ddtaquiz =  new ddtaquiz($quizid, $cm->id, $quiz->name, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade,$quiz->directfeedback,$quiz->showgrade);
+        $ddtaquiz->timing->enable($quiz->timelimit, $quiz->overduehandling,$quiz->graceperiod);
+
         if($ddtaquiz->get_main_block()->get_name() != $ddtaquiz->get_name()) {
             $ddtaquiz->get_main_block()->set_name($ddtaquiz->get_name());
 
@@ -407,4 +416,130 @@ class ddtaquiz {
     public function showDirectFeedback(){
         return $this->directfeedback == 1;
     }
+
+    public function get_graceperiod(){
+        return $this->timing->get_graceperiod();
+    }
+
+    public function get_overduehandling(){
+        return $this->timing->get_overduehandling();
+    }
+}
+
+class ddtaquiz_timing {
+    private $timelimit;
+    private $overduehandling;
+    private $graceperiod;
+
+    public const AUTOBANDON = 'autoabandon';
+    public const AUTOSUBMIT = 'autosubmit';
+    public const GRACEPERIOD = 'graceperiod';
+    /**
+     * ddtaquiz_timing constructor.
+     * @param $timelimit
+     * @param $overduehandling
+     * @param $graceperiod
+     */
+    private function __construct($timelimit, $overduehandling, $graceperiod)
+    {
+        $this->timelimit = $timelimit;
+        $this->overduehandling = $overduehandling;
+        $this->graceperiod = $graceperiod;
+    }
+
+    public static function create():self{
+        return new ddtaquiz_timing(0,self::AUTOSUBMIT,0);
+    }
+
+    /**
+     * @param $timelimit
+     * @param $overduehandling
+     * @param $graceperiod
+     * @throws Exception
+     */
+    public function enable($timelimit, $overduehandling, $graceperiod){
+        if($timelimit > 1){
+            switch ($overduehandling){
+                case self::GRACEPERIOD : {
+                    if($graceperiod > 60){
+                        $this->timelimit = $timelimit;
+                        $this->overduehandling = $overduehandling;
+                        $this->graceperiod = $graceperiod;
+                        break;
+                    }else{
+                        throw new Exception('Grace period must be greater then 1 minute' . $overduehandling);
+                    }
+                }
+
+                case self::AUTOSUBMIT :
+                case self::AUTOBANDON : {
+                    $this->timelimit = $timelimit;
+                    $this->overduehandling = $overduehandling;
+                    $this->graceperiod = 0;
+                    break;
+                }
+                default : {
+                    throw new Exception('The selected timing mode is not available');
+                    break;
+                }
+            }
+        }else{
+            $this->disable();
+        }
+    }
+
+    /**
+     *
+     */
+    public function disable(){
+        $this->timelimit = 0;
+        $this->overduehandling = self::AUTOSUBMIT;
+        $this->graceperiod = 0;
+    }
+
+    /**
+     * @return bool
+     */
+    public function enabled():bool{
+        return $this->timelimit > 0;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function get_timelimit()
+    {
+        return $this->timelimit;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function get_overduehandling()
+    {
+        return $this->overduehandling;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function get_graceperiod()
+    {
+        return $this->graceperiod;
+    }
+
+
+
+}
+
+/**
+ * @return array string => lang string the options for handling overdue quiz
+ *      attempts.
+ */
+function ddtaquiz_get_overdue_handling_options() {
+    return array(
+        'autosubmit'  => 'Open attempts are submitted automatically',
+        'graceperiod' => 'There is a grace period when open attempts can be submitted, but no more questions answered',
+        'autoabandon' => 'Attempts must be submitted before time expires, or they are not counted',
+    );
 }

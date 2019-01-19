@@ -44,13 +44,14 @@ class attempt {
     const IN_PROGRESS = 'inprogress';
 
     /** @var string to identify the overdue state. */
-    // ... const OVERDUE     = 'overdue'; .
+    const OVERDUE   = 'overdue';
 
     /** @var string to identify the finished state. */
     const FINISHED = 'finished';
 
+
     /** @var string to identify the abandoned state. */
-    // ... const ABANDONED   = 'abandoned'; .
+    const ABANDONED   = 'abandoned';
 
     /** @var int the id of this ddtaquiz_attempt. */
     protected $id;
@@ -85,6 +86,9 @@ class attempt {
     /** @var boolean preview was previewed. */
     protected $preview;
 
+    protected $timecheckstate;
+    protected $timemodified;
+
 
     // Constructor =============================================================
     /**
@@ -104,7 +108,7 @@ class attempt {
      */
     public function __construct($id, question_usage_by_activity $quba, ddtaquiz $quiz,
             $userid, $attemptnumber, $currentslot = 1, $timestart, $state, $timefinish,
-            $sumgrades, $preview) {
+            $sumgrades, $preview,$timecheckstate,$timemodified) {
         $this->id = $id;
         $this->quba = $quba;
         $this->quiz = $quiz;
@@ -116,6 +120,8 @@ class attempt {
         $this->timefinish = $timefinish;
         $this->sumgrades = $sumgrades;
         $this->preview = $preview;
+        $this->timecheckstate = $timecheckstate;
+        $this->timemodified = $timemodified;
     }
 
 
@@ -134,7 +140,8 @@ class attempt {
 
         return new attempt($attemptid, $quba, $quiz, $attemptrow->userid, $attemptrow->attempt,
             $attemptrow->currentslot, $attemptrow->timestart, $attemptrow->state,
-            $attemptrow->timefinish, $attemptrow->sumgrades, $attemptrow->preview);
+            $attemptrow->timefinish, $attemptrow->sumgrades, $attemptrow->preview,$attemptrow->timecheckstate,
+            $attemptrow->timemodified);
     }
 
     /**
