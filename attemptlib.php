@@ -168,6 +168,9 @@ class attempt {
         $attemptrow->state = self::IN_PROGRESS;
         $attemptrow->timefinish = 0;
         $attemptrow->sumgrades = null;
+        $attemptrow->timecheckstate = null;
+        $attemptrow->timemodified = $attemptrow->timestart;
+        $attemptrow->sumgrades = null;
         $attemptrow->attempt = $DB->count_records('ddtaquiz_attempts',
             array('quiz' => $quiz->get_id(), 'userid' => $userid)) + 1;
         $attemptrow->preview = $preview;
@@ -207,7 +210,7 @@ class attempt {
 
         $attempt = new attempt($attemptid, $quba, $quiz, $userid, $attemptrow->attempt,
             $attemptrow->currentslot, $attemptrow->timestart, $attemptrow->state,
-            $attemptrow->timefinish, $attemptrow->sumgrades, $preview);
+            $attemptrow->timefinish, $attemptrow->sumgrades, $preview, $attemptrow->timecheckstate, $attemptrow->timemodified);
         return $attempt;
     }
 
