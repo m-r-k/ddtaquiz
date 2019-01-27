@@ -417,12 +417,39 @@ class ddtaquiz {
         return $this->directfeedback == 1;
     }
 
+    /**
+     * @return mixed
+     */
     public function get_graceperiod(){
         return $this->timing->get_graceperiod();
     }
 
+    /**
+     * @return mixed
+     */
     public function get_overduehandling(){
         return $this->timing->get_overduehandling();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function get_timelimit(){
+        return $this->timing->get_timelimit();
+    }
+
+    /**
+     * @return bool
+     */
+    public function timing_activated():bool{
+        return $this->timing->enabled();
+    }
+
+    /**
+     * @return bool
+     */
+    public function to_abandon():bool{
+        return $this->timing->to_abandon();
     }
 }
 
@@ -467,7 +494,7 @@ class ddtaquiz_timing {
                         $this->graceperiod = $graceperiod;
                         break;
                     }else{
-                        throw new Exception('Grace period must be greater then 1 minute' . $overduehandling);
+                        throw new Exception(get_string('graceperiod_error','ddtaquiz'));
                     }
                 }
 
@@ -479,7 +506,7 @@ class ddtaquiz_timing {
                     break;
                 }
                 default : {
-                    throw new Exception('The selected timing mode is not available');
+                    throw new Exception(get_string('timing_mode_error','ddtaquiz'));
                     break;
                 }
             }
@@ -528,18 +555,23 @@ class ddtaquiz_timing {
         return $this->graceperiod;
     }
 
-
+    /**
+     * @return bool
+     */
+    public function to_abandon():bool{
+        return $this->overduehandling == self::AUTOBANDON;
+    }
 
 }
 
 /**
- * @return array string => lang string the options for handling overdue quiz
- *      attempts.
+ * @return array
+ * @throws coding_exception
  */
 function ddtaquiz_get_overdue_handling_options() {
     return array(
-        'autosubmit'  => 'Open attempts are submitted automatically',
-        'graceperiod' => 'There is a grace period when open attempts can be submitted, but no more questions answered',
-        'autoabandon' => 'Attempts must be submitted before time expires, or they are not counted',
+        'autosubmit'  => get_string('overduehandling_autosubmit','ddtaquiz'),
+        'graceperiod' => get_string('overduehandling_graceperiod','ddtaquiz'),
+        'autoabandon' => get_string('overduehandling_autoabandon','ddtaquiz'),
     );
 }

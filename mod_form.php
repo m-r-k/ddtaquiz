@@ -91,7 +91,7 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
 
 
         //Direct Feedback
-        $mform->addElement('header', 'directFeedBackHeader', get_string('directFeedback', 'ddtaquiz'));
+        $mform->addElement('header', 'directFeedBackHeader',get_string('directFeedback', 'ddtaquiz') );
         $mform->addElement('select', 'directFeedback',  get_string('directFeedback', 'ddtaquiz'),
             array(1 => 'Show',
                 0=>'Dont show'));
@@ -99,10 +99,10 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
 
 
         //Timing
-        $mform->addElement('header', 'timing', 'Timing', 'ddtaquiz');
+        $mform->addElement('header', 'timing', get_string('timing', 'ddtaquiz'), 'ddtaquiz');
 
         // Time limit.
-        $mform->addElement('duration', 'timelimit', 'Time limit',
+        $mform->addElement('duration', 'timelimit', get_string('timelimit', 'ddtaquiz'),
             array('optional' => true));
         $mform->addHelpButton('timelimit', 'timelimit', 'ddtaquiz');
         $mform->setAdvanced('timelimit', $quizconfig->timelimit_adv);
@@ -110,18 +110,13 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
 
         // What to do with overdue attempts.
         $mform->addElement('select', 'overduehandling',
-            'When time expires',
+            get_string('overduehandling', 'ddtaquiz'),
             ddtaquiz_get_overdue_handling_options());
         $mform->addHelpButton('overduehandling', 'overduehandling', 'ddtaquiz');
         $mform->setAdvanced('overduehandling', $quizconfig->overduehandling_adv);
         $mform->setDefault('overduehandling', $quizconfig->overduehandling);
-        // TODO Formslib does OR logic on disableif, and we need AND logic here.
-        // $mform->disabledIf('overduehandling', 'timelimit', 'eq', 0);
-        // $mform->disabledIf('overduehandling', 'timeclose', 'eq', 0);
-
         // Grace period time.
-        $mform->addElement('duration', 'graceperiod',
-            'Submission grace period',
+        $mform->addElement('duration', 'graceperiod',get_string('graceperiod', 'ddtaquiz'),
             array('optional' => true));
         $mform->addHelpButton('graceperiod', 'graceperiod', 'ddtaquiz');
         $mform->setAdvanced('graceperiod', $quizconfig->graceperiod_adv);
