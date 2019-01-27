@@ -405,7 +405,7 @@ class attempt {
         $transaction = $DB->start_delegated_transaction();
 
         $quba = $this->get_quba();
-        if($state != self::ABANDONED)
+        if($state == self::ABANDONED)
             $quba->get_question_attempt($this->get_current_slot())->discard_autosaved_step();
         $quba->finish_all_questions($timenow);
         question_engine::save_questions_usage_by_activity($quba);
