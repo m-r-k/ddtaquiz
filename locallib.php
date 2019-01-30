@@ -21,7 +21,6 @@
  * logic, should go here. Never include this file from your lib.php!
  *
  * @package    mod_ddtaquiz
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -35,7 +34,6 @@ require_once($CFG->dirroot . '/mod/ddtaquiz/attemptlib.php');
 /**
  * A class encapsulating a ddta quiz.
  *
- * @copyright  2017 Jan Emrich <jan.emrich@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 3.1
  */

@@ -18,7 +18,6 @@
  * Back-end code for handling conditions on blocks and feedback.
  *
  * @package    mod_ddtaquiz
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

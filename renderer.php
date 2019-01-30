@@ -18,7 +18,6 @@
  * Defines the renderer for the ddtaquiz module.
  *
  * @package    mod_ddtaquiz
- * @copyright  2017 Jana Vatter <jana.vatter@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +29,6 @@ use mod_ddtaquiz\output\ddtaquiz_bootstrap_render;
 /**
  * The renderer for the ddtaquiz module.
  *
- * @copyright  2017 Jana Vatter <jana.vatter@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_ddtaquiz_renderer extends plugin_renderer_base

@@ -21,7 +21,6 @@
  * and for displaying the navigation panel.
  *
  * @package   mod_ddtaquiz
- * @copyright 2017 Jan Emrich <jan.emrich@stud.tu-darmstadt.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

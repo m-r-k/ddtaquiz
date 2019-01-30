@@ -20,7 +20,6 @@
  * Normally, it will end up redirecting to attempt.php - unless a password form is displayed.
  *
  * @package   mod_ddtaquiz
- * @copyright  2017 Jana Vatter <jana.vatter@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
