@@ -22,11 +22,12 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// Load the mandatory configurations and libraries
 require_once(dirname(__FILE__) . '/../../config.php');
 require_once(dirname(__FILE__).'/locallib.php');
 require_once(dirname(__FILE__).'/attemptlib.php');
 
-// Get submitted parameters.
+// Get the attempt id from the parameters.
 $attemptid = required_param('attempt', PARAM_INT);
 
 $attempt = attempt::load($attemptid);
@@ -42,6 +43,7 @@ if (!$course = $DB->get_record('course', array('id' => $cm->course))) {
 // Check login.
 require_login($course, false, $cm);
 
+// If the attempt is already finished, go to the review page
 if ($attempt->is_finished()) {
     redirect($attempt->review_url());
 }
