@@ -271,3 +271,10 @@ input[type=number].conditionelement {
 .timeDiv{
     padding-bottom: 10px;
 }
+
+.question-character{
+    display: none;
+}
+.shiftedFeedback{
+    padding-left: 50px;
+}

@@ -1091,9 +1091,9 @@ class edit_renderer extends \plugin_renderer_base {
 
     /**
      * Outputs the HTML to choose which questions feedback is replaced by the feedback block.
-     *
-     * @param \feedback_block $block the block for which to generate the HTML.
-     * @return string HTML to output.
+     * @param \feedback_block $block
+     * @return string
+     * @throws \coding_exception
      */
     public function uses_block(\feedback_block $block) {
         $header = \html_writer::tag('h3', get_string('usesquestions', 'ddtaquiz'));
@@ -1116,18 +1116,18 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * Outputs the HTML for a element whose feedback is replaced by the feedback block.
-     *
-     * @param \feedback_block $block the block for which to generate the HTML.
-     * @param null|\block_element $question the question for which to generate the HTML.
-     * @return string HTML to output.
+     * @param \feedback_block $block
+     * @param \feedback_used_question|null $used_question
+     * @return string
+     * @throws \coding_exception
      */
-    public function uses_element(\feedback_block $block, \block_element $question = null) {
+    public function uses_element(\feedback_block $block, \feedback_used_question $used_question = null) {
         static $index = 64; // ... 'A' - 1.
         $index += 1;
-
-        $preContent = \html_writer::span(html_writer::tag('b',chr($index)), 'usesquestionletter');
-        $content = $this->uses_selector($block, $question);
+        $preContent =
+            \html_writer::span(html_writer::tag('b',chr($index)), 'usesquestionletter');
+        $content =
+            $this->uses_selector($block, $used_question,$index);
 
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
@@ -1151,26 +1151,37 @@ class edit_renderer extends \plugin_renderer_base {
      * @param null|\block_element $selected the selected option.
      * @return string HTML to output.
      */
-    public function uses_selector(\feedback_block $block, \block_element $selected = null) {
+    public function uses_selector(\feedback_block $block, \feedback_used_question $used_question = null,$letter) {
         $options = '';
 
         static $index = 0;
         $index += 1;
-
         foreach ($block->get_quiz()->get_elements() as $element) {
             $attributes = array('value' => $element->get_id());
-            if ($selected && $selected->get_id() == $element->get_id()) {
+            if ($used_question && $used_question->getBlockElement()->get_id() == $element->get_id()) {
                 $attributes['selected'] = '';
             }
             $options .=
                 \html_writer::tag('option', $element->get_name(), $attributes);
         }
-        if ($selected) {
-            return \html_writer::tag('select', $options,
-                array('class' => 'usesquestionselector custom-select', 'name' => 'usesquestions[' . $index . ']'));
+        if ($used_question) {
+            if($used_question->isShifted())
+                $checkbox = html_writer::tag('input','',['type'=>'checkbox', 'class'=>'shift-checkbox','name'=>'usesquestions['.$index.'][shift]','checked'=>'true']);
+            else
+                $checkbox = html_writer::tag('input','',['type'=>'checkbox', 'class'=>'shift-checkbox','name'=>'usesquestions['.$index.'][shift]']);
+            return
+                html_writer::tag('input','',['hidden'=>true,'class'=>'question-letter','value'=>$letter,'name'=>'usesquestions[' . $index . '][letter]']).
+            \html_writer::tag('select', $options,
+                array('class' => 'usesquestionselector custom-select', 'name' => 'usesquestions[' . $index . '][questionId]')).
+                html_writer::tag('label','Shift: ',['class'=>'mr-2 ml-5']).
+                $checkbox;
         } else {
-            return \html_writer::tag('select', $options,
-                array('class' => 'usesquestionselector custom-select'));
+            return
+                html_writer::tag('input','',['hidden'=>true,'class'=>'question-letter','value'=>$letter]).
+                \html_writer::tag('select', $options,
+                array('class' => 'usesquestionselector custom-select')).
+                html_writer::tag('label','Shift: ',['class'=>'mr-2 ml-5']).
+                html_writer::tag('input','',['type'=>'checkbox', 'class'=>'shift-checkbox']);
         }
     }
 
