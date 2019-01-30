@@ -161,3 +161,20 @@ $string['directFeedBackHeader']='Feedback';
 $string['directFeedBackCorrectAnswer']='The correct answer is ';
 $string['directFeedback']='Direct Feedback';
 $string['directFeedbackDesc']='If activated a button is shown to display a direct feedback during each questionattempt';
+
+//Timelimit
+$string['timing'] = 'Timing';
+$string['timing_mode_error'] = 'The selected timing mode is not available.';
+$string['timelimit'] = 'Time limit';
+$string['timelimit_help'] = 'If enabled, the time limit is stated on the initial quiz page and a countdown timer is displayed on top of progressbar.';
+
+$string['overduehandling'] = 'When time expires';
+$string['overduehandling_help'] = 'This setting controls what happens if the Student fails to submit their quiz attempt before time expires. If the student is actively working on the quiz at the time, then the countdown timer will always automatically submit the attempt for them, but if they have logged out, then this setting controls what happens.';
+$string['overduehandling_autosubmit'] = 'Open attempts are submitted automatically';
+$string['overduehandling_graceperiod'] = 'There is a grace period when open attempts can be submitted, but no more questions answered';
+$string['overduehandling_autoabandon'] = 'Attempts must be submitted before time expires, or they are not counted';
+$string['graceperiod'] = 'Submission grace period';
+$string['graceperiod_help'] = 'If what to do when time expires is set to \'Allow a grace period to submit, but not change any responses\', this is the amount of extra time that is allowed.';
+$string['graceperiod_error'] = 'Grace period must be greater then 1 minute.';
+
+$string['eventquizattemptabandoned'] = 'Quiz attempt abandoned';

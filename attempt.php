@@ -41,7 +41,7 @@ if (!$course = $DB->get_record('course', array('id' => $cm->course))) {
 // Check login.
 require_login($course, false, $cm);
 
-if ($attempt->is_finished()) {
+if ($attempt->check_state_finished()) {
     redirect($attempt->review_url());
 }
 

@@ -43,13 +43,13 @@ class attempt {
     const IN_PROGRESS = 'inprogress';
 
     /** @var string to identify the overdue state. */
-    // ... const OVERDUE     = 'overdue'; .
+    const OVERDUE   = 'overdue';
 
     /** @var string to identify the finished state. */
     const FINISHED = 'finished';
 
-    /** @var string to identify the abandoned state. */
-    // ... const ABANDONED   = 'abandoned'; .
+    const ABANDONED = 'abandoned';
+
 
     /** @var int the id of this ddtaquiz_attempt. */
     protected $id;
@@ -84,6 +84,9 @@ class attempt {
     /** @var boolean preview was previewed. */
     protected $preview;
 
+    protected $timecheckstate;
+    protected $timemodified;
+
 
     // Constructor =============================================================
     /**
@@ -103,7 +106,7 @@ class attempt {
      */
     public function __construct($id, question_usage_by_activity $quba, ddtaquiz $quiz,
             $userid, $attemptnumber, $currentslot = 1, $timestart, $state, $timefinish,
-            $sumgrades, $preview) {
+            $sumgrades, $preview,$timecheckstate,$timemodified) {
         $this->id = $id;
         $this->quba = $quba;
         $this->quiz = $quiz;
@@ -115,6 +118,8 @@ class attempt {
         $this->timefinish = $timefinish;
         $this->sumgrades = $sumgrades;
         $this->preview = $preview;
+        $this->timecheckstate = $timecheckstate;
+        $this->timemodified = $timemodified;
     }
 
 
@@ -133,7 +138,8 @@ class attempt {
 
         return new attempt($attemptid, $quba, $quiz, $attemptrow->userid, $attemptrow->attempt,
             $attemptrow->currentslot, $attemptrow->timestart, $attemptrow->state,
-            $attemptrow->timefinish, $attemptrow->sumgrades, $attemptrow->preview);
+            $attemptrow->timefinish, $attemptrow->sumgrades, $attemptrow->preview,$attemptrow->timecheckstate,
+            $attemptrow->timemodified);
     }
 
     /**
@@ -159,6 +165,9 @@ class attempt {
         $attemptrow->timestart = time();
         $attemptrow->state = self::IN_PROGRESS;
         $attemptrow->timefinish = 0;
+        $attemptrow->sumgrades = null;
+        $attemptrow->timecheckstate = null;
+        $attemptrow->timemodified = $attemptrow->timestart;
         $attemptrow->sumgrades = null;
         $attemptrow->attempt = $DB->count_records('ddtaquiz_attempts',
             array('quiz' => $quiz->get_id(), 'userid' => $userid)) + 1;
@@ -199,7 +208,7 @@ class attempt {
 
         $attempt = new attempt($attemptid, $quba, $quiz, $userid, $attemptrow->attempt,
             $attemptrow->currentslot, $attemptrow->timestart, $attemptrow->state,
-            $attemptrow->timefinish, $attemptrow->sumgrades, $preview);
+            $attemptrow->timefinish, $attemptrow->sumgrades, $preview, $attemptrow->timecheckstate, $attemptrow->timemodified);
         return $attempt;
     }
 
@@ -267,6 +276,13 @@ class attempt {
      */
     public function get_start_time() {
         return $this->timestart;
+    }
+
+    public function get_timeleft(){
+        return $this->get_quiz()->get_timelimit()  - (time() - $this->timestart);
+    }
+    public function get_graceperiod(){
+        return $this->get_quiz()->get_graceperiod();
     }
 
     /**
@@ -354,18 +370,43 @@ class attempt {
     }
 
     /**
+     * Checks if this attempt is finished.
+     *
+     * @return boolean wether this attempt is finished.
+     */
+    public function check_state_finished() {
+        if($this->state == self::FINISHED){
+            return true;
+        }
+
+        if($this->quiz->timing_activated() && $this->get_timeleft() < 0 && $this->state == self::IN_PROGRESS){
+            if($this->quiz->to_abandon()){
+                $this->finish_attempt(time(), self::ABANDONED);
+            }else{
+                $this->finish_attempt(time(), self::OVERDUE);
+            }
+        }
+
+        if ($this->currentslot > $this->get_quiz()->get_slotcount() && $this->state == self::IN_PROGRESS) {
+            $this->finish_attempt(time(), self::FINISHED);
+        }
+        return $this->currentslot > $this->get_quiz()->get_slotcount();
+    }
+
+    /**
      * Process responses during an attempt at a quiz and finish the attempt.
      *
      * @param  int $timenow the current time.
      */
-    public function finish_attempt($timenow) {
+    public function finish_attempt($timenow,$state) {
         global $DB;
 
         $transaction = $DB->start_delegated_transaction();
 
         $quba = $this->get_quba();
+        if($state == self::ABANDONED)
+            $quba->get_question_attempt($this->get_current_slot())->discard_autosaved_step();
         $quba->finish_all_questions($timenow);
-
         question_engine::save_questions_usage_by_activity($quba);
 
         $attemptrow = new stdClass();
@@ -389,7 +430,10 @@ class attempt {
             )
         );
 
-        $event = \mod_ddtaquiz\event\attempt_finished::create($params);
+        if($state == self::FINISHED)
+            $event = \mod_ddtaquiz\event\attempt_finished::create($params);
+        else
+            $event = \mod_ddtaquiz\event\attempt_overdue::create($params);
         $event->trigger();
 
         $transaction->allow_commit();
@@ -408,18 +452,6 @@ class attempt {
     }
 
     /**
-     * Checks if this attempt is finished.
-     *
-     * @return boolean wether this attempt is finished.
-     */
-    public function is_finished() {
-        if ($this->currentslot > $this->get_quiz()->get_slotcount() && $this->state != self::FINISHED) {
-            $this->finish_attempt(time());
-        }
-        return $this->currentslot > $this->get_quiz()->get_slotcount();
-    }
-
-    /**
      * Checks if this attempt is a preview.
      *
      * @return boolean wether this attempt is a preview.
@@ -432,7 +464,7 @@ class attempt {
      * Determines the next slot based on the conditions of the blocks.
      */
     public function next_slot() {
-        if ($this->is_finished()) {
+        if ($this->check_state_finished()) {
             return;
         }
         $nextslot = $this->get_quiz()->next_slot($this);
@@ -440,8 +472,7 @@ class attempt {
             $this->set_current_slot($nextslot);
         } else {
             $this->set_current_slot($this->quiz->get_main_block()->get_slotcount() + 1);
-            $timenow = time();
-            $this->finish_attempt($timenow);
+            $this->check_state_finished();
         }
     }
 
