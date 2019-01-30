@@ -19,7 +19,6 @@
  * overview or responses report, that has one row per attempt.
  *
  * @package    mod_ddtaquiz
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,7 +32,6 @@ require_once($CFG->libdir.'/tablelib.php');
 /**
  * Base class for reports that are basically a table with one row for each attempt.
  *
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class attempts {

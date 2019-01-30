@@ -18,7 +18,6 @@
  * This file defines the ddtaquiz grades table.
  *
  * @package    mod_ddtaquiz
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +29,6 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * This is a table subclass for displaying the ddtaquiz grades report.
  *
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

@@ -18,7 +18,6 @@
  * Base class used by the reports.
  *
  * @package    mod_ddtaquiz
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,7 +30,6 @@ require_once($CFG->libdir.'/tablelib.php');
 /**
  * Base class used by the reports.
  *
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 abstract class attempts_table extends \table_sql {

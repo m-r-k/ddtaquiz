@@ -29,7 +29,6 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Quiz combined report settings form.
  *
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class combined_form extends attempts_form {

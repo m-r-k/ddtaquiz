@@ -17,7 +17,6 @@
  * Javascript for the edit feedback page. Enables a user to add questions whose feedback is to be replaced.
  *
  * @package    mod_ddtaquiz
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

@@ -18,7 +18,6 @@
  * The mod_ddtaquiz attempt submitted event.
  *
  * @package    mod_ddtaquiz
- * @copyright  2018 Johanna Heinz <johanna.heinz@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -37,7 +36,6 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package    mod_ddtaquiz
  * @since      Moodle 2.6
- * @copyright  2018 Johanna Heinz <johanna.heinz@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class attempt_finished extends \core\event\base {

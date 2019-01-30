@@ -18,7 +18,6 @@
  * This file defines the responses report class.
  *
  * @package    mod_ddtaquiz
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -37,7 +36,6 @@ defined('MOODLE_INTERNAL') || die();
  * Like the overview report, there are options for showing students with/without
  * attempts, and for deleting selected attempts.
  *
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class responses extends attempts {

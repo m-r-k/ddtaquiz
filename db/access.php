@@ -40,7 +40,6 @@
  * The variable name for the capability definitions array is $capabilities
  *
  * @package    mod_ddtaquiz
- * @copyright  2017 Jana Vatter <jana.vatter@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

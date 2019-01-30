@@ -20,7 +20,6 @@
  *
  * @package    mod_ddtaquiz
  * @category   question
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * A column type for the add this question to the block action.
  *
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class add_action_column extends \core_question\bank\action_column_base {
