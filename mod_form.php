@@ -21,19 +21,18 @@
  * visit: http://docs.moodle.org/en/Development:lib/formslib.php
  *
  * @package    mod_ddtaquiz
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/course/moodleform_mod.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/locallib.php');
 
 /**
  * Module instance settings form.
  *
  * @package    mod_ddtaquiz
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_ddtaquiz_mod_form extends moodleform_mod {
@@ -90,11 +89,37 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
 
 
         //Direct Feedback
-        $mform->addElement('header', 'directFeedback', get_string('directFeedback', 'ddtaquiz'));
-        $mform->addElement('select', 'directfeedback',  get_string('directFeedback', 'ddtaquiz'),
+        $mform->addElement('header', 'directFeedBackHeader',get_string('directFeedback', 'ddtaquiz') );
+        $mform->addElement('select', 'directFeedback',  get_string('directFeedback', 'ddtaquiz'),
             array(1 => 'Show',
                 0=>'Dont show'));
-        $mform->setDefault('directfeedback', $quizconfig->directfeedback);
+        $mform->setDefault('directFeedback', $quizconfig->directFeedback);
+
+
+        //Timing
+        $mform->addElement('header', 'timing', get_string('timing', 'ddtaquiz'), 'ddtaquiz');
+
+        // Time limit.
+        $mform->addElement('duration', 'timelimit', get_string('timelimit', 'ddtaquiz'),
+            array('optional' => true));
+        $mform->addHelpButton('timelimit', 'timelimit', 'ddtaquiz');
+        $mform->setAdvanced('timelimit', $quizconfig->timelimit_adv);
+        $mform->setDefault('timelimit', $quizconfig->timelimit);
+
+        // What to do with overdue attempts.
+        $mform->addElement('select', 'overduehandling',
+            get_string('overduehandling', 'ddtaquiz'),
+            ddtaquiz_get_overdue_handling_options());
+        $mform->addHelpButton('overduehandling', 'overduehandling', 'ddtaquiz');
+        $mform->setAdvanced('overduehandling', $quizconfig->overduehandling_adv);
+        $mform->setDefault('overduehandling', $quizconfig->overduehandling);
+        // Grace period time.
+        $mform->addElement('duration', 'graceperiod',get_string('graceperiod', 'ddtaquiz'),
+            array('optional' => true));
+        $mform->addHelpButton('graceperiod', 'graceperiod', 'ddtaquiz');
+        $mform->setAdvanced('graceperiod', $quizconfig->graceperiod_adv);
+        $mform->setDefault('graceperiod', $quizconfig->graceperiod);
+        $mform->disabledIf('graceperiod', 'overduehandling', 'neq', 'graceperiod');
 
         // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();

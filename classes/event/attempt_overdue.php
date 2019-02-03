@@ -38,7 +38,7 @@ defined('MOODLE_INTERNAL') || die();
  * @since      Moodle 2.6
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class attempt_finished extends \core\event\base {
+class attempt_overdue extends \core\event\base {
 
     /**
      * Init method.
@@ -56,7 +56,7 @@ class attempt_finished extends \core\event\base {
      */
     public function get_description() {
         return "The user with id '$this->relateduserid' has submitted the attempt with id '$this->objectid' for the " .
-        "quiz with course module id '$this->contextinstanceid'.";
+        "quiz with course module id '$this->contextinstanceid'. He has not finished it on time.";
     }
 
     /**
@@ -65,7 +65,7 @@ class attempt_finished extends \core\event\base {
      * @return string
      */
     public static function get_name() {
-        return get_string('eventddtaquizattemptfinished', 'ddtaquiz');
+        return get_string('eventquizattemptabandoned', 'ddtaquiz');
     }
 
     /**

@@ -19,7 +19,6 @@
  *
  * @package   mod_ddtaquiz
  * @category  backup
- * @copyright 2018 Jan Emrich <jan.emrich@stud.tu-darmstadt.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -34,7 +33,6 @@ require_once($CFG->dirroot . '/mod/ddtaquiz/backup/moodle2/restore_ddtaquiz_step
  *
  * @package   mod_ddtaquiz
  * @category  backup
- * @copyright 2018 Jan Emrich <jan.emrich@stud.tu-darmstadt.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class restore_ddtaquiz_activity_task extends restore_activity_task {

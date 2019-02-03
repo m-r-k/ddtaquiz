@@ -18,7 +18,6 @@
  * The mod_ddtaquiz question manually graded event.
  *
  * @package    mod_ddtaquiz
- * @copyright  2018 Johanna Heinz <johanna.heinz@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 namespace mod_ddtaquiz\event;
@@ -38,7 +37,6 @@ defined('MOODLE_INTERNAL') || die();
  *
  * @package    mod_ddtaquiz
  * @since      Moodle 3.1
- * @copyright  2018 Johanna Heinz <johanna.heinz@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class question_manually_graded extends \core\event\base {

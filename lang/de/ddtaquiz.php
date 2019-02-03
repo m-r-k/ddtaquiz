@@ -18,7 +18,6 @@
  * German strings for ddtaquiz.
  *
  * @package    mod_ddtaquiz
- * @copyright  2018 Johanna Heinz <johanna.heinz@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 

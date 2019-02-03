@@ -15,33 +15,36 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Defines the view event.
+ * Admin settings class for the ddtaquiz overdue attempt handling method.
  *
- * @package    mod_ddtaquiz
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @package   mod_ddtaquiz
+ * @copyright 2008 Tim Hunt
+ * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-namespace mod_ddtaquiz\event;
 
 defined('MOODLE_INTERNAL') || die();
 
+
 /**
- * The mod_ddtaquiz instance viewed event class
+ * Admin settings class for the ddtaquiz overdue attempt handling method.
  *
- * If the view mode needs to be stored as well, you may need to
- * override methods get_url() and get_legacy_log_data(), too.
+ * Just so we can lazy-load the choices.
  *
- * @package    mod_ddtaquiz
- * @since      Moodle 2.7
+ * @copyright  2011 The Open University
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
-class course_module_viewed extends \core\event\course_module_viewed {
+class mod_ddtaquiz_admin_setting_overduehandling extends admin_setting_configselect_with_advanced {
+    public function load_choices() {
+        global $CFG;
 
-    /**
-     * Initialize the event
-     */
-    protected function init() {
-        $this->data['objecttable'] = 'ddtaquiz';
-        parent::init();
+        if (is_array($this->choices)) {
+            return true;
+        }
+
+        require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
+        $this->choices = ddtaquiz_get_overdue_handling_options();
+
+        return true;
     }
 }

@@ -18,7 +18,6 @@
  * Defines the renderer for the ddtaquiz module.
  *
  * @package    mod_ddtaquiz
- * @copyright  2017 Jana Vatter <jana.vatter@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -30,7 +29,6 @@ use mod_ddtaquiz\output\ddtaquiz_bootstrap_render;
 /**
  * The renderer for the ddtaquiz module.
  *
- * @copyright  2017 Jana Vatter <jana.vatter@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class mod_ddtaquiz_renderer extends plugin_renderer_base
@@ -274,7 +272,9 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $progress = floor(($slot - 1) * 100 / $attempt->get_quiz()->get_slotcount());
         $progressbar = \html_writer::div('', 'bar',
             array('role' => 'progressbar', 'style' => 'width: ' . $progress . '%;', 'class' => 'bg-primary'));
-        $header = \html_writer::div($progressbar, 'progress');
+        $progressBarContainer = html_writer::div($progressbar, 'progress');
+        $time = html_writer::div(html_writer::div('','timeDiv'),'text-right');
+        $header = \html_writer::div($time.$progressBarContainer, '');
 
         $body = html_writer::start_tag('form',
             array('action' => $processurl, 'method' => 'post',
@@ -313,6 +313,15 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $footer = $this->attempt_navigation_buttons($attempt);
 
         $this->page->requires->js_call_amd('mod_ddtaquiz/attempt', 'init');
+        if($attempt->get_quiz()->timing_activated()){
+            $this->page->requires->js_call_amd('mod_ddtaquiz/attempt', 'startTime',[
+                'abandon' => $attempt->get_quiz()->to_abandon(),
+                'timestamp' => $attempt->get_timeleft(),
+                'graceperiod' => $attempt->get_graceperiod(),
+                'url' => $attempt->attempt_url()->raw_out()
+            ]);
+        }
+
 
         return ddtaquiz_bootstrap_render::createCard(
             $body,

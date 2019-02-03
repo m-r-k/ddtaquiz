@@ -19,7 +19,6 @@
  *
  * @package   mod_ddtaquiz
  * @category  backup
- * @copyright 2018 Jan Emrich <jan.emrich@stud.tu-darmstadt.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,7 +30,6 @@ require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
  *
  * @package   mod_ddtaquiz
  * @category  backup
- * @copyright 2018 Jan Emrich <jan.emrich@stud.tu-darmstadt.de>
  * @license   http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class backup_ddtaquiz_activity_structure_step extends backup_questions_activity_structure_step {

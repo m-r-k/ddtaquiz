@@ -25,7 +25,6 @@
  * here will all be database-neutral, using the functions defined in DLL libraries.
  *
  * @package    mod_ddtaquiz
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -46,7 +45,8 @@ function xmldb_ddtaquiz_upgrade($oldversion) {
             try{
             // Update all records in 'course_modules' for labels to have showdescription = 1.
             $DB->execute(
-                "ALTER TABLE mdl_ddtaquiz ADD directfeedback INT(1) NOT NULL DEFAULT 1 AFTER mainblock");
+                "ALTER TABLE mdl_ddtaquiz ADD directfeedback INT(1) NOT NULL DEFAULT 1 AFTER mainblock"
+            );
 
             // Label savepoint reached.
             upgrade_mod_savepoint(true, 2019011506, 'ddtaquiz');
@@ -54,6 +54,28 @@ function xmldb_ddtaquiz_upgrade($oldversion) {
             catch(Exception $e){
 
             }
+    }
+
+    if($oldversion < 2019011512){
+        try{
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz ADD timelimit BIGINT(10) NOT NULL DEFAULT 0 AFTER timemodified"
+            );
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz ADD overduehandling VARCHAR(16) NOT NULL DEFAULT 'autoabandon' AFTER timelimit"
+            );
+
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz ADD graceperiod BIGINT(10) NOT NULL DEFAULT 0 AFTER overduehandling"
+            );
+
+
+            // Label savepoint reached.
+            upgrade_mod_savepoint(true, 2019011512, 'ddtaquiz');
+        }
+        catch(Exception $e){
+
+        }
     }
     return true;
 }

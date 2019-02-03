@@ -18,7 +18,6 @@
  * Defines the edit renderer for the ddta quiz module.
  *
  * @package    mod_ddtaquiz
- * @copyright  2017 Jana Vatter <jana.vatter@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -33,7 +32,6 @@ use \html_writer;
 /**
  * The renderer for the ddta quiz module.
  *
- * @copyright  2017 Jana Vatter <jana.vatter@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class edit_renderer extends \plugin_renderer_base {

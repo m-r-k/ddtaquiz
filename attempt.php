@@ -18,7 +18,6 @@
  * This script displays a particular page of a quiz attempt that is in progress.
  *
  * @package   mod_ddtaquiz
- * @copyright  2017 Jana Vatter <jana.vatter@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -44,7 +43,7 @@ if (!$course = $DB->get_record('course', array('id' => $cm->course))) {
 require_login($course, false, $cm);
 
 // If the attempt is already finished, go to the review page
-if ($attempt->is_finished()) {
+if ($attempt->check_state_finished()) {
     redirect($attempt->review_url());
 }
 

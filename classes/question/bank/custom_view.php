@@ -20,7 +20,6 @@
  *
  * @package    mod_ddtaquiz
  * @category   external
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
@@ -31,7 +30,6 @@ defined('MOODLE_INTERNAL') || die();
 /**
  * Subclass to customise the view of the question bank for the block editing screen.
  *
- * @copyright  2017 Luca Gladiator <lucamarius.gladiator@stud.tu-darmstadt.de>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 class custom_view extends \core_question\bank\view {
