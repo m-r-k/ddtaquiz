@@ -271,3 +271,13 @@ input[type=number].conditionelement {
 .timeDiv{
     padding-bottom: 10px;
 }
+
+.domain-wrapper {
+	display: flex;
+}
+
+.domain-content {
+	flex-grow: 1;
+	display: flex;
+	justify-content: space-evenly;
+}

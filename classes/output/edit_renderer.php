@@ -187,6 +187,11 @@ class edit_renderer extends \plugin_renderer_base {
         $postContent = '';
         $collapseContent = '';
 
+
+        // add domain choice to content
+        $quizconfig = get_config('ddtaquiz');
+        $postContent .= ddtaquiz_bootstrap_render::createDomainCheckboxes(explode(",", $quizconfig->domains));
+
         // add only if main block
         if ($isMain){
             //mover
@@ -224,6 +229,7 @@ class edit_renderer extends \plugin_renderer_base {
             // otherwise just show body
             $content .= html_writer::span($nr.' '. $blockelem->get_name(), 'blockelementdescriptionname');
         }
+
         // return as accordion header + accordion body , expected to be part of an accordion
         $container = ddtaquiz_bootstrap_render::createAccordionHeader(
             $preContent,

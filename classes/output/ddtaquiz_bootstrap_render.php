@@ -117,7 +117,7 @@ class ddtaquiz_bootstrap_render extends \html_writer
                 'id' => (is_array($attr) && array_key_exists('id',$attr))?$attr['id']:'',
                 'class' => (is_array($attr) && array_key_exists('class',$attr))?$attr['class']:'',
             ]).
-            self::start_tag('h5',['class'=>'mb-0']).
+            self::start_tag('h5',['class'=>'mb-0 domain-wrapper']).
             $preContent;
 
         if($collapseId){
@@ -153,6 +153,30 @@ class ddtaquiz_bootstrap_render extends \html_writer
             $content.
             self::end_div().
             self::end_div();
+
+        return $output;
+    }
+
+    public static function createDomainCheckboxes($domains):string{
+        $output = self::start_div("domain-content");
+        foreach ($domains as $domain) {
+            $output .=
+                self::start_div("domain-checkbox").
+                    self::start_tag("input", [
+                        "class" => "form-check-input",
+                        "type" => "checkbox",
+                        "value" => "",
+                        "id" => $domain."-checkbox"
+                        ]).
+                    self::start_tag("label", [
+                        "class" => "form-check-label",
+                        "for" => $domain."-checkbox"
+                    ]).
+                    $domain.
+                    self::end_tag("label").
+                self::end_div();
+        }
+        $output .= self::end_div();
 
         return $output;
     }
