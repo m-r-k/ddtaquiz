@@ -55,9 +55,9 @@ class ddtaquiz {
      * (that is without any questions inside blocks) in the ddta quiz */
     protected $maxgrade = 0;
 
-    protected $directfeedback=0;
-    protected $domains="";
-    protected  $timing = null;
+    protected $directfeedback = 0;
+    protected $domains = "";
+    protected $timing = null;
 
     protected $name;
 
@@ -449,6 +449,14 @@ class ddtaquiz {
      */
     public function to_abandon():bool{
         return $this->timing->to_abandon();
+    }
+
+    /**
+     * @return mixed
+     */
+    public function get_domains()
+    {
+        return $this->domains;
     }
 }
 
