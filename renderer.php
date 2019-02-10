@@ -267,7 +267,9 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      */
     public function attempt_page(attempt $attempt, $slot, $options, $cmid)
     {
+        //TODO: change process url for direct feedback
         $processurl = new \moodle_url('/mod/ddtaquiz/processslot.php');
+        //$processurl = new \moodle_url('/mod/ddtaquiz/directfeedback.php');
         // The progress bar.
         $progress = floor(($slot - 1) * 100 / $attempt->get_quiz()->get_slotcount());
         $progressbar = \html_writer::div('', 'bar',
@@ -286,17 +288,6 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
 
         $body .=
             $attempt->get_quba()->render_question($slot, $options);
-
-        //block for direct feedback
-        $body .= html_writer::start_div('', array('id' => 'directFeedbackID'));
-        $directFeedbackHeader = \html_writer::tag('h3', get_string('directFeedBackHeader', 'ddtaquiz'), array('class' => 'questionheader'));
-        //TODO: FIX Body
-        $directFeedbackBody = $attempt->get_quba()->get_question($slot)->generalfeedback;
-        $correctResponses = $attempt->get_quba()->get_question($slot)->get_correct_response();
-        foreach ($correctResponses as $response)
-            $directFeedbackBody .= get_string('directFeedBackCorrectAnswer', 'ddtaquiz') . $response;
-        $body .= ddtaquiz_bootstrap_render::createCard($directFeedbackBody, $directFeedbackHeader);
-        $body .= html_writer::end_div();
 
         // Some hidden fields to track what is going on.
         $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'attempt',
