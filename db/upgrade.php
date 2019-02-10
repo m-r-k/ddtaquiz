@@ -41,7 +41,7 @@ function xmldb_ddtaquiz_upgrade($oldversion) {
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
-    if ($oldversion < 2019011506) {
+    if ($oldversion < 2019021125) {
             try{
             // Update all records in 'course_modules' for labels to have showdescription = 1.
             $DB->execute(
@@ -49,14 +49,14 @@ function xmldb_ddtaquiz_upgrade($oldversion) {
             );
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019011506, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 2019021125, 'ddtaquiz');
             }
             catch(Exception $e){
 
             }
     }
 
-    if($oldversion < 2019011512){
+    if($oldversion < 2019021125){
         try{
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD timelimit BIGINT(10) NOT NULL DEFAULT 0 AFTER timemodified"
@@ -71,21 +71,21 @@ function xmldb_ddtaquiz_upgrade($oldversion) {
 
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019011512, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 2019021125, 'ddtaquiz');
         }
         catch(Exception $e){
 
         }
     }
 
-    if($oldversion < 2019021004){
+    if($oldversion < 2019021125){
         try{
             $DB->execute(
-                "ALTER TABLE mdl_ddtaquiz ADD domains TEXT NOT NULL DEFAULT ''"
+                "ALTER TABLE mdl_ddtaquiz ADD domains VARCHAR(255) NOT NULL DEFAULT '' AFTER  mainblock"
             );
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019021004, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 2019021125, 'ddtaquiz');
         }
         catch(Exception $e){
 

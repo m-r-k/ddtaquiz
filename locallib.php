@@ -56,7 +56,7 @@ class ddtaquiz {
     protected $maxgrade = 0;
 
     protected $directfeedback=0;
-
+    protected $domains="";
     protected  $timing = null;
 
     protected $name;
@@ -76,7 +76,7 @@ class ddtaquiz {
      *
      * @throws
      */
-    public function __construct($id, $cmid, $name, $mainblockid, $grademethod, $maxgrade,$directfeedback,$showgrade) {
+    public function __construct($id, $cmid, $name, $mainblockid, $grademethod, $maxgrade,$directfeedback,$showgrade,$domains) {
         $this->id = $id;
         $this->name = $name;
         $this->cmid = $cmid;
@@ -85,6 +85,7 @@ class ddtaquiz {
         $this->grademethod = $grademethod;
         $this->maxgrade = $maxgrade;
         $this->showgrade = $showgrade;
+        $this->domains = $domains;
         $this->directfeedback = $directfeedback;
         $this->timing = ddtaquiz_timing::create();
     }
@@ -103,7 +104,7 @@ class ddtaquiz {
         $quiz = $DB->get_record('ddtaquiz', array('id' => $quizid), '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('ddtaquiz', $quizid, $quiz->course, false, MUST_EXIST);
 
-        $ddtaquiz =  new ddtaquiz($quizid, $cm->id, $quiz->name, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade,$quiz->directfeedback,$quiz->showgrade);
+        $ddtaquiz =  new ddtaquiz($quizid, $cm->id, $quiz->name, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade,$quiz->directfeedback,$quiz->showgrade,$quiz->domains);
         $ddtaquiz->timing->enable($quiz->timelimit, $quiz->overduehandling,$quiz->graceperiod);
 
         if($ddtaquiz->get_main_block()->get_name() != $ddtaquiz->get_name()) {
