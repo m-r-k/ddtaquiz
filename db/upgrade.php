@@ -77,5 +77,19 @@ function xmldb_ddtaquiz_upgrade($oldversion) {
 
         }
     }
+
+    if($oldversion < 2019021004){
+        try{
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz ADD domains TEXT NOT NULL DEFAULT ''"
+            );
+
+            // Label savepoint reached.
+            upgrade_mod_savepoint(true, 2019021004, 'ddtaquiz');
+        }
+        catch(Exception $e){
+
+        }
+    }
     return true;
 }

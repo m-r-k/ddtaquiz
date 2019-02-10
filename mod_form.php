@@ -121,6 +121,11 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
         $mform->setDefault('graceperiod', $quizconfig->graceperiod);
         $mform->disabledIf('graceperiod', 'overduehandling', 'neq', 'graceperiod');
 
+        //Domains
+        $mform->addElement('header', 'domainHeader',get_string('domainHeader', 'ddtaquiz') );
+        $mform->addElement('text', 'domains', get_string('domainHelp', 'ddtaquiz'), array('size' => '128'));
+        $mform->setDefault('domains', $quizconfig->domains);
+
         // Add standard elements, common to all modules.
         $this->standard_coursemodule_elements();
 

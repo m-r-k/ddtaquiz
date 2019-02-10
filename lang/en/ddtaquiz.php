@@ -177,3 +177,6 @@ $string['graceperiod_help'] = 'If what to do when time expires is set to \'Allow
 $string['graceperiod_error'] = 'Grace period must be greater then 1 minute.';
 
 $string['eventquizattemptabandoned'] = 'Quiz attempt abandoned';
+
+$string['domainHeader'] = 'Domains';
+$string['domainHelp'] = 'Enter the domains of your questions (comma-separated), to get a domain specific feedback.';
