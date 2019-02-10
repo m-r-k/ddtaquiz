@@ -90,10 +90,16 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
 
         //Direct Feedback
         $mform->addElement('header', 'directFeedBackHeader',get_string('directFeedback', 'ddtaquiz') );
-        $mform->addElement('select', 'directFeedback',  get_string('directFeedback', 'ddtaquiz'),
-            array(1 => 'Show',
-                0=>'Dont show'));
-        $mform->setDefault('directFeedback', $quizconfig->directFeedback);
+
+        $mform->addElement('checkbox', 'specificfeedback' , get_string('specificFeedback', 'ddtaquiz'));
+        //$mform->setDefault('specificFeedback', $quizconfig->specificFeedback);
+        $mform->addElement('checkbox', 'generellfeedback' ,  get_string('generellFeedback', 'ddtaquiz'));
+        //$mform->setDefault('generellFeedback', $quizconfig->generellFeedback);
+        $mform->addElement('checkbox', 'correctanswers' , get_string('correctAnswers', 'ddtaquiz'));
+        $mform->setDefault('correctAnswers', $quizconfig->correctAnswers);
+
+
+
 
 
         //Timing
