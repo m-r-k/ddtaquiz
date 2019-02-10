@@ -19,17 +19,17 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
     //Direct specific feedback
-    $settings->add(new admin_setting_configcheckbox('ddtaquiz/specificFeedback',
-        get_string('specificFeedback', 'ddtaquiz'),
-        get_string('specificFeedbackDesc', 'ddtaquiz'), 1));
+    $settings->add(new admin_setting_configcheckbox('ddtaquiz/specificfeedback',
+        get_string('specificfeedback', 'ddtaquiz'),
+        get_string('specificfeedbackdesc', 'ddtaquiz'), 1));
     //Direct generell feedback
-    $settings->add(new admin_setting_configcheckbox('ddtaquiz/generellFeedback',
-        get_string('generellFeedback', 'ddtaquiz'),
-        get_string('generellFeedbackDesc', 'ddtaquiz'), 1));
+    $settings->add(new admin_setting_configcheckbox('ddtaquiz/generellfeedback',
+        get_string('generellfeedback', 'ddtaquiz'),
+        get_string('generellfeedbackdesc', 'ddtaquiz'), 1));
     //Direct correct answer feedback
-    $settings->add(new admin_setting_configcheckbox('ddtaquiz/correctAnswers',
-        get_string('correctAnswers', 'ddtaquiz'),
-        get_string('correctAnswersDesc', 'ddtaquiz'), 1));
+    $settings->add(new admin_setting_configcheckbox('ddtaquiz/correctanswers',
+        get_string('correctanswers', 'ddtaquiz'),
+        get_string('correctanswersdesc', 'ddtaquiz'), 1));
 
 
     // Time limit.

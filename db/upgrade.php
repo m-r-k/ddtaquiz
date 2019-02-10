@@ -42,8 +42,9 @@ function xmldb_ddtaquiz_upgrade($oldversion)
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
-    if ($oldversion < 2019021016) {
+    if ($oldversion < 2019021134) {
         try {
+
             // Update all records in 'course_modules' for labels to have showdescription = 1.
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD specificfeedback INT(1) NOT NULL DEFAULT 1 AFTER mainblock"
@@ -59,13 +60,13 @@ function xmldb_ddtaquiz_upgrade($oldversion)
             );
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019021016, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 2019021134, 'ddtaquiz');
         } catch (Exception $e) {
 
         }
     }
 
-    if ($oldversion < 2019021009) {
+    if ($oldversion < 2019021130) {
         try {
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD timelimit BIGINT(10) NOT NULL DEFAULT 0 AFTER timemodified"
@@ -80,7 +81,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
 
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019021009, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 2019021130, 'ddtaquiz');
         } catch (Exception $e) {
 
         }

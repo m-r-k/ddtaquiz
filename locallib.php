@@ -114,7 +114,7 @@ class ddtaquiz
 
         $quiz = $DB->get_record('ddtaquiz', array('id' => $quizid), '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('ddtaquiz', $quizid, $quiz->course, false, MUST_EXIST);
-        echo '<pre>', print_r($quiz, 1), '</pre>';
+
         $ddtaquiz = new ddtaquiz($quizid, $cm->id, $quiz->name, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade, $quiz->showgrade, $quiz->specificfeedback, $quiz->generellfeedback, $quiz->correctanswers);
         $ddtaquiz->timing->enable($quiz->timelimit, $quiz->overduehandling, $quiz->graceperiod);
 
@@ -448,6 +448,9 @@ class ddtaquiz
         return $this->showgrade == 1;
     }
 
+    public function showDirectFeedback(){
+        return $this->correctanswers||$this->generellfeedback||$this->specificfeedback;
+    }
 
     /**
      * @return mixed
