@@ -158,18 +158,38 @@ class ddtaquiz_bootstrap_render extends \html_writer
     }
 
     public static function createDomainCheckboxes($qid, $domains):string{
+        global $DB;
+        $qInstance = $DB->get_record("ddtaquiz_qinstance", ["id" => $qid]);
+        $activeDomains = null;
+        if ($qInstance->domains) {
+            $activeDomains = explode(",", $qInstance->domains);
+        }
         $output = self::start_div("domain-content");
         foreach ($domains as $domain) {
             $domain = trim($domain);
-            $output .=
-                self::start_div("domain-checkbox").
+            if (in_array("$domain", $activeDomains)) {
+                $output .=
+                    self::start_div("domain-checkbox") .
                     self::start_tag("input", [
                         "class" => "form-check-input",
                         "type" => "checkbox",
-                        "id" => $qid."-".$domain,
+                        "id" => $qid . "-" . $domain,
                         "value" => "",
-                        "name" => "domain"."-".$qid."-".$domain
-                        ]).
+                        "checked" => "",
+                        "name" => "domain" . "-" . $qid . "-" . $domain
+                    ]);
+            } else {
+                $output .=
+                    self::start_div("domain-checkbox") .
+                    self::start_tag("input", [
+                        "class" => "form-check-input",
+                        "type" => "checkbox",
+                        "id" => $qid . "-" . $domain,
+                        "value" => "",
+                        "name" => "domain" . "-" . $qid . "-" . $domain
+                    ]);
+            }
+            $output .=
                     self::start_tag("label", [
                         "class" => "form-check-label",
                         "for" => $qid."-".$domain
