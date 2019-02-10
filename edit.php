@@ -91,6 +91,22 @@ if ($save) {
         if (!is_null($useand)) {
             $block->get_condition()->set_use_and($useand);
         }
+
+        $domains = [];
+        foreach ($_POST as $key => $value) {
+            if(substr($key, 0, 6) == "domain") {
+                $domain = substr($key, 7);
+                $domain = explode("-", $domain);
+                if (array_key_exists($domain[0], $domains)) {
+                    $domain[1] = $domain[1].",".$domains[$domain[0]];
+                }
+                $domains[$domain[0]] = $domain[1];
+            }
+        }
+        global $DB;
+        foreach ($domains as $qKey => $qDomain) {
+            $DB->set_field("ddtaquiz_qinstance", "domains", $qDomain, ["id" => $qKey]);
+        }
     }catch(Exception $e){
         $errorOutput .= \mod_ddtaquiz\output\ddtaquiz_bootstrap_render::createAlert('danger',$e->getMessage());
     }

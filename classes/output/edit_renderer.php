@@ -190,7 +190,7 @@ class edit_renderer extends \plugin_renderer_base {
 
         // add domain choice to content
         $quizconfig = get_config('ddtaquiz');
-        $postContent .= ddtaquiz_bootstrap_render::createDomainCheckboxes(explode(",", $quizconfig->domains));
+        $postContent .= ddtaquiz_bootstrap_render::createDomainCheckboxes($blockelem->get_id(), explode(",", $quizconfig->domains));
 
         // add only if main block
         if ($isMain){

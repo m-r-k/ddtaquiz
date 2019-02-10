@@ -83,6 +83,9 @@ function xmldb_ddtaquiz_upgrade($oldversion) {
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD domains VARCHAR(255) NOT NULL DEFAULT '' AFTER  mainblock"
             );
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz_qinstance ADD domains TEXT NOT NULL"
+            );
 
             // Label savepoint reached.
             upgrade_mod_savepoint(true, 2019021125, 'ddtaquiz');

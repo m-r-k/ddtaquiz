@@ -157,20 +157,22 @@ class ddtaquiz_bootstrap_render extends \html_writer
         return $output;
     }
 
-    public static function createDomainCheckboxes($domains):string{
+    public static function createDomainCheckboxes($qid, $domains):string{
         $output = self::start_div("domain-content");
         foreach ($domains as $domain) {
+            $domain = trim($domain);
             $output .=
                 self::start_div("domain-checkbox").
                     self::start_tag("input", [
                         "class" => "form-check-input",
                         "type" => "checkbox",
+                        "id" => $qid."-".$domain,
                         "value" => "",
-                        "id" => $domain."-checkbox"
+                        "name" => "domain"."-".$qid."-".$domain
                         ]).
                     self::start_tag("label", [
                         "class" => "form-check-label",
-                        "for" => $domain."-checkbox"
+                        "for" => $qid."-".$domain
                     ]).
                     $domain.
                     self::end_tag("label").
