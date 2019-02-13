@@ -24,7 +24,8 @@
 defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
 require_once(dirname(__FILE__) . '/../../config.php');
-require_once(dirname(__FILE__).'/locallib.php');
+require_once(dirname(__FILE__) . '/locallib.php');
+
 use mod_ddtaquiz\output\ddtaquiz_bootstrap_render;
 
 /**
@@ -276,8 +277,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $progressbar = \html_writer::div('', 'bar',
             array('role' => 'progressbar', 'style' => 'width: ' . $progress . '%;', 'class' => 'bg-primary'));
         $progressBarContainer = html_writer::div($progressbar, 'progress');
-        $time = html_writer::div(html_writer::div('','timeDiv'),'text-right');
-        $header = \html_writer::div($time.$progressBarContainer, '');
+        $time = html_writer::div(html_writer::div('', 'timeDiv'), 'text-right');
+        $header = \html_writer::div($time . $progressBarContainer, '');
 
         $body = html_writer::start_tag('form',
             array('action' => $processurl, 'method' => 'post',
@@ -288,24 +289,20 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $body .= html_writer::start_tag('div');
 
         //This id is needed for disabling the input if feedback is displayed
-        $body .=  html_writer::start_div('', array('id' => 'questionField'));
-            $body .= $attempt->get_quba()->render_question($slot, $options);
+        $body .= html_writer::start_div('', array('id' => 'questionField'));
+        $body .= $attempt->get_quba()->render_question($slot, $options);
         $body .= html_writer::end_div();
 
-        //$feedback = $DB->get_record('ddtaquiz_feedback_block', array('id' => $blockid));
-
-
         //block for direct feedback
-        //TODO: Button shows only if answer is given
         $body .= html_writer::start_div('', array('id' => 'directFeedbackID'));
         $directFeedbackHeader = \html_writer::tag('h3', get_string('directfeedbackheader', 'ddtaquiz'), array('class' => 'questionheader'));
-        $directFeedbackBody="";
+        $directFeedbackBody = "";
         //TODO: FIX Body
         $ddtaquiz = $attempt->get_quiz();
-        $feedbacks=$ddtaquiz->showDirectFeedback();
-        foreach($feedbacks as $key=>$feedback){
-            $cartBody="Feedback Body";
-            $directFeedbackBody.=ddtaquiz_bootstrap_render::createCard($cartBody, \html_writer::tag('h3',get_string($key, 'ddtaquiz')));
+        $feedbacks = $ddtaquiz->showDirectFeedback();
+        foreach ($feedbacks as $key => $feedback) {
+            $cartBody = "Feedback Body";
+            $directFeedbackBody .= ddtaquiz_bootstrap_render::createCard($cartBody, \html_writer::tag('h3', get_string($key, 'ddtaquiz')));
         }
         $body .= ddtaquiz_bootstrap_render::createCard($directFeedbackBody, $directFeedbackHeader);
         $body .= html_writer::end_div();
@@ -325,8 +322,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $footer = $this->attempt_navigation_buttons($attempt);
 
         $this->page->requires->js_call_amd('mod_ddtaquiz/attempt', 'init');
-        if($attempt->get_quiz()->timing_activated()){
-            $this->page->requires->js_call_amd('mod_ddtaquiz/attempt', 'startTime',[
+        if ($attempt->get_quiz()->timing_activated()) {
+            $this->page->requires->js_call_amd('mod_ddtaquiz/attempt', 'startTime', [
                 'abandon' => $attempt->get_quiz()->to_abandon(),
                 'timestamp' => $attempt->get_timeleft(),
                 'graceperiod' => $attempt->get_graceperiod(),
@@ -360,7 +357,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $output .= html_writer::start_div('col-md-6 text-left');
 
         //Direct feedback button
-        if (count($ddtaquiz->showDirectFeedback())!=0) {
+        if (count($ddtaquiz->showDirectFeedback()) != 0) {
             $directFeedbackLabel = get_string('directfeedbackbutton', 'ddtaquiz');
             $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'directFeedback',
                 'value' => $directFeedbackLabel, 'class' => 'btn btn-primary text-left', 'id' => 'directFeedbackBtn'));
