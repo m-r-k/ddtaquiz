@@ -22,7 +22,7 @@
         <FIELD NAME="timelimit" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="timelimit for an attempt"/>
         <FIELD NAME="overduehandling" TYPE="char" LENGTH="16" NOTNULL="true" DEFAULT="autoabandon" SEQUENCE="false" COMMENT="what to do when time finished"/>
         <FIELD NAME="graceperiod" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="grace period when time is over"/>
-        <FIELD NAME="domains" TYPE="text" NOTNULL="true" DEFAULT="" SEQUENCE="false" COMMENT="Domains for Domainspecific Feedback"/>
+        <FIELD NAME="domains" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT=" " SEQUENCE="false" COMMENT="Domains for Domainspecific Feedback"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -51,7 +51,7 @@
         <FIELD NAME="type" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="0 := question 1:= block"/>
         <FIELD NAME="grade" TYPE="number" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" DECIMALS="5" COMMENT="the grade of this block / question"/>
         <FIELD NAME="slot" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="postition of this element"/>
-        <FIELD NAME="domains" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="domains of the quiz"/>
+        <FIELD NAME="domains" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT=" " SEQUENCE="false" COMMENT="domains of the quiz"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

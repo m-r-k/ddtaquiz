@@ -272,7 +272,7 @@ input[type=number].conditionelement {
     padding-bottom: 10px;
 }
 
-.domain-wrapper {
+.ui-sortable .domain-wrapper {
 	display: flex;
 }
 
@@ -280,4 +280,8 @@ input[type=number].conditionelement {
 	flex-grow: 1;
 	display: flex;
 	justify-content: space-evenly;
+}
+
+.domain-group {
+	margin-bottom: 20px;
 }
