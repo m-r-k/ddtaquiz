@@ -37,7 +37,8 @@ require_once($CFG->dirroot . '/mod/ddtaquiz/attemptlib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  * @since      Moodle 3.1
  */
-class ddtaquiz {
+class ddtaquiz
+{
     /** @var int the id of this ddta quiz. */
     protected $id = 0;
     /** @var int the course module id for this quiz. */
@@ -54,10 +55,17 @@ class ddtaquiz {
     /** @var int the total sum of the max grades of the main questions instances
      * (that is without any questions inside blocks) in the ddta quiz */
     protected $maxgrade = 0;
+    /** @var int
+     */
+    protected $specificfeedback = 0;
+    /** @var int
+     */
+    protected $generellfeedback = 0;
+    /** @var int
+     */
+    protected $correctanswers = 0;
 
-    protected $directfeedback=0;
-
-    protected  $timing = null;
+    protected $timing = null;
 
     protected $name;
 
@@ -71,12 +79,13 @@ class ddtaquiz {
      * @param int $mainblockid the id of the main block of this ddta quiz.
      * @param int $grademethod the method used for grading.
      * @param int $maxgrade the best attainable grade of this quiz.
-     * @param int $directfeedback the best attainable grade of this quiz.
      * @param $showgrade
-     *
-     * @throws
+     * @param int $specificFeedback
+     * @param int $generellFeedback
+     * @param int $correctAnswers
      */
-    public function __construct($id, $cmid, $name, $mainblockid, $grademethod, $maxgrade,$directfeedback,$showgrade) {
+    public function __construct($id, $cmid, $name, $mainblockid, $grademethod, $maxgrade, $showgrade, $specificFeedback, $generellFeedback, $correctAnswers)
+    {
         $this->id = $id;
         $this->name = $name;
         $this->cmid = $cmid;
@@ -85,8 +94,10 @@ class ddtaquiz {
         $this->grademethod = $grademethod;
         $this->maxgrade = $maxgrade;
         $this->showgrade = $showgrade;
-        $this->directfeedback = $directfeedback;
         $this->timing = ddtaquiz_timing::create();
+        $this->specificfeedback = $specificFeedback;
+        $this->generellfeedback = $generellFeedback;
+        $this->correctanswers = $correctAnswers;
     }
 
     /**
@@ -97,16 +108,17 @@ class ddtaquiz {
      *
      * @throws
      */
-    public static function load($quizid) {
+    public static function load($quizid)
+    {
         global $DB;
 
         $quiz = $DB->get_record('ddtaquiz', array('id' => $quizid), '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('ddtaquiz', $quizid, $quiz->course, false, MUST_EXIST);
 
-        $ddtaquiz =  new ddtaquiz($quizid, $cm->id, $quiz->name, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade,$quiz->directfeedback,$quiz->showgrade);
-        $ddtaquiz->timing->enable($quiz->timelimit, $quiz->overduehandling,$quiz->graceperiod);
+        $ddtaquiz = new ddtaquiz($quizid, $cm->id, $quiz->name, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade, $quiz->showgrade, $quiz->specificfeedback, $quiz->generellfeedback, $quiz->correctanswers);
+        $ddtaquiz->timing->enable($quiz->timelimit, $quiz->overduehandling, $quiz->graceperiod);
 
-        if($ddtaquiz->get_main_block()->get_name() != $ddtaquiz->get_name()) {
+        if ($ddtaquiz->get_main_block()->get_name() != $ddtaquiz->get_name()) {
             $ddtaquiz->get_main_block()->set_name($ddtaquiz->get_name());
 
         }
@@ -120,8 +132,9 @@ class ddtaquiz {
      * @throws Exception
      * @throws dml_exception
      */
-    public function update_name( $name){
-        if(empty($name))
+    public function update_name($name)
+    {
+        if (empty($name))
             throw new Exception('Quiz name cannot be empty');
         global $DB;
 
@@ -130,12 +143,14 @@ class ddtaquiz {
 
         $DB->update_record('ddtaquiz', $quiz);
     }
+
     /**
      * Get the main block of the quiz.
      *
      * @return block the main block of the quiz.
      */
-    public function get_main_block() {
+    public function get_main_block()
+    {
         if (!$this->mainblock) {
             $this->mainblock = block::load($this, $this->mainblockid);
             $this->enumerate();
@@ -148,7 +163,8 @@ class ddtaquiz {
      *
      * @return int the id of this quiz.
      */
-    public function get_id() {
+    public function get_id()
+    {
         return $this->id;
     }
 
@@ -157,7 +173,8 @@ class ddtaquiz {
      *
      * @return int the course module id of this quiz.
      */
-    public function get_cmid() {
+    public function get_cmid()
+    {
         return $this->cmid;
     }
 
@@ -166,7 +183,8 @@ class ddtaquiz {
      *
      * @return int the course id.
      */
-    public function get_course_id() {
+    public function get_course_id()
+    {
         list($course, $cm) = get_course_and_cm_from_cmid($this->cmid);
         return $course->id;
     }
@@ -176,7 +194,8 @@ class ddtaquiz {
      *
      * @return int the maximum grade.
      */
-    public function get_maxgrade() {
+    public function get_maxgrade()
+    {
         return $this->maxgrade;
     }
 
@@ -185,7 +204,8 @@ class ddtaquiz {
      *
      * @return context_module the context for this module.
      */
-    public function get_context() {
+    public function get_context()
+    {
         return context_module::instance($this->cmid);
     }
 
@@ -194,7 +214,8 @@ class ddtaquiz {
      *
      * @return string the name.
      */
-    public function get_name() {
+    public function get_name()
+    {
         return $this->name;
     }
 
@@ -203,7 +224,8 @@ class ddtaquiz {
      *
      * @return int the number of slots used by this quiz.
      */
-    public function get_slotcount() {
+    public function get_slotcount()
+    {
         $this->enumerate();
         return $this->get_main_block()->get_slotcount();
     }
@@ -214,7 +236,8 @@ class ddtaquiz {
      * @param attempt $attempt the attempt that  the student is currently working on.
      * @return null|int the number of the next slot that the student should work on or null, if no such slot exists.
      */
-    public function next_slot(attempt $attempt) {
+    public function next_slot(attempt $attempt)
+    {
         $this->enumerate();
         return $this->get_main_block()->next_slot($attempt);
     }
@@ -222,7 +245,8 @@ class ddtaquiz {
     /**
      * Enumerates the questions of this quiz.
      */
-    protected function enumerate() {
+    protected function enumerate()
+    {
         $this->get_main_block()->enumerate(1);
     }
 
@@ -232,7 +256,8 @@ class ddtaquiz {
      * @param int $elementid the id of the element.
      * @return null|int the slot number of the element or null, if the element can not be found.
      */
-    public function get_slot_for_element($elementid) {
+    public function get_slot_for_element($elementid)
+    {
         $this->enumerate();
         return $this->get_main_block()->get_slot_for_element($elementid);
     }
@@ -242,7 +267,8 @@ class ddtaquiz {
      *
      * @param question_usage_by_activity $quba the question usage to add the questions to.
      */
-    public function add_questions_to_quba(question_usage_by_activity $quba) {
+    public function add_questions_to_quba(question_usage_by_activity $quba)
+    {
         $this->get_main_block()->add_questions_to_quba($quba);
     }
 
@@ -251,7 +277,8 @@ class ddtaquiz {
      *
      * @return array the block_elements representing the questions.
      */
-    public function get_questions() {
+    public function get_questions()
+    {
         return $this->get_main_block()->get_questions();
     }
 
@@ -260,14 +287,16 @@ class ddtaquiz {
      *
      * @return array the block_elements representing the elements.
      */
-    public function get_elements() {
+    public function get_elements()
+    {
         return $this->get_main_block()->get_elements();
     }
 
     /**
      * Updates the maximum grade.
      */
-    public function update_maxgrade() {
+    public function update_maxgrade()
+    {
         global $DB;
 
         $grade = 0;
@@ -293,7 +322,8 @@ class ddtaquiz {
      *
      * @return bool Indicates success or failure.
      */
-    public function save_best_grade() {
+    public function save_best_grade()
+    {
         global $DB, $USER;
 
         $quiz = $DB->get_record('ddtaquiz', array('id' => $this->get_id()), '*', MUST_EXIST);
@@ -324,7 +354,7 @@ class ddtaquiz {
 
         // Save the best grade in the database.
         if ($grade = $DB->get_record('ddtaquiz_grades',
-                array('quiz' => $quiz->id, 'userid' => $userid))) {
+            array('quiz' => $quiz->id, 'userid' => $userid))) {
             $grade->grade = $bestgrade;
             $grade->timemodified = time();
             $DB->update_record('ddtaquiz_grades', $grade);
@@ -347,7 +377,8 @@ class ddtaquiz {
      * @param float $grade The grade to round.
      * @return float
      */
-    public function format_grade($grade) {
+    public function format_grade($grade)
+    {
         return format_float($grade, $this->get_grade_format());
     }
 
@@ -356,7 +387,8 @@ class ddtaquiz {
      *
      * @return integer
      */
-    protected function get_grade_format() {
+    protected function get_grade_format()
+    {
         return 2;
     }
 
@@ -365,7 +397,8 @@ class ddtaquiz {
      *
      * @return int the number of attempts.
      */
-    public function get_num_attempts() {
+    public function get_num_attempts()
+    {
         global $DB;
         return $DB->count_records('ddtaquiz_attempts', array('quiz' => $this->id));
     }
@@ -375,7 +408,8 @@ class ddtaquiz {
      *
      * @return boolean wether the quiz has attempts, that are not a preview.
      */
-    public function has_attempts() {
+    public function has_attempts()
+    {
         global $DB;
         $count = $DB->count_records('ddtaquiz_attempts', array('quiz' => $this->id, 'preview' => 0));
         if ($count > 0) {
@@ -390,7 +424,8 @@ class ddtaquiz {
      *
      * @return int 0 for one attempt, 1 for best attempt, 2 for last attempt.
      */
-    public function get_grademethod() {
+    public function get_grademethod()
+    {
         return $this->grademethod;
     }
 
@@ -399,7 +434,8 @@ class ddtaquiz {
      *
      * @return bool true if the quiz may be taken multiple times by one student.
      */
-    public function multiple_attempts_allowed() {
+    public function multiple_attempts_allowed()
+    {
         return $this->grademethod == 1 || $this->grademethod == 2;
     }
 
@@ -407,51 +443,66 @@ class ddtaquiz {
      * Returns true if grades are to be shown to user, false otherwise
      * @return bool
      */
-    public function show_grades(){
+    public function show_grades()
+    {
         return $this->showgrade == 1;
     }
 
     public function showDirectFeedback(){
-        return $this->directfeedback == 1;
+        $feedbacks=array("correctanswers"=>$this->correctanswers,"generellfeedback"=>$this->generellfeedback,"specificfeedback"=>$this->specificfeedback);
+
+        foreach($feedbacks as $key=>$feedback){
+            if(!$feedback){
+                unset($feedbacks[$key]);
+            }
+
+        }
+        return $feedbacks;
     }
 
     /**
      * @return mixed
      */
-    public function get_graceperiod(){
+    public function get_graceperiod()
+    {
         return $this->timing->get_graceperiod();
     }
 
     /**
      * @return mixed
      */
-    public function get_overduehandling(){
+    public function get_overduehandling()
+    {
         return $this->timing->get_overduehandling();
     }
 
     /**
      * @return mixed
      */
-    public function get_timelimit(){
+    public function get_timelimit()
+    {
         return $this->timing->get_timelimit();
     }
 
     /**
      * @return bool
      */
-    public function timing_activated():bool{
+    public function timing_activated(): bool
+    {
         return $this->timing->enabled();
     }
 
     /**
      * @return bool
      */
-    public function to_abandon():bool{
+    public function to_abandon(): bool
+    {
         return $this->timing->to_abandon();
     }
 }
 
-class ddtaquiz_timing {
+class ddtaquiz_timing
+{
     private $timelimit;
     private $overduehandling;
     private $graceperiod;
@@ -459,6 +510,7 @@ class ddtaquiz_timing {
     public const AUTOBANDON = 'autoabandon';
     public const AUTOSUBMIT = 'autosubmit';
     public const GRACEPERIOD = 'graceperiod';
+
     /**
      * ddtaquiz_timing constructor.
      * @param $timelimit
@@ -472,8 +524,9 @@ class ddtaquiz_timing {
         $this->graceperiod = $graceperiod;
     }
 
-    public static function create():self{
-        return new ddtaquiz_timing(0,self::AUTOSUBMIT,0);
+    public static function create(): self
+    {
+        return new ddtaquiz_timing(0, self::AUTOSUBMIT, 0);
     }
 
     /**
@@ -482,33 +535,37 @@ class ddtaquiz_timing {
      * @param $graceperiod
      * @throws Exception
      */
-    public function enable($timelimit, $overduehandling, $graceperiod){
-        if($timelimit > 1){
-            switch ($overduehandling){
-                case self::GRACEPERIOD : {
-                    if($graceperiod > 60){
-                        $this->timelimit = $timelimit;
-                        $this->overduehandling = $overduehandling;
-                        $this->graceperiod = $graceperiod;
-                        break;
-                    }else{
-                        throw new Exception(get_string('graceperiod_error','ddtaquiz'));
+    public function enable($timelimit, $overduehandling, $graceperiod)
+    {
+        if ($timelimit > 1) {
+            switch ($overduehandling) {
+                case self::GRACEPERIOD :
+                    {
+                        if ($graceperiod > 60) {
+                            $this->timelimit = $timelimit;
+                            $this->overduehandling = $overduehandling;
+                            $this->graceperiod = $graceperiod;
+                            break;
+                        } else {
+                            throw new Exception(get_string('graceperiod_error', 'ddtaquiz'));
+                        }
                     }
-                }
 
                 case self::AUTOSUBMIT :
-                case self::AUTOBANDON : {
-                    $this->timelimit = $timelimit;
-                    $this->overduehandling = $overduehandling;
-                    $this->graceperiod = 0;
-                    break;
-                }
-                default : {
-                    throw new Exception(get_string('timing_mode_error','ddtaquiz'));
-                    break;
-                }
+                case self::AUTOBANDON :
+                    {
+                        $this->timelimit = $timelimit;
+                        $this->overduehandling = $overduehandling;
+                        $this->graceperiod = 0;
+                        break;
+                    }
+                default :
+                    {
+                        throw new Exception(get_string('timing_mode_error', 'ddtaquiz'));
+                        break;
+                    }
             }
-        }else{
+        } else {
             $this->disable();
         }
     }
@@ -516,7 +573,8 @@ class ddtaquiz_timing {
     /**
      *
      */
-    public function disable(){
+    public function disable()
+    {
         $this->timelimit = 0;
         $this->overduehandling = self::AUTOSUBMIT;
         $this->graceperiod = 0;
@@ -525,7 +583,8 @@ class ddtaquiz_timing {
     /**
      * @return bool
      */
-    public function enabled():bool{
+    public function enabled(): bool
+    {
         return $this->timelimit > 0;
     }
 
@@ -556,7 +615,8 @@ class ddtaquiz_timing {
     /**
      * @return bool
      */
-    public function to_abandon():bool{
+    public function to_abandon(): bool
+    {
         return $this->overduehandling == self::AUTOBANDON;
     }
 
@@ -566,10 +626,11 @@ class ddtaquiz_timing {
  * @return array
  * @throws coding_exception
  */
-function ddtaquiz_get_overdue_handling_options() {
+function ddtaquiz_get_overdue_handling_options()
+{
     return array(
-        'autosubmit'  => get_string('overduehandling_autosubmit','ddtaquiz'),
-        'graceperiod' => get_string('overduehandling_graceperiod','ddtaquiz'),
-        'autoabandon' => get_string('overduehandling_autoabandon','ddtaquiz'),
+        'autosubmit' => get_string('overduehandling_autosubmit', 'ddtaquiz'),
+        'graceperiod' => get_string('overduehandling_graceperiod', 'ddtaquiz'),
+        'autoabandon' => get_string('overduehandling_autoabandon', 'ddtaquiz'),
     );
 }

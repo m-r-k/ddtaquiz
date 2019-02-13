@@ -36,28 +36,38 @@ defined('MOODLE_INTERNAL') || die();
  * @param int $oldversion the current version number.
  * @return bool
  */
-function xmldb_ddtaquiz_upgrade($oldversion) {
+function xmldb_ddtaquiz_upgrade($oldversion)
+{
     global $DB;
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
-    if ($oldversion < 2019011506) {
-            try{
+    if ($oldversion < 2019021134) {
+        try {
+
             // Update all records in 'course_modules' for labels to have showdescription = 1.
             $DB->execute(
-                "ALTER TABLE mdl_ddtaquiz ADD directfeedback INT(1) NOT NULL DEFAULT 1 AFTER mainblock"
+                "ALTER TABLE mdl_ddtaquiz ADD specificfeedback INT(1) NOT NULL DEFAULT 1 AFTER mainblock"
+            );
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz ADD generellfeedback INT(1) NOT NULL DEFAULT 1 AFTER specificfeedback"
+            );
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz ADD correctanswers INT(1) NOT NULL DEFAULT 1 AFTER generellfeedback"
+            );
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz DROP directfeedback"
             );
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019011506, 'ddtaquiz');
-            }
-            catch(Exception $e){
+            upgrade_mod_savepoint(true, 2019021134, 'ddtaquiz');
+        } catch (Exception $e) {
 
-            }
+        }
     }
 
-    if($oldversion < 2019011512){
-        try{
+    if ($oldversion < 2019021130) {
+        try {
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD timelimit BIGINT(10) NOT NULL DEFAULT 0 AFTER timemodified"
             );
@@ -71,9 +81,8 @@ function xmldb_ddtaquiz_upgrade($oldversion) {
 
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019011512, 'ddtaquiz');
-        }
-        catch(Exception $e){
+            upgrade_mod_savepoint(true, 2019021130, 'ddtaquiz');
+        } catch (Exception $e) {
 
         }
     }

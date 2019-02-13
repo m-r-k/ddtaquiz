@@ -267,7 +267,9 @@ input[type=number].conditionelement {
 #directFeedbackID{
 	display:none;
 }
-
+#directFeedbackBtn{
+	display:none;
+}
 .timeDiv{
     padding-bottom: 10px;
 }

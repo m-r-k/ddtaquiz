@@ -156,10 +156,14 @@ $string['combinedfilename'] = 'combined';
 $string['noCandidatesForCondition'] = 'First add at least one question!';
 
 //Direct Feedback
-$string['directFeedBackHeader']='Feedback';
-$string['directFeedBackCorrectAnswer']='The correct answer is ';
-$string['directFeedback']='Direct Feedback';
-$string['directFeedbackDesc']='If activated a button is shown to display a direct feedback during each questionattempt';
+$string['directfeedbackheader']='Direct Feedback';
+$string['directfeedbackbutton']='Direct Feedback';
+$string['specificfeedback']='Spezific feedback';
+$string['specificfeedback_help']='Spezific feedback help text';
+$string['generellfeedback']='Generell feedback';
+$string['generellfeedback_help']='Generell feedback  help text';
+$string['correctanswers']='Correct answer feedback';
+$string['correctanswers_help']='Correct answer feedback  help text';
 
 //Timelimit
 $string['timing'] = 'Timing';
