@@ -157,6 +157,7 @@ $string['noCandidatesForCondition'] = 'First add at least one question!';
 
 //Direct Feedback
 $string['directfeedbackheader']='Direct Feedback';
+$string['directfeedbackbutton']='Direct Feedback';
 $string['specificfeedback']='Spezific feedback';
 $string['specificfeedback_help']='Spezific feedback help text';
 $string['generellfeedback']='Generell feedback';

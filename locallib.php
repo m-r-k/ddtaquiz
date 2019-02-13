@@ -449,7 +449,15 @@ class ddtaquiz
     }
 
     public function showDirectFeedback(){
-        return $this->correctanswers||$this->generellfeedback||$this->specificfeedback;
+        $feedbacks=array("correctanswers"=>$this->correctanswers,"generellfeedback"=>$this->generellfeedback,"specificfeedback"=>$this->specificfeedback);
+
+        foreach($feedbacks as $key=>$feedback){
+            if(!$feedback){
+                unset($feedbacks[$key]);
+            }
+
+        }
+        return $feedbacks;
     }
 
     /**
