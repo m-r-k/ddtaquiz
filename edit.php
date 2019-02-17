@@ -104,6 +104,7 @@ if ($save) {
             }
         }
         global $DB;
+        // get all qinst of quiz and set 0 for all that have nothing
         foreach ($domains as $qKey => $qDomain) {
             $DB->set_field("ddtaquiz_qinstance", "domains", $qDomain, ["id" => $qKey]);
         }
@@ -168,6 +169,10 @@ if ($save) {
         $feedbackblock = feedback_block::create($ddtaquiz, get_string('feedbackblockdefaultname', 'ddtaquiz'));
         $nexturl = new moodle_url('/mod/ddtaquiz/editfeedback.php',
             array('cmid' => $cmid, 'bid' => $feedbackblock->get_id()));
+    } else if (optional_param('adddomainfeedback', 0, PARAM_INT)) {
+        $feedbackblock = feedback_block::create($ddtaquiz, get_string('domainfeedbackblockdefaultname', 'ddtaquiz'), 1);
+        $nexturl = new moodle_url('/mod/ddtaquiz/editfeedback.php',
+            array('cmid' => $cmid, 'bid' => $feedbackblock->get_id(), 'domain' => 1));
     } else {
         $nexturl = new moodle_url('/mod/ddtaquiz/view.php', array('id' => $cmid));
     }

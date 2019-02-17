@@ -650,3 +650,231 @@ class multiquestions_condition_part {
 
     }
 }
+
+class domain_condition extends condition {
+    // domain name
+    protected $name;
+    // replacement for domain abbreviation
+    protected $replace;
+    // condition type (see class condition part)
+    protected $type;
+    // reference grade for evaluation
+    protected $grade = 0;
+
+    /** */
+    const WAS_DISPLAYED     = 0;
+    /** condition that student has less points than a set amount */
+    const LESS              = 1;
+    /** condition that student has less or more points than a set amount */
+    const LESS_OR_EQUAL     = 2;
+    /** condition that student has more points than a set amount */
+    const GREATER           = 3;
+    /** condition that student has more or the same points than a set amount */
+    const GREATER_OR_EQUAL  = 4;
+    /** condition that student has the same points than a set amount */
+    const EQUAL             = 5;
+    /** condition that student has not the same points than a set amount */
+    const NOT_EQUAL         = 6;
+
+    /**
+     * Constructor, assuming we already have the necessary data loaded.
+     *
+     * @param int $id the id of this condition.
+     * @param string $name
+     * @param string $replace
+     * @param int $type
+     */
+    public function __construct($id, $name, $replace, $type, $grade = 0) {
+        $this->id = $id;
+        $this->name = $name;
+        $this->replace = $replace;
+        $this->type = $type;
+        $this->grade = $grade;
+    }
+
+    /**
+     * Loads the condition for one block from the database.
+     *
+     * @param int $id the id of the block to get the condition for.
+     * @return condition the loaded condition.
+     */
+    public static function load($id) {
+        global $DB;
+
+        if ($id) {
+            $condition = $DB->get_record('ddtaquiz_condition', array('id' => $id));
+            if (isset($condition->domainname))
+                $name = $condition->domainname;
+            else
+                $name = "";
+            if (isset($condition->domainreplace))
+                $replace = $condition->domainreplace;
+            else
+                $replace = "";
+            if (isset($condition->domaintype))
+                $type = $condition->domaintype;
+            else
+                $type = 1;
+            if (isset($condition->domaingrade))
+                $grade = $condition->domaingrade;
+            else
+                $grade = 0;
+        } else {
+            $name = "";
+            $replace = "";
+            $type = 1;
+            $grade = 0;
+        }
+        return new domain_condition($id, $name,$replace, $type, $grade);
+    }
+
+    /**
+     * Inserts a new condition into the database.
+     *
+     * @return condition the newly created condtion part.
+     */
+    public static function create() {
+        global $DB;
+
+        $record = new stdClass();
+        $record->useand = true;
+
+        $id = $DB->insert_record('ddtaquiz_condition', $record);
+
+        return new domain_condition($id, "", "", 0);
+    }
+
+    /**
+     * Inserts a new condition into the database.
+     *
+     * @return condition the newly created condtion part.
+     */
+    public function update() {
+        global $DB;
+
+        $record = new stdClass();
+        $record->id = $this->get_id();
+        $record->useand = $this->useand;
+        $record->domaintype = $this->type;
+        $record->domainname = $this->name;
+        $record->domainreplace = $this->replace;
+        $record->domaingrade = $this->grade;
+
+        $DB->update_record('ddtaquiz_condition', $record);
+    }
+
+    /**
+     * Checks whether this condition is met for a certain attempt.
+     *
+     * @param \attempt $attempt the attempt to check this part of the condition for.
+     * @return bool whether this condition is fullfilled.
+     */
+    public function is_fullfilled($attempt) {
+        global $DB;
+        $elements = $attempt->get_quiz()->get_elements();
+        $active_elements = [];
+        foreach ($elements as $element) {
+            $id = $element->get_id();
+            $q_instance = $DB->get_record("ddtaquiz_qinstance", ["id" => $id]);
+            if (in_array($this->name, explode(",", $q_instance->domains))) {
+                array_push($active_elements, $id);
+            }
+        }
+        $achieved_grade = 0;
+        foreach ($elements as $element) {
+            if (in_array($element->get_id(), $active_elements)) {
+                $add_grade = $element->get_grade($attempt);
+                if (!is_null($add_grade)) {
+                    $achieved_grade += $add_grade;
+                }
+            }
+        }
+        switch ($this->type) {
+            case self::LESS:
+                return $achieved_grade < $this->grade;
+            case self::LESS_OR_EQUAL:
+                return $achieved_grade <= $this->grade;
+            case self::GREATER:
+                return $achieved_grade > $this->grade;
+            case self::GREATER_OR_EQUAL:
+                return $achieved_grade >= $this->grade;
+            case self::EQUAL:
+                return $achieved_grade == $this->grade;
+            case self::NOT_EQUAL:
+                return $achieved_grade != $this->grade;
+            default:
+                debugging('Unsupported condition part type: ' . $this->type);
+                return true;
+        }
+    }
+
+    /**
+     * @return string
+     */
+    public function get_name()
+    {
+        return $this->name;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function set_name($name)
+    {
+        $this->name = $name;
+        $this->update();
+    }
+
+    /**
+     * @return string
+     */
+    public function get_replace()
+    {
+        return $this->replace;
+    }
+
+    /**
+     * @param string $replace
+     */
+    public function set_replace($replace)
+    {
+        $this->replace = $replace;
+        $this->update();
+    }
+
+    /**
+     * @return int
+     */
+    public function get_type()
+    {
+        return $this->type;
+    }
+
+    /**
+     * @param int $type
+     */
+    public function set_type($type)
+    {
+        $this->type = $type;
+        $this->update();
+    }
+
+    /**
+     * @return int
+     */
+    public function get_grade()
+    {
+        return $this->grade;
+    }
+
+    /**
+     * @param int $grade
+     */
+    public function set_grade($grade)
+    {
+        $this->grade = $grade;
+        $this->update();
+    }
+
+
+}

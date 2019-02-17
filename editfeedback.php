@@ -27,6 +27,7 @@ require_once($CFG->dirroot . '/question/editlib.php');
 
 $blockid = required_param('bid', PARAM_INT);
 $save = optional_param('save', 0, PARAM_INT);
+$domain = optional_param('domain', 0, PARAM_INT);
 
 list($thispageurl, $contexts, $cmid, $cm, $quiz, $pagevars) = question_edit_setup('editq',
     '/mod/ddtaquiz/editfeedback.php', true);
@@ -43,7 +44,7 @@ $thispageurl->param('bid', $blockid);
 
 $PAGE->set_url($thispageurl);
 
-if (optional_param('save', 0, PARAM_INT)) {
+if ($save) {
     $name = required_param('blockname', PARAM_TEXT);
     $feedbackblock->set_name($name);
 
@@ -53,19 +54,38 @@ if (optional_param('save', 0, PARAM_INT)) {
     $feedbackblock->update($name, $feedbacktext, $uses);
 
     // Condition.
-    try{
-        if (array_key_exists('conditionparts', $_POST)) {
-            $feedbackblock->get_condition()->updateSingleParts($_POST['conditionparts']);
+    if ($domain) {
+        try {
+            if (array_key_exists('domainname', $_POST)) {
+                $feedbackblock->get_condition()->set_name($_POST['domainname']);
+            }
+            if (array_key_exists('domaintype', $_POST)) {
+                $feedbackblock->get_condition()->set_type($_POST['domaintype']);
+            }
+            if (array_key_exists('domaingrade', $_POST)) {
+                $feedbackblock->get_condition()->set_grade($_POST['domaingrade']);
+            }
+            if (array_key_exists('domainreplace', $_POST)) {
+                $feedbackblock->get_condition()->set_replace($_POST['domainreplace']);
+            }
+        } catch (Exception $e) {
+            $_SESSION['edit-error'] .= \mod_ddtaquiz\output\ddtaquiz_bootstrap_render::createAlert('danger', $e->getMessage());
         }
-        if (array_key_exists('conditionMQParts', $_POST)) {
-            $feedbackblock->get_condition()->updateMQParts($_POST['conditionMQParts']);
+    } else {
+        try {
+            if (array_key_exists('conditionparts', $_POST)) {
+                $feedbackblock->get_condition()->updateSingleParts($_POST['conditionparts']);
+            }
+            if (array_key_exists('conditionMQParts', $_POST)) {
+                $feedbackblock->get_condition()->updateMQParts($_POST['conditionMQParts']);
+            }
+            $useand = optional_param('use_and', null, PARAM_INT);
+            if (!is_null($useand)) {
+                $feedbackblock->get_condition()->set_use_and($useand);
+            }
+        } catch (Exception $e) {
+            $_SESSION['edit-error'] .= \mod_ddtaquiz\output\ddtaquiz_bootstrap_render::createAlert('danger', $e->getMessage());
         }
-        $useand = optional_param('use_and', null, PARAM_INT);
-        if (!is_null($useand)) {
-            $feedbackblock->get_condition()->set_use_and($useand);
-        }
-    }catch(Exception $e){
-        $_SESSION['edit-error'] .= \mod_ddtaquiz\output\ddtaquiz_bootstrap_render::createAlert('danger',$e->getMessage());
     }
     if (optional_param('done', 0, PARAM_INT)) {
         $nexturl = new moodle_url('/mod/ddtaquiz/edit.php', array('cmid' => $cmid));

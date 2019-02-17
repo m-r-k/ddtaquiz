@@ -105,6 +105,10 @@
       <FIELDS>
         <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
         <FIELD NAME="useand" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="Whether the parts of this condition are connected with and. Or is used otherwise."/>
+        <FIELD NAME="domaintype" TYPE="int" LENGTH="5" NOTNULL="false" SEQUENCE="false" COMMENT="0: was displayed 1: &amp;lt; 2: &amp;lt;= 3: &amp;gt; 4: &amp;gt;= 5: ="/>
+        <FIELD NAME="domainname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
+        <FIELD NAME="domainreplace" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Replacement for the short domain name"/>
+        <FIELD NAME="grade" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
@@ -131,6 +135,7 @@
         <FIELD NAME="quizid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The quiz this feedback block belongs to."/>
         <FIELD NAME="conditionid" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="the condition under which to use this feedback"/>
         <FIELD NAME="feedbacktext" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The text of the ddta feedback."/>
+        <FIELD NAME="domainfeedback" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="wether or not this is a domain feedback"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

@@ -141,7 +141,7 @@
 }
 
 input[type=number].conditionelement {
-	width: 50px;
+	width: auto;
 }
 
 #conditiontypechoicecontainer {
@@ -284,4 +284,8 @@ input[type=number].conditionelement {
 
 .domain-group {
 	margin-bottom: 20px;
+}
+
+.domain-wrapper .conditionreplace {
+	width: auto;
 }

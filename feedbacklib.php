@@ -33,7 +33,7 @@ defined('MOODLE_INTERNAL') || die();
 class feedback {
     /** @var array the feedback blocks of this feedback. */
     protected $feedbackblocks = null;
-    /** @var int $quiz the quiz this feedback belongs to. */
+    /** @var ddtaquiz $quiz the quiz this feedback belongs to. */
     protected $quiz = null;
 
     /**
@@ -56,6 +56,15 @@ class feedback {
     }
 
     /**
+     * Gets the corresponding ddtaquiz for the feedback.
+     *
+     * @return ddtaquiz the corresponding quiz
+     */
+    public function get_quiz() {
+        return $this->quiz;
+    }
+
+    /**
      * Returns the feedback blocks of this feedback.
      *
      * @return array the feedback_blocks.
@@ -64,7 +73,7 @@ class feedback {
         if (is_null($this->feedbackblocks)) {
             global $DB;
 
-            $records = $DB->get_records('ddtaquiz_feedback_block', array('quizid' => $this->quiz->get_id()));
+            $records = $DB->get_records('ddtaquiz_feedback_block', array('quizid' => $this->quiz->get_id(), 'domainfeedback' => 0));
             $blocks = array_map(function ($block) {
                 return feedback_block::load($block->id, $this->quiz);
             }, $records);
@@ -183,7 +192,7 @@ class feedback_block {
      * @param condition $condition the condition under which to use this feedback instead of the standard feedback.
      * @param string $feedbacktext the feedbacktext.
      */
-    public function __construct($id, $quiz, $name, condition $condition, $feedbacktext) {
+    public function __construct($id, $quiz, $name, $condition, $feedbacktext) {
         $this->id = $id;
         $this->quiz = $quiz;
         $this->name = $name;
@@ -203,8 +212,11 @@ class feedback_block {
 
         $feedback = $DB->get_record('ddtaquiz_feedback_block', array('id' => $blockid));
 
-        $condition = condition::load($feedback->conditionid);
-
+        if ($feedback->domainfeedback) {
+            $condition = domain_condition::load($feedback->conditionid);
+        } else {
+            $condition = condition::load($feedback->conditionid);
+        }
         return new feedback_block($blockid, $quiz, $feedback->name, $condition, $feedback->feedbacktext);
     }
 
@@ -213,18 +225,25 @@ class feedback_block {
      *
      * @param ddtaquiz $quiz the quiz this feedbackblock belongs to.
      * @param string $name the name of the feedback block.
+     * @param int $domain set "1" for domain feedback block
      * @return feedback_block the created feedback block.
+     * @throws dml_exception
      */
-    public static function create(ddtaquiz $quiz, $name) {
+    public static function create(ddtaquiz $quiz, $name, $domain = 0) {
         global $DB;
 
-        $condition = condition::create();
+        if ($domain) {
+            $condition = domain_condition::create();
+        } else {
+            $condition = condition::create();
+        }
 
         $record = new stdClass();
         $record->name = $name;
         $record->quizid = $quiz->get_id();
         $record->conditionid = $condition->get_id();
         $record->feedbacktext = '';
+        $record->domainfeedback = $domain;
 
         $blockid = $DB->insert_record('ddtaquiz_feedback_block', $record);
 
@@ -308,7 +327,7 @@ class feedback_block {
     /**
      * Gets the condition under which to display this feedback.
      *
-     * @return condition the condition.
+     * @return mixed
      */
     public function get_condition() {
         return $this->condition;
@@ -493,5 +512,37 @@ class specialized_feedback {
         } else {
             return false;
         }
+    }
+}
+
+class domain_feedback extends feedback {
+
+    /**
+     * Returns the feedback blocks of this feedback.
+     *
+     * @return array the feedback_blocks.
+     */
+    public function get_blocks() {
+        if (is_null($this->feedbackblocks)) {
+            global $DB;
+
+            $records = $DB->get_records('ddtaquiz_feedback_block', array('quizid' => $this->quiz->get_id(), 'domainfeedback' => 1));
+            $blocks = array_map(function ($block) {
+                return feedback_block::load($block->id, $this->quiz);
+            }, $records);
+
+            $this->feedbackblocks = $blocks;
+        }
+        return $this->feedbackblocks;
+    }
+
+    /**
+     * Gets the specialized feedback for a ddtaquiz.
+     *
+     * @param ddtaquiz $quiz the ddtaquiz to get the feedback for.
+     * @return feedback the feedback for this quiz.
+     */
+    public static function get_feedback(ddtaquiz $quiz) {
+        return new domain_feedback($quiz);
     }
 }

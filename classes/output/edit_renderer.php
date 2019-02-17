@@ -28,6 +28,7 @@ require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
 require_once($CFG->dirroot . '/lib/editorlib.php');
 
 use \html_writer;
+use \domain_feedback;
 
 /**
  * The renderer for the ddta quiz module.
@@ -126,6 +127,7 @@ class edit_renderer extends \plugin_renderer_base {
 
         /********************** FeedBack Card  *****************************************/
         if ($block->is_main_block()) {
+            $output .= $this->domain_feedback_block($feedback->get_quiz(), $pageurl);
             $output .= $this->feedback_block($feedback, $pageurl);
         }
 
@@ -492,6 +494,81 @@ class edit_renderer extends \plugin_renderer_base {
 
 
         return  ddtaquiz_bootstrap_render::createCard($conditionCardBody,$conditionCardHeader, $conditionCardFooter);
+    }
+
+    /**
+     * TODO:
+     * Renders the HTML for the condition block.
+     *
+     * @param \domain_condition $condition the condition to be rendered.
+     * @param array $candidates the block_elements the condition can depend on.
+     * @return string the HTML of the condition block.
+     * @throws
+     */
+    public function domain_condition_block(\domain_condition $condition, $candidates) {
+        $conditionCardHeader = \html_writer::tag('h3', get_string('conditions', 'ddtaquiz'), array('class' => 'conditionblockheader'));
+
+        //If no candidate is available display a warning
+        if(count($candidates)==0)
+        {
+            $this->page->requires->js_call_amd('mod_ddtaquiz/main', 'cleanAlerts');
+            $content = \html_writer::tag('label', get_string('noCandidatesForCondition', 'ddtaquiz'));
+            $conditionpart = ddtaquiz_bootstrap_render::createAlert('danger',$content);
+        } else {
+            $preContent = \html_writer::tag('label', get_string('gradeatdomain', 'ddtaquiz'),
+                array('class' => 'conditionelement'));
+
+            $options = '';
+            foreach ($candidates as $element) {
+                $attributes = [];
+                if (trim($element) == trim($condition->get_name())) {
+                    $attributes['selected'] = '';
+                }
+                $options .= \html_writer::tag('option', $element, $attributes);
+            }
+            $option_select = \html_writer::tag('select', $options,
+                array('class' => 'conditionquestion custom-select', 'name' => 'domainname'));
+            $content = \html_writer::tag('span', $option_select);
+            $content .= ' ' . \html_writer::tag('label', get_string('mustbe', 'ddtaquiz'),
+                    array('class' => 'conditionelement'));
+
+            $comparator_options = $this->comparator_attributes($condition);
+            $comparator = \html_writer::tag('select', $comparator_options,
+                array('class' => 'conditiontype custom-select', 'name' => 'domaintype'));
+            $postContent = \html_writer::tag('span', $comparator);
+            $postContent .= ' ' . \html_writer::tag('input', '',
+                    array('class' => 'conditionelement conditionpoints form-control inline', 'name' => 'domaingrade',
+                        'type' => 'number', 'value' => $condition->get_grade()));
+
+            $postContent .= ' ' . \html_writer::tag('input', '',
+                    array('class' => 'conditionelement conditionreplace form-control inline', 'name' => 'domainreplace',
+                        'value' => $condition->get_replace()));
+
+            $strdelete = get_string('delete');
+            $image = $this->pix_icon('t/delete', $strdelete);
+            $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
+                'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger float-right', 'data-action' => 'delete'));
+
+            $conditionpart = ddtaquiz_bootstrap_render::createAccordionHeader(
+                $preContent,
+                $content,
+                $postContent
+            );
+        }
+
+        $conditionpart .= \html_writer::tag('input', '',
+                array('class' => 'conditionid', 'name' => 'id', 'value' => $condition->get_id()));
+
+        $conditioncontent = \html_writer::div($conditionpart, 'conditionpart');
+
+        $conditionlist = \html_writer::div($conditioncontent, 'conditionpartslist');
+
+        // build questionCard body
+        $conditionCardBody = ddtaquiz_bootstrap_render::createAccordion('condition-list',$conditionlist);
+
+        $conditionCardFooter = "";
+
+        return ddtaquiz_bootstrap_render::createCard($conditionCardBody,$conditionCardHeader, $conditionCardFooter);
     }
 
     /**
@@ -1000,6 +1077,39 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
+     * Render the domain feedback block.
+     *
+     * @param \ddtaquiz $quiz corresponding quiz
+     * @param \moodle_url $pageurl the url of this page.
+     * @return string the HTML of the feedback block.
+     *
+     * @throws \coding_exception
+     */
+    public function domain_feedback_block($quiz, $pageurl) {
+        $questionCardHeader = html_writer::tag('h3', get_string('domainfeedback', 'ddtaquiz'), array('class' => 'feedbackheader'));
+        $output = '';
+
+        // children of Accordion
+        $accordionChildren = '';
+        $feedback = domain_feedback::get_feedback($quiz);
+        $blocks = $feedback->get_blocks();
+        $counter = 1;
+        foreach ($blocks as $block) { $this->feedback_block_elem($block, $pageurl,$counter);
+            $accordionChildren .= html_writer::start_div('card');
+            $accordionChildren .= $this->feedback_block_elem($block, $pageurl,$counter);;
+            $accordionChildren .= html_writer::end_div();
+            $counter++;
+        }
+        // build questionCard body
+        $questionCardBody = ddtaquiz_bootstrap_render::createAccordion('domain-feedbackblock-children-list',$accordionChildren);
+
+        $questionCardFooter = html_writer::tag('button', get_string('adddomainfeedback', 'ddtaquiz'),
+            array('type' => 'submit', 'name' => 'adddomainfeedback', 'value' => 1,'class'=>'btn btn-dark card-btn float-right'));
+
+        return ddtaquiz_bootstrap_render::createCard($questionCardBody,$questionCardHeader, $questionCardFooter);
+    }
+
+    /**
      * TODO: done
      *
      * Render one element of a feedbackbblock.
@@ -1047,9 +1157,13 @@ class edit_renderer extends \plugin_renderer_base {
      * @throws \coding_exception
      */
     public function edit_feedback_page($errorOutput, \feedback_block $block, \moodle_url $pageurl, array $pagevars) {
-        $candidates = $block->get_quiz()->get_elements();
+        $domain = $block->get_condition() instanceof \domain_condition;
+        if ($domain) {
+            $candidates = explode(",", $block->get_quiz()->get_domains());
+        } else {
+            $candidates = $block->get_quiz()->get_elements();
+        }
         $output = '';
-
         //hidden inputs
         $output .= html_writer::start_tag('form',
             array('method' => 'POST', 'id' => 'blockeditingform', 'action' => $pageurl->out()));
@@ -1057,10 +1171,17 @@ class edit_renderer extends \plugin_renderer_base {
             array('type' => 'hidden', 'name' => 'cmid', 'value' => $pageurl->get_param('cmid')));
         $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'bid', 'value' => $block->get_id()));
         $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'save', 'value' => 1));
+        if ($domain) {
+            $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'domain', 'value' => 1));
+        }
 
         //header
-        $headingContent = get_string('editingfeedback', 'ddtaquiz');
-        $headingContent .= html_writer::tag('input', '', array('class'=>' col-3 form-control inline rounded ml-3 ','type' => 'text', 'name' => 'blockname', 'value' => $block->get_name()));
+        if ($domain) {
+            $headingContent = get_string('editingdomainfeedback', 'ddtaquiz');
+        } else {
+            $headingContent = get_string('editingfeedback', 'ddtaquiz');
+        }
+        $headingContent .= html_writer::tag('input', '', array('class' => ' col-3 form-control inline rounded ml-3 ', 'type' => 'text', 'name' => 'blockname', 'value' => $block->get_name()));
         $headingIcon = ''; //TODO: add icons
         $output .= $this->heading(
             ddtaquiz_bootstrap_render::createHeading(
@@ -1069,26 +1190,31 @@ class edit_renderer extends \plugin_renderer_base {
             )
         );
 
-        $output .= html_writer::div($errorOutput,'errors');
+        $output .= html_writer::div($errorOutput, 'errors');
 
-        //
-        $output .= $this->uses_block($block);
-
-        $output .= $this->condition_block($block->get_condition(), $candidates);
-
+        if ($domain) {
+            $output .= $this->domain_condition_block($block->get_condition(), $candidates);
+        } else {
+            $output .= $this->uses_block($block);
+            $output .= $this->condition_block($block->get_condition(), $candidates);
+        }
         $output .= $this->feedback_editor($block->get_feedback_text());
 
         $output .=
-            html_writer::start_div('card-footer text-right').
+            html_writer::start_div('card-footer text-right') .
             html_writer::tag('button', get_string('done', 'ddtaquiz'),
-                array('class'=>'btn btn-primary card-btn','type' => 'submit', 'name' => 'done', 'value' => 1)).
+                array('class' => 'btn btn-primary card-btn', 'type' => 'submit', 'name' => 'done', 'value' => 1)) .
             html_writer::end_div();
 
         $output .= html_writer::end_tag('form');
 
-        $output .= $this->condition_type_chooser($candidates);
+        if ($domain) {
 
+        } else {
+            $output .= $this->condition_type_chooser($candidates);
+        }
         $this->page->requires->js_call_amd('mod_ddtaquiz/main', 'init');
+
 
         return $output;
     }

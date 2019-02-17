@@ -160,14 +160,14 @@ class ddtaquiz_bootstrap_render extends \html_writer
     public static function createDomainCheckboxes($qid, $domains):string{
         global $DB;
         $qInstance = $DB->get_record("ddtaquiz_qinstance", ["id" => $qid]);
-        $activeDomains = null;
+        $activeDomains = [];
         if ($qInstance->domains) {
             $activeDomains = explode(",", $qInstance->domains);
         }
         $output = self::start_div("domain-content");
         foreach ($domains as $domain) {
             $domain = trim($domain);
-            if (in_array("$domain", $activeDomains)) {
+            if (in_array($domain, $activeDomains)) {
                 $output .=
                     self::start_div("domain-checkbox") .
                     self::start_tag("input", [

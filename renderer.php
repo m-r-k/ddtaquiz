@@ -379,7 +379,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $output = '';
         $output .= $this->heading(get_string('quizfinished', 'ddtaquiz'));
         $output .= $this->review_summary_table($summarydata);
-        $output .= $this->review_domain($attempt, $options, $feedback);
+        $output .= $this->review_domain($attempt);
         $output .= $this->review_block($attempt->get_quiz()->get_main_block(), $attempt, $options, $feedback);
         $output .= $this->finish_review_button($attempt->get_quiz()->get_cmid());
 
@@ -430,39 +430,24 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * Renders the feedback for the domain.
      *
      * @param attempt $attempt the attempt this review belongs to.
-     * @param question_display_options $options the display options.
-     * @param feedback $feedback the specialized feedback.
      * @return string HTML to output.
      */
-    protected function review_domain(attempt $attempt, $options, $feedback)
+    protected function review_domain(attempt $attempt)
     {
-        $domains = $attempt->get_quiz()->get_domains();
-        $questions = $attempt->get_quiz()->get_elements();
-        $sql = "SELECT id, domains FROM mdl_ddtaquiz_qinstance WHERE id in (";
-        $output = '';
-        foreach ($questions as $question) {
-            $sql .= $question->get_id().",";
-        }
-        $sql = substr($sql, 0, -1);
-        $sql .= ")";
-
-        global $DB;
-        $records = $DB->get_records_sql($sql);
-        $output .= "<div class ='card domain-group'>";
-        foreach (explode(",", $domains) as $domain) {
-            $domain = trim($domain);
-            $output .= "<div class='card-header domain-group-header'>".$domain."</div><ul class='list-group domain-group-content'>";
-            foreach ($records as $record) {
-                if (in_array($domain, explode(",", $record->domains))) {
-                    $output .= "<li class='list-group-item'>".$record->id."</li>";
-                }
+        $output = "";
+        $quiz = $attempt->get_quiz();
+        $feedback = \domain_feedback::get_feedback($quiz);
+        /** @var \feedback_block $block */
+        foreach ($feedback->get_blocks() as $block) {
+            $condition = $block->get_condition();
+            if ($condition->is_fullfilled($attempt)) {
+                $conditionCardHeader = \html_writer::tag('h3', $condition->get_replace(), array('class' => 'conditionblockheader'));
+                $conditionCardBody = \html_writer::div($block->get_feedback_text(), 'conditionpartslist');
+                $conditionCardFooter = "";
+                $output .= ddtaquiz_bootstrap_render::createCard($conditionCardBody,$conditionCardHeader, $conditionCardFooter);
             }
-            $output .= "</ul>";
         }
-        $output .= "</div>";
         return $output;
-
-
     }
 
     /**

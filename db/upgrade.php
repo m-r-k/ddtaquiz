@@ -94,5 +94,57 @@ function xmldb_ddtaquiz_upgrade($oldversion) {
 
         }
     }
+
+    if($oldversion < 2019021701){
+        try{
+
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz_feedback_block ADD domainfeedback INT(1) NOT NULL DEFAULT 0 AFTER feedbacktext"
+            );
+
+            // Label savepoint reached.
+            upgrade_mod_savepoint(true, 2019021701, 'ddtaquiz');
+        }
+        catch(Exception $e){
+
+        }
+    }
+
+    if($oldversion < 2019021703){
+        try{
+
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz_condition ADD domaintype INT(5) AFTER useand"
+            );
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz_condition ADD domainname VARCHAR(100) AFTER domaintype"
+            );
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz_condition ADD domainreplace VARCHAR(100) AFTER domainname"
+            );
+
+            // Label savepoint reached.
+            upgrade_mod_savepoint(true, 2019021703, 'ddtaquiz');
+        }
+        catch(Exception $e){
+
+        }
+    }
+
+    if($oldversion < 2019021704){
+        try{
+
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz_condition ADD domaingrade DECIMAL(10,5) AFTER domainreplace"
+            );
+
+            // Label savepoint reached.
+            upgrade_mod_savepoint(true, 2019021704, 'ddtaquiz');
+        }
+        catch(Exception $e){
+
+        }
+    }
+
     return true;
 }
