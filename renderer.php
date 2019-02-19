@@ -269,9 +269,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      */
     public function attempt_page(attempt $attempt, $slot, $options, $cmid)
     {
-        //TODO: change process url for direct feedback
         $processurl = new \moodle_url('/mod/ddtaquiz/processslot.php');
-        //$processurl = new \moodle_url('/mod/ddtaquiz/directfeedback.php');
         // The progress bar.
         $progress = floor(($slot - 1) * 100 / $attempt->get_quiz()->get_slotcount());
         $progressbar = \html_writer::div('', 'bar',
@@ -285,27 +283,10 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                 'enctype' => 'multipart/form-data', 'accept-charset' => 'utf-8',
                 'id' => 'responseform'));
 
-
         $body .= html_writer::start_tag('div');
 
-        //This id is needed for disabling the input if feedback is displayed
-        $body .= html_writer::start_div('', array('id' => 'questionField'));
         $body .= $attempt->get_quba()->render_question($slot, $options);
-        $body .= html_writer::end_div();
 
-        //block for direct feedback
-        $body .= html_writer::start_div('', array('id' => 'directFeedbackID'));
-        $directFeedbackHeader = \html_writer::tag('h3', get_string('directfeedbackheader', 'ddtaquiz'), array('class' => 'questionheader'));
-        $directFeedbackBody = "";
-        //TODO: FIX Body
-        $ddtaquiz = $attempt->get_quiz();
-        $feedbacks = $ddtaquiz->showDirectFeedback();
-        foreach ($feedbacks as $key => $feedback) {
-            $cartBody = "Feedback Body";
-            $directFeedbackBody .= ddtaquiz_bootstrap_render::createCard($cartBody, \html_writer::tag('h3', get_string($key, 'ddtaquiz')));
-        }
-        $body .= ddtaquiz_bootstrap_render::createCard($directFeedbackBody, $directFeedbackHeader);
-        $body .= html_writer::end_div();
 
         // Some hidden fields to track what is going on.
         $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'attempt',
@@ -318,9 +299,20 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $body .= html_writer::end_tag('div');
         $body .= html_writer::end_tag('form');
 
+        //Direct Feedback
+        $ddtaquiz = $attempt->get_quiz();
+        try {
+            if (($slot - 1) > 0) {
+                if (count($ddtaquiz->showDirectFeedback()) != 0) {
+                    $directFeedbackBody = $attempt->get_quba()->render_question($slot - 1, $options);
+                    $body .= ddtaquiz_bootstrap_render::createModal('Direct Feedback', $directFeedbackBody, '', array('id' => 'directFeedbackModal'));
+                    $body .= ddtaquiz_bootstrap_render::createModalTrigger('directFeedbackModal', "button", "Feedback for last question", array('id' => 'ModalButton'));
+                }
+            }
+        } catch (Exception $e) {
+        }
 
         $footer = $this->attempt_navigation_buttons($attempt);
-
         $this->page->requires->js_call_amd('mod_ddtaquiz/attempt', 'init');
         if ($attempt->get_quiz()->timing_activated()) {
             $this->page->requires->js_call_amd('mod_ddtaquiz/attempt', 'startTime', [
@@ -350,27 +342,27 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      */
     public function attempt_navigation_buttons(attempt $attempt)
     {
-        $ddtaquiz = $attempt->get_quiz();
+//        $ddtaquiz = $attempt->get_quiz();
         $output = '';
-        $output .= html_writer::start_div('container-fluid');
-        $output .= html_writer::start_div('row');
-        $output .= html_writer::start_div('col-md-6 text-left');
-
-        //Direct feedback button
-        if (count($ddtaquiz->showDirectFeedback()) != 0) {
-            $directFeedbackLabel = get_string('directfeedbackbutton', 'ddtaquiz');
-            $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'directFeedback',
-                'value' => $directFeedbackLabel, 'class' => 'btn btn-primary text-left', 'id' => 'directFeedbackBtn'));
-        }
-        $output .= html_writer::end_div();
-        $output .= html_writer::start_div('col-md-6 text-right');
+//        $output .= html_writer::start_div('container-fluid');
+//        $output .= html_writer::start_div('row');
+//        $output .= html_writer::start_div('col-md-6 text-left');
+//
+//        //Direct feedback button
+//        if (count($ddtaquiz->showDirectFeedback()) != 0) {
+//            $directFeedbackLabel = get_string('directfeedbackbutton', 'ddtaquiz');
+//            $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'directFeedback',
+//                'value' => $directFeedbackLabel, 'class' => 'btn btn-primary text-left', 'id' => 'directFeedbackBtn'));
+//        }
+//        $output .= html_writer::end_div();
+//        $output .= html_writer::start_div('col-md-6 text-right');
         $nextlabel = get_string('nextpage', 'ddtaquiz');
         $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'next',
             'value' => $nextlabel, 'class' => 'btn btn-primary text-right', 'id' => 'attemptNextBtn'));
-        $output .= html_writer::end_div();
-        $output .= html_writer::end_div();
-        $output .= html_writer::end_div();
-        $output .= html_writer::end_div();
+//        $output .= html_writer::end_div();
+//        $output .= html_writer::end_div();
+//        $output .= html_writer::end_div();
+//        $output .= html_writer::end_div();
         return $output;
     }
 

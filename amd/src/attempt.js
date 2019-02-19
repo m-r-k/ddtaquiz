@@ -45,18 +45,7 @@ define(['jquery'], function ($) {
                 $('#attemptNextBtn').click(function (e) {
                     $('#responseform').submit();
                 });
-                $('#directFeedbackBtn').click(function (e) {
-                    var feedBack=$('#directFeedbackID');
-                    feedBack.css("display", feedBack.css("display") === 'none' ? 'block' : 'none');
-                    var questionField=$('#questionField');
-                    questionField.css("pointer-events", 'none');
-                });
-                // TODO: Support other elemtns
-                $( "[type=radio]" ).click(function (e) {
-                    var feedBack=$('#directFeedbackBtn');
-                    feedBack.css("display",  'block');
-                });
-
+                 $('#ModalButton').click();
 
             });
 
