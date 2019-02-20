@@ -98,12 +98,21 @@ if ($save) {
                 $domain = substr($key, 7);
                 $domain = explode("-", $domain);
                 if (array_key_exists($domain[0], $domains)) {
-                    $domain[1] = $domain[1].",".$domains[$domain[0]];
+                    $domain[1] = $domain[1].";".$domains[$domain[0]];
                 }
                 $domains[$domain[0]] = $domain[1];
             }
         }
         global $DB;
+
+        $elements = $block->get_elements();
+
+        foreach ($elements as $element) {
+            $id = $element->get_id();
+            if (!array_key_exists($id, $domains)) {
+                $domains[$id] = "";
+            }
+        }
         // get all qinst of quiz and set 0 for all that have nothing
         foreach ($domains as $qKey => $qDomain) {
             $DB->set_field("ddtaquiz_qinstance", "domains", $qDomain, ["id" => $qKey]);

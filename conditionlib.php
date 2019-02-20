@@ -745,50 +745,14 @@ class domain_condition extends condition {
     }
 
     /**
-     * Inserts a new condition into the database.
-     *
-     * @return condition the newly created condtion part.
-     */
-    public function update() {
-        global $DB;
-
-        $record = new stdClass();
-        $record->id = $this->get_id();
-        $record->useand = $this->useand;
-        $record->domaintype = $this->type;
-        $record->domainname = $this->name;
-        $record->domainreplace = $this->replace;
-        $record->domaingrade = $this->grade;
-
-        $DB->update_record('ddtaquiz_condition', $record);
-    }
-
-    /**
      * Checks whether this condition is met for a certain attempt.
      *
      * @param \attempt $attempt the attempt to check this part of the condition for.
      * @return bool whether this condition is fullfilled.
      */
     public function is_fullfilled($attempt) {
-        global $DB;
-        $elements = $attempt->get_quiz()->get_elements();
-        $active_elements = [];
-        foreach ($elements as $element) {
-            $id = $element->get_id();
-            $q_instance = $DB->get_record("ddtaquiz_qinstance", ["id" => $id]);
-            if (in_array($this->name, explode(",", $q_instance->domains))) {
-                array_push($active_elements, $id);
-            }
-        }
-        $achieved_grade = 0;
-        foreach ($elements as $element) {
-            if (in_array($element->get_id(), $active_elements)) {
-                $add_grade = $element->get_grade($attempt);
-                if (!is_null($add_grade)) {
-                    $achieved_grade += $add_grade;
-                }
-            }
-        }
+        $grades = $this->get_grading($attempt);
+        $achieved_grade = $grades[0];
         switch ($this->type) {
             case self::LESS:
                 return $achieved_grade < $this->grade;
@@ -809,6 +773,52 @@ class domain_condition extends condition {
     }
 
     /**
+     * Checks whether this condition is met for a certain attempt.
+     *
+     * @param \attempt $attempt the attempt to check this part of the condition for.
+     * @return array array[0] holds achieved grade, array[1] hold total grade.
+     */
+    public function get_grading($attempt) {
+        $grades = [];
+
+        global $DB;
+        $elements = $attempt->get_quiz()->get_elements();
+        $active_elements = [];
+        foreach ($elements as $element) {
+            $id = $element->get_id();
+            $q_instance = $DB->get_record("ddtaquiz_qinstance", ["id" => $id]);
+            if (in_array($this->name, explode(";", $q_instance->domains))) {
+                array_push($active_elements, $id);
+            }
+        }
+
+        $achieved_grade = 0;
+        $total_grade = 0;
+        foreach ($elements as $element) {
+            if (in_array($element->get_id(), $active_elements)) {
+                $add_grade = $element->get_grade($attempt);
+                if (!is_null($add_grade)) {
+                    $achieved_grade += $add_grade;
+                }
+                $add_total_grade = 0;
+                if ($element->is_question()) {
+                    $question = question_bank::load_question($element->get_element()->id);
+                    $add_total_grade = $question->defaultmark;
+                } else if ($element->is_block()) {
+                    $add_total_grade = $element->get_element()->get_maxgrade();
+                }
+                if (!is_null($add_total_grade)) {
+                    $total_grade += $add_total_grade;
+                }
+            }
+        }
+
+        $grades[0] = $achieved_grade;
+        $grades[1] = $total_grade;
+        return $grades;
+    }
+
+    /**
      * @return string
      */
     public function get_name()
@@ -821,8 +831,10 @@ class domain_condition extends condition {
      */
     public function set_name($name)
     {
+        global $DB;
+
         $this->name = $name;
-        $this->update();
+        $DB->set_field("ddtaquiz_condition", "domainname", $name, ["id" => $this->get_id()]);
     }
 
     /**
@@ -838,8 +850,10 @@ class domain_condition extends condition {
      */
     public function set_replace($replace)
     {
+        global $DB;
+
         $this->replace = $replace;
-        $this->update();
+        $DB->set_field("ddtaquiz_condition", "domainreplace", $replace, ["id" => $this->get_id()]);
     }
 
     /**
@@ -855,8 +869,10 @@ class domain_condition extends condition {
      */
     public function set_type($type)
     {
+        global $DB;
+
         $this->type = $type;
-        $this->update();
+        $DB->set_field("ddtaquiz_condition", "domaintype", $type, ["id" => $this->get_id()]);
     }
 
     /**
@@ -872,8 +888,10 @@ class domain_condition extends condition {
      */
     public function set_grade($grade)
     {
+        global $DB;
+
         $this->grade = $grade;
-        $this->update();
+        $DB->set_field("ddtaquiz_condition", "domaingrade", $grade, ["id" => $this->get_id()]);
     }
 
 

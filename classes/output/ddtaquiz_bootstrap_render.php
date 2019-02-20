@@ -162,7 +162,7 @@ class ddtaquiz_bootstrap_render extends \html_writer
         $qInstance = $DB->get_record("ddtaquiz_qinstance", ["id" => $qid]);
         $activeDomains = [];
         if ($qInstance->domains) {
-            $activeDomains = explode(",", $qInstance->domains);
+            $activeDomains = explode(";", $qInstance->domains);
         }
         $output = self::start_div("domain-content");
         foreach ($domains as $domain) {

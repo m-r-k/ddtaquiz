@@ -441,8 +441,11 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         foreach ($feedback->get_blocks() as $block) {
             $condition = $block->get_condition();
             if ($condition->is_fullfilled($attempt)) {
-                $conditionCardHeader = \html_writer::tag('h3', $condition->get_replace(), array('class' => 'conditionblockheader'));
-                $conditionCardBody = \html_writer::div($block->get_feedback_text(), 'conditionpartslist');
+                $grades = $condition->get_grading($attempt);
+                $title= $condition->get_replace() ? $condition->get_replace() : $condition->get_name();
+                $conditionCardHeader = \html_writer::tag('h3', $title, array('class' => 'conditionblockheader'));
+                $conditionCardBody = \html_writer::div("Result: ".$grades[0]." / ".$grades[1], 'result');
+                $conditionCardBody .= \html_writer::div($block->get_feedback_text(), 'conditionpartslist');
                 $conditionCardFooter = "";
                 $output .= ddtaquiz_bootstrap_render::createCard($conditionCardBody,$conditionCardHeader, $conditionCardFooter);
             }

@@ -185,4 +185,4 @@ $string['domainfeedbackblockdefaultname'] = 'New domain feedback';
 $string['editingdomainfeedback'] = 'Editing domain feedback';
 $string['editingdomainfeedbackx'] = 'Editing domain feedback: {$a}';
 $string['gradeatdomain'] = 'Grade for';
-$string['domainHelp'] = 'Enter the domains of your questions (comma-separated), to get a domain specific feedback.';
+$string['domainHelp'] = 'Enter the domains of your questions (semicolon-separated), to get a domain specific feedback.';

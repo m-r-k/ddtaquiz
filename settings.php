@@ -49,6 +49,6 @@ if ($ADMIN->fulltree) {
     // Domains for the domain specific feedback
     $settings->add(new admin_setting_configtext('ddtaquiz/domains',
         'Domains',
-        'Enter the domains of your questions (comma-separated), to get a domain specific feedback.',
+        'Enter the domains of your questions (semicolon-separated), to get a domain specific feedback.',
         ""));
 }

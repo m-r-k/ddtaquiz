@@ -192,7 +192,7 @@ class edit_renderer extends \plugin_renderer_base {
 
         // add domain choice to content
         $quizconfig = $blockelem->get_quiz()->get_domains();
-        $postContent .= ddtaquiz_bootstrap_render::createDomainCheckboxes($blockelem->get_id(), explode(",", $quizconfig));
+        $postContent .= ddtaquiz_bootstrap_render::createDomainCheckboxes($blockelem->get_id(), explode(";", $quizconfig));
 
         // add only if main block
         if ($isMain){
@@ -1159,7 +1159,7 @@ class edit_renderer extends \plugin_renderer_base {
     public function edit_feedback_page($errorOutput, \feedback_block $block, \moodle_url $pageurl, array $pagevars) {
         $domain = $block->get_condition() instanceof \domain_condition;
         if ($domain) {
-            $candidates = explode(",", $block->get_quiz()->get_domains());
+            $candidates = explode(";", $block->get_quiz()->get_domains());
         } else {
             $candidates = $block->get_quiz()->get_elements();
         }
