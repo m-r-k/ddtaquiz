@@ -164,6 +164,9 @@ $string['generellfeedback']='Generell feedback';
 $string['generellfeedback_help']='Generell feedback  help text';
 $string['correctanswers']='Correct answer feedback';
 $string['correctanswers_help']='Correct answer feedback  help text';
+$string['correctanswersdesc'] ='Shows the correct anwser in the Feedback';
+$string['generellfeedbackdesc'] ='Shows the general feedback';
+$string['specificfeedbackdesc'] ='Shows the feedabck for a given response';
 
 //Timelimit
 $string['timing'] = 'Timing';

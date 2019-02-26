@@ -42,7 +42,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
-    if ($oldversion < 2019021134) {
+    if ($oldversion < 2019022600) {
         try {
 
             // Update all records in 'course_modules' for labels to have showdescription = 1.
@@ -60,13 +60,13 @@ function xmldb_ddtaquiz_upgrade($oldversion)
             );
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019021134, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 2019022600, 'ddtaquiz');
         } catch (Exception $e) {
 
         }
     }
 
-    if ($oldversion < 2019021130) {
+    if ($oldversion < 2019022600) {
         try {
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD timelimit BIGINT(10) NOT NULL DEFAULT 0 AFTER timemodified"
@@ -81,13 +81,13 @@ function xmldb_ddtaquiz_upgrade($oldversion)
 
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019021130, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 2019022600, 'ddtaquiz');
         } catch (Exception $e) {
 
         }
     }
 
-    if($oldversion < 2019021126){
+    if($oldversion < 2019022600){
         try{
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD domains VARCHAR(255) NOT NULL DEFAULT ' ' AFTER  mainblock"
@@ -97,14 +97,14 @@ function xmldb_ddtaquiz_upgrade($oldversion)
             );
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019021126, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 2019022600, 'ddtaquiz');
         }
         catch(Exception $e){
 
         }
     }
 
-    if($oldversion < 2019021701){
+    if($oldversion < 2019022600){
         try{
 
             $DB->execute(
@@ -112,14 +112,14 @@ function xmldb_ddtaquiz_upgrade($oldversion)
             );
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019021701, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 2019022600, 'ddtaquiz');
         }
         catch(Exception $e){
 
         }
     }
 
-    if($oldversion < 2019021703){
+    if($oldversion < 2019022600){
         try{
 
             $DB->execute(
@@ -133,14 +133,14 @@ function xmldb_ddtaquiz_upgrade($oldversion)
             );
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019021703, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 2019022600, 'ddtaquiz');
         }
         catch(Exception $e){
 
         }
     }
 
-    if($oldversion < 2019021704){
+    if($oldversion < 2019022600){
         try{
 
             $DB->execute(
@@ -148,7 +148,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
             );
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019021704, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 2019022600, 'ddtaquiz');
         }
         catch(Exception $e){
 
