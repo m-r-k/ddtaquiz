@@ -155,17 +155,17 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 2019022601){
+    if($oldversion < 2019022603){
         try{
 
             $DB->execute(
-                "ALTER TABLE ddtaquiz_feedback_uses ADD shift INT(1)"
+                "ALTER TABLE ddtaquiz_feedback_uses ADD shift INT(1) AFTER questioninstanceid"
             );
             $DB->execute(
-                "ALTER TABLE ddtaquiz_feedback_uses ADD letter VARCHAR(100)"
+                "ALTER TABLE ddtaquiz_feedback_uses ADD letter VARCHAR(16) AFTER shift"
             );
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019022601, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 2019022603, 'ddtaquiz');
         }
         catch(Exception $e){
 
