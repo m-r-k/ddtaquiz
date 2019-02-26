@@ -502,6 +502,14 @@ class ddtaquiz
     {
         return $this->timing->to_abandon();
     }
+
+    /**
+     * @return mixed
+     */
+    public function get_domains()
+    {
+        return $this->domains;
+    }
 }
 
 class ddtaquiz_timing

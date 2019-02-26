@@ -55,4 +55,10 @@ if ($ADMIN->fulltree) {
         'Last submission grace period',
         'There is a potential problem right at the end of the quiz. On the one hand, we want to let students continue working right up until the last second - with the help of the timer that automatically submits the quiz when time runs out. On the other hand, the server may then be overloaded, and take some time to get to process the responses. Therefore, we will accept responses for up to this long after time expires, so they are not penalised for the server being slow. However, the student could cheat and get this many seconds to answer the quiz. You have to make a trade-off based on how much you trust the performance of your server during quizzes.',
         60, 1));
+
+    // Domains for the domain specific feedback
+    $settings->add(new admin_setting_configtext('ddtaquiz/domains',
+        'Domains',
+        'Enter the domains of your questions (semicolon-separated), to get a domain specific feedback.',
+        ""));
 }

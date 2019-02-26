@@ -91,6 +91,32 @@ if ($save) {
         if (!is_null($useand)) {
             $block->get_condition()->set_use_and($useand);
         }
+
+        $domains = [];
+        foreach ($_POST as $key => $value) {
+            if(substr($key, 0, 6) == "domain") {
+                $domain = substr($key, 7);
+                $domain = explode("-", $domain);
+                if (array_key_exists($domain[0], $domains)) {
+                    $domain[1] = $domain[1].";".$domains[$domain[0]];
+                }
+                $domains[$domain[0]] = $domain[1];
+            }
+        }
+        global $DB;
+
+        $elements = $block->get_elements();
+
+        foreach ($elements as $element) {
+            $id = $element->get_id();
+            if (!array_key_exists($id, $domains)) {
+                $domains[$id] = "";
+            }
+        }
+        // get all qinst of quiz and set 0 for all that have nothing
+        foreach ($domains as $qKey => $qDomain) {
+            $DB->set_field("ddtaquiz_qinstance", "domains", $qDomain, ["id" => $qKey]);
+        }
     }catch(Exception $e){
         $errorOutput .= \mod_ddtaquiz\output\ddtaquiz_bootstrap_render::createAlert('danger',$e->getMessage());
     }
@@ -152,6 +178,10 @@ if ($save) {
         $feedbackblock = feedback_block::create($ddtaquiz, get_string('feedbackblockdefaultname', 'ddtaquiz'));
         $nexturl = new moodle_url('/mod/ddtaquiz/editfeedback.php',
             array('cmid' => $cmid, 'bid' => $feedbackblock->get_id()));
+    } else if (optional_param('adddomainfeedback', 0, PARAM_INT)) {
+        $feedbackblock = feedback_block::create($ddtaquiz, get_string('domainfeedbackblockdefaultname', 'ddtaquiz'), 1);
+        $nexturl = new moodle_url('/mod/ddtaquiz/editfeedback.php',
+            array('cmid' => $cmid, 'bid' => $feedbackblock->get_id(), 'domain' => 1));
     } else {
         $nexturl = new moodle_url('/mod/ddtaquiz/view.php', array('id' => $cmid));
     }

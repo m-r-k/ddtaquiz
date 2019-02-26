@@ -380,6 +380,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $output = '';
         $output .= $this->heading(get_string('quizfinished', 'ddtaquiz'));
         $output .= $this->review_summary_table($summarydata);
+        $output .= $this->review_domain($attempt);
         $output .= $this->review_block($attempt->get_quiz()->get_main_block(), $attempt, $options, $feedback);
         $output .= $this->finish_review_button($attempt->get_quiz()->get_cmid());
 
@@ -423,6 +424,33 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
 
         $output .= html_writer::end_tag('tbody');
         $output .= html_writer::end_tag('table');
+        return $output;
+    }
+
+    /**
+     * Renders the feedback for the domain.
+     *
+     * @param attempt $attempt the attempt this review belongs to.
+     * @return string HTML to output.
+     */
+    protected function review_domain(attempt $attempt)
+    {
+        $output = "";
+        $quiz = $attempt->get_quiz();
+        $feedback = \domain_feedback::get_feedback($quiz);
+        /** @var \feedback_block $block */
+        foreach ($feedback->get_blocks() as $block) {
+            $condition = $block->get_condition();
+            if ($condition->is_fullfilled($attempt)) {
+                $grades = $condition->get_grading($attempt);
+                $title= $condition->get_replace() ? $condition->get_replace() : $condition->get_name();
+                $conditionCardHeader = \html_writer::tag('h3', $title, array('class' => 'conditionblockheader'));
+                $conditionCardBody = \html_writer::div("Result: ".$grades[0]." / ".$grades[1], 'result');
+                $conditionCardBody .= \html_writer::div($block->get_feedback_text(), 'conditionpartslist');
+                $conditionCardFooter = "";
+                $output .= ddtaquiz_bootstrap_render::createCard($conditionCardBody,$conditionCardHeader, $conditionCardFooter);
+            }
+        }
         return $output;
     }
 

@@ -141,7 +141,7 @@
 }
 
 input[type=number].conditionelement {
-	width: 50px;
+	width: auto;
 }
 
 #conditiontypechoicecontainer {
@@ -269,4 +269,22 @@ input[type=number].conditionelement {
 }
 .timeDiv{
     padding-bottom: 10px;
+}
+
+.ui-sortable .domain-wrapper {
+	display: flex;
+}
+
+.domain-content {
+	flex-grow: 1;
+	display: flex;
+	justify-content: space-evenly;
+}
+
+.domain-group {
+	margin-bottom: 20px;
+}
+
+.domain-wrapper .conditionreplace {
+	width: auto;
 }
