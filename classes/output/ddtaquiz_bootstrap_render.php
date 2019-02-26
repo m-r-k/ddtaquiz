@@ -167,36 +167,38 @@ class ddtaquiz_bootstrap_render extends \html_writer
         $output = self::start_div("domain-content");
         foreach ($domains as $domain) {
             $domain = trim($domain);
-            if (in_array($domain, $activeDomains)) {
+            if ($domain) {
+                if (in_array($domain, $activeDomains)) {
+                    $output .=
+                        self::start_div("domain-checkbox") .
+                        self::start_tag("input", [
+                            "class" => "form-check-input",
+                            "type" => "checkbox",
+                            "id" => $qid . "-" . $domain,
+                            "value" => "",
+                            "checked" => "",
+                            "name" => "domain" . "-" . $qid . "-" . $domain
+                        ]);
+                } else {
+                    $output .=
+                        self::start_div("domain-checkbox") .
+                        self::start_tag("input", [
+                            "class" => "form-check-input",
+                            "type" => "checkbox",
+                            "id" => $qid . "-" . $domain,
+                            "value" => "",
+                            "name" => "domain" . "-" . $qid . "-" . $domain
+                        ]);
+                }
                 $output .=
-                    self::start_div("domain-checkbox") .
-                    self::start_tag("input", [
-                        "class" => "form-check-input",
-                        "type" => "checkbox",
-                        "id" => $qid . "-" . $domain,
-                        "value" => "",
-                        "checked" => "",
-                        "name" => "domain" . "-" . $qid . "-" . $domain
-                    ]);
-            } else {
-                $output .=
-                    self::start_div("domain-checkbox") .
-                    self::start_tag("input", [
-                        "class" => "form-check-input",
-                        "type" => "checkbox",
-                        "id" => $qid . "-" . $domain,
-                        "value" => "",
-                        "name" => "domain" . "-" . $qid . "-" . $domain
-                    ]);
-            }
-            $output .=
                     self::start_tag("label", [
                         "class" => "form-check-label",
-                        "for" => $qid."-".$domain
-                    ]).
-                    $domain.
-                    self::end_tag("label").
-                self::end_div();
+                        "for" => $qid . "-" . $domain
+                    ]) .
+                    $domain .
+                    self::end_tag("label") .
+                    self::end_div();
+            }
         }
         $output .= self::end_div();
 
