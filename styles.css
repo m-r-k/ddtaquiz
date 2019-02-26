@@ -288,3 +288,10 @@ input[type=number].conditionelement {
 .domain-wrapper .conditionreplace {
 	width: auto;
 }
+
+.question-character{
+    display: none;
+}
+.shiftedFeedback{
+    padding-left: 50px;
+}

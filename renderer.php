@@ -488,6 +488,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $output = '';
         if ($feedback->has_specialized_feedback($blockelem, $attempt)) {
             $specialfeedback = $feedback->get_specialized_feedback_at_element($blockelem, $attempt);
+            /** @var specialized_feedback $sf */
             foreach ($specialfeedback as $sf) {
                 $parts = $sf->get_parts();
                 $review = $this->review_parts($parts, $block, $attempt, $options, $feedback);
@@ -547,11 +548,21 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
     protected function review_parts($parts, $block, $attempt, $options, $feedback)
     {
         $output = '';
+        $index = 0;
         foreach ($parts as $part) {
             if (is_string($part)) {
+                $index = 0;
                 $output .= html_writer::div($part, 'specialfeedbacktext');
-            } else if ($part instanceof block_element) {
-                $output .= $this->review_block_element_render($block, $part, $attempt, $options, $feedback);
+            } else if ($part instanceof feedback_used_question) {
+                $index++;
+                if($part->isShifted()){
+                    $output.=
+                        \html_writer::start_tag('div',['class'=>'shiftedFeedback']).
+                        $this->review_block_element_render($block, $part->getBlockElement(), $attempt, $options, $feedback).
+                        html_writer::end_div();
+                }else{
+                    $output.= $this->review_block_element_render($block, $part->getBlockElement(), $attempt, $options, $feedback);
+                }
             }
         }
         return $output;

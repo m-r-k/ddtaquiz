@@ -49,7 +49,10 @@ if ($save) {
     $feedbackblock->set_name($name);
 
     $feedbacktext = optional_param('feedbacktext', '', PARAM_RAW);
-    $uses = optional_param_array('usesquestions', array(), PARAM_INT);
+    if(isset($_POST['usesquestions']))
+        $uses = $_POST['usesquestions'];
+    else
+        $uses = [];
 
     $feedbackblock->update($name, $feedbacktext, $uses);
 

@@ -66,8 +66,8 @@ class feedback {
 
     /**
      * Returns the feedback blocks of this feedback.
-     *
-     * @return array the feedback_blocks.
+     * @return array
+     * @throws dml_exception
      */
     public function get_blocks() {
         if (is_null($this->feedbackblocks)) {
@@ -85,15 +85,16 @@ class feedback {
 
     /**
      * Checks whether specialized feedback exist for a block element.
-     *
-     * @param block_element $blockelement the block element to check.
-     * @param attempt $attempt the attempt to check if it has specialized feedback for.
-     * @return bool true if specialized feedback for the block element exists.
+     * @param block_element $blockelement
+     * @param $attempt
+     * @return bool
+     * @throws dml_exception
      */
     public function has_specialized_feedback(block_element $blockelement, $attempt) {
+        /** @var feedback_block $block */
         foreach ($this->get_blocks() as $block) {
-            foreach ($block->get_used_question_instances() as $qi) {
-                if ($qi->get_id() == $blockelement->get_id() && $block->get_condition()->is_fullfilled($attempt)) {
+            foreach ($block->get_used_question_instances() as $feedback_used_question) {
+                if ($feedback_used_question->getBlockElement()->get_id() == $blockelement->get_id() && $block->get_condition()->is_fullfilled($attempt)) {
                     return true;
                 }
             }
@@ -103,21 +104,23 @@ class feedback {
 
     /**
      * Returns the specialized feedback to be displayed in turn of the feedback for a blockelement.
-     *
-     * @param block_element $blockelement the element to get the replacement feedback for.
-     * @param attempt $attempt the attempt for which to get the specialized feedback.
-     * @return array an array of specialized_feedback objects.
+     * @param block_element $blockelement
+     * @param attempt $attempt
+     * @return array
+     * @throws dml_exception
      */
     public function get_specialized_feedback_at_element(block_element $blockelement, attempt $attempt) {
         $ret = array();
+        /** @var feedback_block $block */
         foreach ($this->get_blocks() as $block) {
-            $usedqinstances = $block->get_used_question_instances();
-            if (count($usedqinstances) < 1) {
+            $feedback_used_questions = $block->get_used_question_instances();
+            if (count($feedback_used_questions) < 1) {
                 continue;
             }
-            $qi = array_values($usedqinstances)[0];
+            /** @var feedback_used_question $feedback_used_question */
+            $feedback_used_question = array_values($feedback_used_questions)[0];
             if ($block->get_condition()->is_fullfilled($attempt) &&
-                $qi->get_id() == $blockelement->get_id()) {
+                $feedback_used_question->getBlockElement()->get_id() == $blockelement->get_id()) {
                     array_push($ret, new specialized_feedback($block));
             }
         }
@@ -154,7 +157,7 @@ class feedback {
                 continue;
             }
             $first = array_values($usedqinstances)[0];
-            if ($first->get_id() == $elem->get_id()) {
+            if ($first->getBlockElement()->get_id() == $elem->get_id()) {
                 return $block;
             }
         }
@@ -251,11 +254,12 @@ class feedback_block {
     }
 
     /**
+     * TODO::reduce code
      * Updates the values of this feedback.
-     *
-     * @param string $name the new name.
-     * @param string $feedbacktext the new feedback text.
-     * @param array $usesquestions the questions used by this feedback.
+     * @param $name
+     * @param $feedbacktext
+     * @param $usesquestions
+     * @throws dml_exception
      */
     public function update($name, $feedbacktext, $usesquestions) {
         global $DB;
@@ -270,21 +274,42 @@ class feedback_block {
         }
 
         $old = $DB->get_records('ddtaquiz_feedback_uses', array('feedbackblockid' => $this->id), 'id');
+
         for ($i = 0; $i < max(array(count($usesquestions), count($old))); $i++) {
             if ($i >= count($old)) {
+                $usedQuestion = $usesquestions[array_keys($usesquestions)[$i]];
                 $record = new stdClass();
                 $record->feedbackblockid = $this->id;
-                $record->questioninstanceid = $usesquestions[array_keys($usesquestions)[$i]];
+                $record->questioninstanceid =(int) $usedQuestion['questionId'];
+                $record->letter = (int) $usedQuestion['letter'];
+
+                if(key_exists('shift',$usedQuestion))
+                    $shift = 1;
+                else
+                    $shift = 0;
+
+                $record->shift = $shift;
                 $DB->insert_record('ddtaquiz_feedback_uses', $record);
             } else if ($i >= count($usesquestions)) {
                 $record = $old[array_keys($old)[$i]];
                 $DB->delete_records('ddtaquiz_feedback_uses', array('id' => $record->id));
             } else {
                 $record = $old[array_keys($old)[$i]];
-                if ($record->questioninstanceid != $usesquestions[array_keys($usesquestions)[$i]]) {
-                    $record->questioninstanceid = $usesquestions[array_keys($usesquestions)[$i]];
-                    $DB->update_record('ddtaquiz_feedback_uses', $record);
+                $usedQuestion = $usesquestions[array_keys($usesquestions)[$i]];
+
+                if ($record->questioninstanceid != $usedQuestion['questionId']) {
+                    $record->questioninstanceid = (int) $usedQuestion['questionId'];
                 }
+
+                $record->letter =(int) $usedQuestion['letter'];
+                if(key_exists('shift',$usedQuestion))
+                    $shift = 1;
+                else
+                    $shift = 0;
+
+                $record->shift = $shift;
+
+                $DB->update_record('ddtaquiz_feedback_uses', $record);
             }
 
         }
@@ -353,8 +378,8 @@ class feedback_block {
 
     /**
      * Returns the block elements of the question instances whos feedback is replaced by this block.
-     *
-     * @return array the block_elements of the question instances.
+     * @return array|feedback_used_question[]
+     * @throws dml_exception
      */
     public function get_used_question_instances() {
         if (!$this->uses) {
@@ -364,20 +389,20 @@ class feedback_block {
                 $records = array();
             }
             $records = array_map(function ($obj) {
-                $blockelement = block_element::load($this->quiz, $obj->questioninstanceid);
-                if ($blockelement instanceof block_element) {
-                    return $blockelement;
+                $used_question = feedback_used_question::load($this->quiz, $obj->questioninstanceid,$obj->shift,$obj->letter);
+                if ($used_question instanceof feedback_used_question) {
+                    return $used_question;
                 } else {
                     return $obj;
                 }
             }, $records);
 
             // Delete references for block_elements that do not exist anymore.
-            $records = array_filter($records, function($element) {
-                if ($element instanceof block_element) {
+            $records = array_filter($records, function($used_question) {
+                if ($used_question instanceof feedback_used_question) {
                     return true;
                 } else {
-                    $this->remove_uses($element->id);
+                    $this->remove_uses($used_question->id);
                     return false;
                 }
             });
@@ -387,26 +412,41 @@ class feedback_block {
     }
 
     /**
-     * Adds a question instance to the ones used by this feedback.
-     *
-     * @param int $questioninstanceid the id of the question instance.
+     * @param $letter
+     * @return feedback_used_question|mixed|null
+     * @throws dml_exception
      */
-    public function add_question_instance($questioninstanceid) {
+    public function get_used_question_with_letter($letter){
+        foreach ($this->get_used_question_instances() as $feedback_used_question){
+            if($feedback_used_question->letterEquals($letter))
+                return $feedback_used_question;
+        }
+        return null;
+    }
+    /**
+     * Adds a question instance to the ones used by this feedback.
+     * @param $questioninstanceid
+     * @param $shift
+     * @throws dml_exception
+     */
+    public function add_question_instance($questioninstanceid,$shift,$letter) {
         global $DB;
 
         $record = new stdClass();
         $record->feedbackblockid = $this->id;
-        $record->questioninstanceid = $questioninstanceid;
+        $record->questioninstanceid = (int)$questioninstanceid;
+        $record->shift = (int)$shift;
+        $record->letter = (string)$letter;
 
         $DB->insert_record('ddtaquiz_feedback_uses', $record);
-
-        array_push($this->uses, $questioninstanceid);
+        $uses = feedback_used_question::load($this->quiz, $record->questioninstanceid,$record->shift,$record->letter);
+        array_push($this->uses, $uses);
     }
 
     /**
      * Adds a question instance to the ones used by this feedback.
-     *
-     * @param int $id the id of the uses row.
+     * @param $id
+     * @throws dml_exception
      */
     public function remove_uses($id) {
         global $DB;
@@ -420,7 +460,9 @@ class feedback_block {
      * @return int the adapted grade.
      */
     public function get_adapted_grade() {
-        $uses = $this->uses;
+        $uses = array_map(function(feedback_used_question $feedback_used_question){
+            return $feedback_used_question->getBlockElement();
+        },$this->uses);
         $qid = array_shift($uses)->get_element()->id;
         $first = question_bank::load_question($qid, false);
         $mark = $first->defaultmark;
@@ -437,6 +479,71 @@ class feedback_block {
     }
 }
 
+class feedback_used_question{
+    protected $blockElement;
+    protected $shift = false;
+    protected $letter = null;
+
+    /**
+     * feedback_used_question constructor.
+     * @param block_element $block_element
+     * @param $shift
+     * @param $letter
+     */
+    public function __construct(\block_element $block_element,$shift, $letter)
+    {
+        $this->blockElement = $block_element;
+        $this->shift = $shift;
+        $this->letter = $letter;
+    }
+
+    /**
+     * @param $quiz
+     * @param $questioninstanceid
+     * @param $shift
+     * @return feedback_used_question|null
+     */
+    public static function load($quiz, $questioninstanceid,$shift,$letter): ?self{
+        $blockElement = block_element::load($quiz, $questioninstanceid);
+        if($blockElement instanceof block_element)
+            return new self($blockElement, $shift,$letter);
+        else
+            return null;
+    }
+
+    /**
+     * @return block_element
+     */
+    public function getBlockElement(): block_element
+    {
+        return $this->blockElement;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isShifted(): bool
+    {
+        return $this->shift == 1;
+    }
+
+    /**
+     * @return null
+     */
+    public function getLetter()
+    {
+        return chr($this->letter);
+    }
+
+    /**
+     * @param $letter
+     * @return bool
+     */
+    public function letterEquals($letter){
+        return $letter === chr($this->letter);
+    }
+
+}
 /**
  * A class encapsulating a specialized feedback.
  *
@@ -446,30 +553,31 @@ class feedback_block {
  */
 class specialized_feedback {
     /** @var feedback_block the feedback block this feedback is constructed from. */
-    protected $block = null;
+    protected $feedbackBlock = null;
     /**
      * Constructor.
      *
      * @param feedback_block $block the block to get the specialized feedback from.
      */
     public function __construct(feedback_block $block) {
-        $this->block = $block;
+        $this->feedbackBlock = $block;
     }
 
     /**
-     * Returns the parts this feedback consists of.
-     *
-     * @return array an array of strings and block_elements being the parts of this feedback.
+     * @return array
+     * @throws dml_exception
      */
     public function get_parts() {
         $ret = array();
 
-        $raw = $this->block->get_feedback_text();
+        $raw = $this->feedbackBlock->get_feedback_text();
         $parts = explode('[[', $raw);
 
         foreach ($parts as $part) {
             if (substr($part, 1, 2) == ']]') {
-                array_push($ret, $this->block_element_from_char(substr($part, 0, 1)));
+                /** @var feedback_used_question $usedQuestion */
+                $usedQuestion = $this->feedbackBlock->get_used_question_with_letter(substr($part, 0, 1));
+                array_push($ret, $usedQuestion);
                 $tmp = substr($part, 3);
                 if ($this->is_relevant($tmp)) {
                     array_push($ret, $tmp);
@@ -480,23 +588,6 @@ class specialized_feedback {
         }
 
         return $ret;
-    }
-
-    /**
-     * Gets the block element represented by a character.
-     *
-     * @param string $char the character to get the block element for.
-     * @return block_element the block element represented by the char.
-     */
-    protected function block_element_from_char($char) {
-        $order = ord(strtoupper($char));
-        $index = $order - ord('A');
-        $usedqinstances = $this->block->get_used_question_instances();
-        if (ord('A') <= $order && $order <= ord('Z') && $index < count($usedqinstances)) {
-            return $usedqinstances[array_keys($usedqinstances)[$index]];
-        } else {
-            return null;
-        }
     }
 
     /**

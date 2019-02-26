@@ -27,6 +27,7 @@ define(['jquery'], function($) {
 		var children = $('.usedquestions').children();
 		for (var i = 0; i < children.length; i++) {
 			$(children[i]).find('.usesquestionletter').html(String.fromCharCode(letter));
+            $(children[i]).find('.question-letter').attr('value',letter);
 			letter++;
 		}
 	};
@@ -41,10 +42,13 @@ define(['jquery'], function($) {
                 // Upcounting letters
                 //var lastletter = $('.usesquestioncontainer').find('.usesquestionletter').html();
                 //$('.usesquestioncontainer').find('.usesquestionletter').html(String.fromCharCode(lastletter.charCodeAt(0) + 1));
+                newusespart.find('.usesquestionselector').attr('name', 'usesquestions[newparts' + index + '][questionId]');
+                newusespart.find('.shift-checkbox').attr('name','usesquestions[newparts' + index + '][shift]');
+                newusespart.find('.question-letter').attr('name','usesquestions[newparts' + index + '][letter]');
+
                 update_chars();
                 // Increase submit index
                 index++;
-                newusespart.find('.usesquestionselector').attr('name', 'usesquestions[newparts' + index + ']');
             });
             $('.usesdelete').click(function(e) {
                 e.preventDefault();
