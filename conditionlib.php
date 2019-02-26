@@ -61,6 +61,7 @@ class condition {
      *
      * @param int $id the id of the block to get the condition for.
      * @return condition the loaded condition.
+     * @throws dml_exception
      */
     public static function load($id) {
         global $DB;
@@ -102,6 +103,7 @@ class condition {
      * Inserts a new condition into the database.
      *
      * @return condition the newly created condtion part.
+     * @throws dml_exception
      */
     public static function create() {
         global $DB;
@@ -166,6 +168,7 @@ class condition {
      * Sets how the parts of this condition are connected.
      *
      * @param bool $useand whether the parts of this condition should be connected with and. Or is used otherwise.
+     * @throws dml_exception
      */
     public function set_use_and($useand) {
         if ($this->useand != $useand) {
@@ -353,6 +356,7 @@ class condition_part {
      * @param int $elementid the id of the element this condition references.
      * @param int $grade the grade this condition is relative to.
      * @return condition_part the newly created condtion part.
+     * @throws dml_exception
      */
     public static function create(condition $condition, $type, $elementid, $grade) {
         global $DB;
@@ -444,6 +448,7 @@ class condition_part {
      * @param int $type the new type.
      * @param int $elementid the id of the new element to refer to.
      * @param int $grade the new grade to use for this part.
+     * @throws dml_exception
      */
     public function update($type, $elementid, $grade) {
         if ($this->type != $type || $this->elementid != $elementid || $this->grade != $grade) {
@@ -697,6 +702,7 @@ class domain_condition extends condition {
      *
      * @param int $id the id of the block to get the condition for.
      * @return condition the loaded condition.
+     * @throws dml_exception
      */
     public static function load($id) {
         global $DB;
@@ -732,6 +738,7 @@ class domain_condition extends condition {
      * Inserts a new condition into the database.
      *
      * @return condition the newly created condtion part.
+     * @throws dml_exception
      */
     public static function create() {
         global $DB;
@@ -777,6 +784,7 @@ class domain_condition extends condition {
      *
      * @param \attempt $attempt the attempt to check this part of the condition for.
      * @return array array[0] holds achieved grade, array[1] hold total grade.
+     * @throws dml_exception
      */
     public function get_grading($attempt) {
         $grades = [];
@@ -828,6 +836,7 @@ class domain_condition extends condition {
 
     /**
      * @param string $name
+     * @throws dml_exception
      */
     public function set_name($name)
     {
@@ -847,6 +856,7 @@ class domain_condition extends condition {
 
     /**
      * @param string $replace
+     * @throws dml_exception
      */
     public function set_replace($replace)
     {
@@ -866,6 +876,7 @@ class domain_condition extends condition {
 
     /**
      * @param int $type
+     * @throws dml_exception
      */
     public function set_type($type)
     {
@@ -885,6 +896,7 @@ class domain_condition extends condition {
 
     /**
      * @param int $grade
+     * @throws dml_exception
      */
     public function set_grade($grade)
     {

@@ -65,6 +65,11 @@ class mod_ddtaquiz_external extends external_api {
      * @param string $qbs1 the sort parameter.
      * @param string $category the category of the question.
      * @return string the questionbank view HTML.
+     * @throws invalid_parameter_exception
+     * @throws invalid_response_exception
+     * @throws moodle_exception
+     * @throws required_capability_exception
+     * @throws restricted_context_exception
      */
     public static function get_questionbank($cmid, $bid, $page, $qperpage, $qbs1, $category) {
         global $PAGE, $DB;

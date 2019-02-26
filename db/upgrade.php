@@ -155,5 +155,22 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
+    if($oldversion < 2019022601){
+        try{
+
+            $DB->execute(
+                "ALTER TABLE ddtaquiz_feedback_uses ADD shift INT(1)"
+            );
+            $DB->execute(
+                "ALTER TABLE ddtaquiz_feedback_uses ADD letter VARCHAR(100)"
+            );
+            // Label savepoint reached.
+            upgrade_mod_savepoint(true, 2019022601, 'ddtaquiz');
+        }
+        catch(Exception $e){
+
+        }
+    }
+
     return true;
 }

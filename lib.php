@@ -69,6 +69,8 @@ function ddtaquiz_supports($feature) {
  * @param stdClass $ddtaquiz Submitted data from the form in mod_form.php.
  * @param mod_ddtaquiz_mod_form $mform The form instance itself (if needed).
  * @return int The id of the newly inserted ddtaquiz record.
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function ddtaquiz_add_instance(stdClass $ddtaquiz, mod_ddtaquiz_mod_form $mform = null) {
     global $DB;
@@ -97,6 +99,8 @@ function ddtaquiz_add_instance(stdClass $ddtaquiz, mod_ddtaquiz_mod_form $mform 
  * @param stdClass $ddtaquiz An object from the form in mod_form.php.
  * @param mod_ddtaquiz_mod_form $mform The form instance itself (if needed).
  * @return boolean Success/Fail.
+ * @throws coding_exception
+ * @throws dml_exception
  */
 function ddtaquiz_update_instance(stdClass $ddtaquiz, mod_ddtaquiz_mod_form $mform = null) {
     global $DB;
@@ -122,6 +126,7 @@ function ddtaquiz_update_instance(stdClass $ddtaquiz, mod_ddtaquiz_mod_form $mfo
  *
  * @param int $courseid the Course ID.
  * @return bool
+ * @throws dml_exception
  */
 function ddtaquiz_refresh_events($courseid = 0) {
     global $DB;
@@ -148,6 +153,7 @@ function ddtaquiz_refresh_events($courseid = 0) {
  *
  * @param int $id Id of the module instance.
  * @return boolean Success/Failure.
+ * @throws dml_exception
  */
 function ddtaquiz_delete_instance($id) {
     global $DB;
@@ -283,6 +289,7 @@ function ddtaquiz_get_extra_capabilities() {
  * @param int $ddtaquizid ID of an instance of this module.
  * @param int $scaleid ID of the scale.
  * @return bool true if the scale is used by the given ddtaquiz instance.
+ * @throws dml_exception
  */
 function ddtaquiz_scale_used($ddtaquizid, $scaleid) {
     global $DB;
@@ -301,6 +308,7 @@ function ddtaquiz_scale_used($ddtaquizid, $scaleid) {
  *
  * @param int $scaleid ID of the scale.
  * @return boolean true if the scale is used by any ddtaquiz instance.
+ * @throws dml_exception
  */
 function ddtaquiz_scale_used_anywhere($scaleid) {
     global $DB;
@@ -318,8 +326,9 @@ function ddtaquiz_scale_used_anywhere($scaleid) {
  * Needed by {@link grade_update_mod_grades()}.
  *
  * @param stdClass $ddtaquiz instance object with extra cmidnumber and modname property.
- * @param mixed  $grades Grade (object, array) or several grades (arrays of arrays or objects),
+ * @param mixed $grades Grade (object, array) or several grades (arrays of arrays or objects),
  *  NULL if updating grade_item definition only. If $grades equals 'reset'resets grades in the gradebook.
+ * @throws coding_exception
  */
 function ddtaquiz_grade_item_update(stdClass $ddtaquiz, $grades=null) {
     global $CFG;
@@ -352,7 +361,7 @@ function ddtaquiz_grade_item_update(stdClass $ddtaquiz, $grades=null) {
  * Delete grade item for given ddtaquiz instance.
  *
  * @param stdClass $ddtaquiz instance object.
- * @return grade_item
+ * @return int
  */
 function ddtaquiz_grade_item_delete($ddtaquiz) {
     global $CFG;
@@ -369,6 +378,7 @@ function ddtaquiz_grade_item_delete($ddtaquiz) {
  *
  * @param stdClass $ddtaquiz instance object with extra cmidnumber and modname property.
  * @param int $userid update grade of specific user only, 0 means all participants.
+ * @throws dml_exception
  */
 function ddtaquiz_update_grades(stdClass $ddtaquiz, $userid = 0) {
     global $CFG, $DB;
@@ -431,6 +441,9 @@ function ddtaquiz_get_file_info($browser, $areas, $course, $cm, $context, $filea
  * @param array $args extra arguments (itemid, path).
  * @param bool $forcedownload whether or not force download.
  * @param array $options additional options affecting the file serving.
+ * @throws coding_exception
+ * @throws moodle_exception
+ * @throws require_login_exception
  */
 function ddtaquiz_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options=array()) {
     global $DB, $CFG;
@@ -454,6 +467,8 @@ function ddtaquiz_pluginfile($course, $cm, $context, $filearea, array $args, $fo
  *
  * @param settings_navigation $settingsnav complete settings navigation tree.
  * @param navigation_node $ddtaquiznode ddtaquiz administration node.
+ * @throws coding_exception
+ * @throws moodle_exception
  */
 function ddtaquiz_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $ddtaquiznode=null) {
     global $PAGE, $CFG, $DB;
@@ -523,6 +538,7 @@ function ddtaquiz_extend_settings_navigation(settings_navigation $settingsnav, n
  * @param stdClass $ddtaquiz id of ddtaquiz.
  * @param int $userid optional user id, 0 means all users.
  * @return array array of grades, false if none.
+ * @throws dml_exception
  */
 function ddtaquiz_get_user_grades(stdClass $ddtaquiz, $userid = 0) {
     global $CFG, $DB;

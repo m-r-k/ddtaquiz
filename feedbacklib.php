@@ -131,6 +131,7 @@ class feedback {
      * Removes a feedbackblock from this feedback.
      *
      * @param int $id the id of the block to remove.
+     * @throws dml_exception
      */
     public function remove_block($id) {
         global $DB;
@@ -146,6 +147,7 @@ class feedback {
      * @param block_element $elem the block element.
      * @param attempt $attempt the attempt for which to check.
      * @return null|feedback_block the feedback block or null.
+     * @throws dml_exception
      */
     public function search_uses($elem, $attempt) {
         foreach ($this->get_blocks() as $block) {
@@ -209,6 +211,7 @@ class feedback_block {
      * @param int $blockid the feedback block id.
      * @param ddtaquiz $quiz the id of the quiz, this block belongs to.
      * @return feedback_block the new feedback block object.
+     * @throws dml_exception
      */
     public static function load($blockid, ddtaquiz $quiz) {
         global $DB;
@@ -337,6 +340,7 @@ class feedback_block {
      * Sets the name of the feedbackblock.
      *
      * @param string $name new name of the block.
+     * @throws dml_exception
      */
     public function set_name($name) {
         global $DB;
@@ -612,6 +616,7 @@ class domain_feedback extends feedback {
      * Returns the feedback blocks of this feedback.
      *
      * @return array the feedback_blocks.
+     * @throws dml_exception
      */
     public function get_blocks() {
         if (is_null($this->feedbackblocks)) {

@@ -40,7 +40,9 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      *
      * @param array $quiz Array containing quiz data.
      * @param mod_ddtaquiz_view_object $viewobj the information required to display the view page.
-     * @return $output html data.
+     * @return string $output html data.
+     * @throws coding_exception
+     * @throws moodle_exception
      */
     public function view_page($quiz, $viewobj)
     {
@@ -58,7 +60,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * @param int $slot which question to display.
      * @param question_display_options $options the display options.
      * @param array $summarydata contains all table data.
-     * @return $output containing html data.
+     * @return string $output containing html data.
      */
     public function review_question_page(attempt $attempt, $slot, question_display_options $options, $summarydata)
     {
@@ -77,7 +79,9 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * @param int $slot which question to display.
      * @param question_display_options $options the display options.
      * @param array $summarydata contains all table data.
-     * @return $output containing html data.
+     * @return string $output containing html data.
+     * @throws coding_exception
+     * @throws moodle_exception
      */
     public function grade_question_page(attempt $attempt, $slot, question_display_options $options, $summarydata)
     {
@@ -102,7 +106,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      *
      * @param array $quiz Array contining quiz data.
      * @param mod_ddtaquiz_view_object $viewobj the information required to display the view page.
-     * @return $output html data.
+     * @return string $output html data.
+     * @throws coding_exception
      */
     public function view_table($quiz, $viewobj)
     {
@@ -170,6 +175,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * Generates the table heading.
      *
      * @return string the table heading.
+     * @throws coding_exception
      */
     public function view_table_heading()
     {
@@ -181,6 +187,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      *
      * @param attempt $attempt the attempt.
      * @return string the appropriate lang string to describe the state.
+     * @throws coding_exception
      */
     public function attempt_state(attempt $attempt)
     {
@@ -202,6 +209,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      *
      * @param mod_ddtaquiz_view_object $viewobj the information required to display the view page.
      * @return string HTML to output.
+     * @throws coding_exception
+     * @throws moodle_exception
      */
     public function view_page_buttons($viewobj)
     {
@@ -245,6 +254,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      *
      * @param mod_ddtaquiz_view_object $viewobj the information required to display the view page.
      * @return string HTML fragment.
+     * @throws coding_exception
+     * @throws moodle_exception
      */
     public function edit_quiz_button($viewobj)
     {
@@ -373,7 +384,10 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * @param question_display_options $options the display options.
      * @param array $summarydata contains all table data
      * @param feedback $feedback the feedback for the quiz.
-     * @return $output containing HTML data.
+     * @return string $output containing HTML data.
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public function review_page(attempt $attempt, $options, $summarydata, $feedback)
     {
@@ -391,7 +405,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * Outputs the table containing data from summary data array.
      *
      * @param array $summarydata contains row data for table.
-     * @return $output containing HTML data.
+     * @return string $output containing HTML data.
      */
     public function review_summary_table($summarydata)
     {
@@ -432,6 +446,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      *
      * @param attempt $attempt the attempt this review belongs to.
      * @return string HTML to output.
+     * @throws dml_exception
      */
     protected function review_domain(attempt $attempt)
     {
@@ -462,6 +477,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * @param question_display_options $options the display options.
      * @param feedback $feedback the specialized feedback.
      * @return string HTML to output.
+     * @throws dml_exception
      */
     protected function review_block(block $block, attempt $attempt, $options, $feedback)
     {
@@ -482,6 +498,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * @param question_display_options $options the display options.
      * @param feedback $feedback the specialized feedback.
      * @return string HTML to output.
+     * @throws dml_exception
      */
     protected function review_block_element($block, $blockelem, $attempt, $options, $feedback)
     {
@@ -509,6 +526,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * @param question_display_options $options the display options.
      * @param feedback $feedback the specialized feedback.
      * @return string HTML to output.
+     * @throws dml_exception
      */
     protected function review_block_element_render($block, $blockelem, $attempt, $options, $feedback)
     {
@@ -544,6 +562,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * @param question_display_options $options the display options.
      * @param feedback $feedback the specialized feedback.
      * @return string HTML to output.
+     * @throws dml_exception
      */
     protected function review_parts($parts, $block, $attempt, $options, $feedback)
     {
@@ -573,6 +592,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      *
      * @param int $cmid the course module id.
      * @return string HTML fragment.
+     * @throws coding_exception
+     * @throws moodle_exception
      */
     public function finish_review_button($cmid)
     {

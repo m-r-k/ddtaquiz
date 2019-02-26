@@ -185,6 +185,7 @@ class ddtaquiz
      * Gets the course id.
      *
      * @return int the course id.
+     * @throws moodle_exception
      */
     public function get_course_id()
     {
@@ -323,7 +324,8 @@ class ddtaquiz
     /**
      * Save the overall grade for a user at a quiz to the ddtaquiz_grades table
      *
-     * @return bool Indicates success or failure.
+     * @return void Indicates success or failure.
+     * @throws dml_exception
      */
     public function save_best_grade()
     {
@@ -399,6 +401,7 @@ class ddtaquiz
      * Gets the number of attempts for this quiz.
      *
      * @return int the number of attempts.
+     * @throws dml_exception
      */
     public function get_num_attempts()
     {
@@ -410,6 +413,7 @@ class ddtaquiz
      * Checks if the quiz has any attempts, that are not a preview.
      *
      * @return boolean wether the quiz has attempts, that are not a preview.
+     * @throws dml_exception
      */
     public function has_attempts()
     {

@@ -75,6 +75,7 @@ class block {
      * @param ddtaquiz $quiz the quiz, this block belongs to.
      * @param int $blockid the block id.
      * @return block the new block object.
+     * @throws dml_exception
      */
     public static function load(ddtaquiz $quiz, $blockid) {
         global $DB;
@@ -91,6 +92,7 @@ class block {
      * @param ddtaquiz $quiz the quiz this block belongs to.
      * @param string $name the name of the block.
      * @return block the new block object.
+     * @throws dml_exception
      */
     public static function create(ddtaquiz $quiz, $name) {
         global $DB;
@@ -144,6 +146,7 @@ class block {
      * Sets the name of the block.
      *
      * @param string $name new name of the block.
+     * @throws dml_exception
      */
     public function set_name(string $name) {
 
@@ -164,6 +167,7 @@ class block {
      * Returns the children block.
      *
      * @return array an array of {@link block_element}, which represents the children of this block.
+     * @throws dml_exception
      */
     public function get_children() {
         $this->load_children();
@@ -173,7 +177,8 @@ class block {
     /**
      * Loads the children for the block.
      *
-     * @return block_element the new block object.
+     * @return void the new block object.
+     * @throws dml_exception
      */
     protected function load_children() {
         global $DB;
@@ -195,6 +200,7 @@ class block {
      * Removes the child with the given ddtaquiz_qinstance id.
      *
      * @param int $id the id of the child to remove.
+     * @throws dml_exception
      */
     public function remove_child($id) {
         if (!$this->get_quiz()->has_attempts()) {
@@ -211,6 +217,7 @@ class block {
      * Checks whether the block or subblock has any questions.
      *
      * @return bool true if there are questions in this block.
+     * @throws dml_exception
      */
     public function has_questions() {
         foreach ($this->get_children() as $element) {
@@ -227,6 +234,7 @@ class block {
      * Adds the questions of this block to a question usage.
      *
      * @param question_usage_by_activity $quba the question usage to add the questions to.
+     * @throws dml_exception
      */
     public function add_questions_to_quba(question_usage_by_activity $quba) {
         foreach ($this->get_children() as $element) {
@@ -238,6 +246,7 @@ class block {
      * Returns all questions of this block and its descendants.
      *
      * @return array the block_elements representing the questions.
+     * @throws dml_exception
      */
     public function get_questions() {
         $questions = array();
@@ -255,6 +264,7 @@ class block {
      * Returns all blocks of this block and its descendants.
      *
      * @return array the block_elements representing the blocks.
+     * @throws dml_exception
      */
     public function get_blocks() {
         $blocks = array();
@@ -271,6 +281,7 @@ class block {
      * Returns all elements of this block and its descendants.
      *
      * @return array the block_elements representing the elements.
+     * @throws dml_exception
      */
     public function get_elements() {
         $elements = array();
@@ -287,6 +298,7 @@ class block {
      * Returns the id of the parent block or false, if this block has no parent block.
      *
      * @return bool|int the the id of the parent block or false.
+     * @throws dml_exception
      */
     public function get_parentid() {
         // If this is the main block, there is no parent block.
@@ -304,6 +316,7 @@ class block {
      *
      * @param int $childid the id of the child to find the parent for.
      * @return bool|block the parent block or fals, if the parent can not be found.
+     * @throws dml_exception
      */
     protected function search_parent($childid) {
         foreach ($this->get_children() as $element) {
@@ -342,6 +355,7 @@ class block {
      * Adds a new question to the block.
      *
      * @param int $questionid the id of the question to be added.
+     * @throws dml_exception
      */
     public function add_question($questionid) {
         if (!$this->get_quiz()->has_attempts()) {
@@ -365,6 +379,7 @@ class block {
      * Adds a new subblock to the block.
      *
      * @param block $block the block to be added as a subblock.
+     * @throws dml_exception
      */
     public function add_subblock(block $block) {
         if (!$this->get_quiz()->has_attempts()) {
@@ -388,6 +403,7 @@ class block {
      * Returns all block_elements that can be used for a condition on this block.
      *
      * @return array the block_elements that can be used for a condition.
+     * @throws dml_exception
      */
     public function get_condition_candidates() {
         return $this->get_previous_questions();
@@ -397,6 +413,7 @@ class block {
      * Returns all questions that might be asked ahead of this block. Used to find adequate questions for use in conditions.
      *
      * @return array the block_elements of the questions ahead of this block.
+     * @throws dml_exception
      */
     protected function get_previous_questions() {
         $parent = $this->quiz->get_main_block()->search_parent($this->id);
@@ -432,6 +449,7 @@ class block {
      *
      * @param int $elementid the id of the element.
      * @return null|int the slot number of the element or null, if the element can not be found.
+     * @throws dml_exception
      */
     public function get_slot_for_element($elementid) {
         $slot = $this->startingslot;
@@ -461,6 +479,7 @@ class block {
      *
      * @param int $startingslot the slotnumber to start counting at.
      * @return int hte number of slots used by this block.
+     * @throws dml_exception
      */
     public function enumerate($startingslot) {
         $this->startingslot = $startingslot;
@@ -481,6 +500,7 @@ class block {
      *
      * @param attempt $attempt the attempt that  the student is currently working on.
      * @return null|int the number of the next slot that the student should work on or null, if no such slot exists.
+     * @throws dml_exception
      */
     public function next_slot(attempt $attempt) {
         $currentslot = $attempt->get_current_slot();
@@ -510,6 +530,7 @@ class block {
      * Updates the elements of this block to match a given order.
      *
      * @param array $order an array holding the ids of the block_elements of this block in the desired order.
+     * @throws dml_exception
      */
     public function update_order($order) {
         if (!$this->get_quiz()->has_attempts()) {
@@ -528,6 +549,7 @@ class block {
      *
      * @param attempt $attempt the attempt for which to return the grade_grade.
      * @return int the achieved grade in the attempt.
+     * @throws dml_exception
      */
     public function get_grade(attempt $attempt) {
         $sum = 0;
@@ -545,6 +567,7 @@ class block {
      * Returns the maximum attainable grade for this block.
      *
      * @return int the maximum attainable grade.
+     * @throws dml_exception
      */
     public function get_maxgrade() {
         $sum = 0;
@@ -607,7 +630,8 @@ class block_element {
      *
      * @param ddtaquiz $quiz the quiz this reference belongs to.
      * @param int $blockelementid the blockelement id.
-     * @return block the new block object.
+     * @return block_element|null the new block object.
+     * @throws dml_exception
      */
     public static function load(ddtaquiz $quiz, $blockelementid) {
         global $DB;
@@ -677,6 +701,7 @@ class block_element {
      * Updates this element to reside at a new slot.
      *
      * @param int $slot the new slot for this element.
+     * @throws dml_exception
      */
     public function update_slot($slot) {
         if ($slot != $this->slot) {
@@ -729,6 +754,7 @@ class block_element {
      * Checks whether the element can be edited.
      *
      * @return bool True if it may be edited, false otherwise.
+     * @throws coding_exception
      */
     public function may_edit() {
         if ($this->is_question()) {
@@ -746,6 +772,7 @@ class block_element {
      * Checks whether the element can be viewed.
      *
      * @return bool True if it may be viewed, false otherwise.
+     * @throws coding_exception
      */
     public function may_view() {
         if ($this->is_question()) {
@@ -763,6 +790,7 @@ class block_element {
      *
      * @param array $params paramters to use for the url.
      * @return \moodle_url the edit URL of the element.
+     * @throws moodle_exception
      */
     public function get_edit_url(array $params) {
         global $CFG;

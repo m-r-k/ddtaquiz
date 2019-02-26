@@ -128,6 +128,7 @@ class attempt {
      *
      * @param int $attemptid the id of this attempt.
      * @return attempt the new attempt object.
+     * @throws dml_exception
      */
     public static function load($attemptid) {
         global $DB;
@@ -149,6 +150,9 @@ class attempt {
      * @param int $userid the id of the user this attempt belongs to.
      * @param boolean $preview attempt is a preview attempt.
      * @return attempt the new attempt object.
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws moodle_exception
      */
     public static function create(ddtaquiz $quiz, $userid, $preview = false) {
         global $DB;
@@ -334,6 +338,7 @@ class attempt {
      * Sets the current slot of this attempt.
      *
      * @param int $slot the slot this attempt should be at after this call.
+     * @throws dml_exception
      */
     public function set_current_slot($slot) {
         global $DB;
@@ -351,6 +356,7 @@ class attempt {
      * Processes the slot.
      *
      * @param int $timenow the current time.
+     * @throws dml_transaction_exception
      */
     public function process_slot($timenow) {
         global $DB;
@@ -373,6 +379,10 @@ class attempt {
      * Checks if this attempt is finished.
      *
      * @return boolean wether this attempt is finished.
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws dml_transaction_exception
+     * @throws moodle_exception
      */
     public function check_state_finished() {
         if($this->state == self::FINISHED){
@@ -397,6 +407,11 @@ class attempt {
      * Process responses during an attempt at a quiz and finish the attempt.
      *
      * @param  int $timenow the current time.
+     * @param $state
+     * @throws coding_exception
+     * @throws dml_exception
+     * @throws dml_transaction_exception
+     * @throws moodle_exception
      */
     public function finish_attempt($timenow,$state) {
         global $DB;
@@ -482,6 +497,7 @@ class attempt {
      * Generates the URL to view this attempt.
      *
      * @return moodle_url the URL of that attempt.
+     * @throws moodle_exception
      */
     public function attempt_url() {
         return new moodle_url('/mod/ddtaquiz/attempt.php', array('attempt' => $this->id));
@@ -491,6 +507,7 @@ class attempt {
      * Generates the URL of the review page.
      *
      * @return moodle_url the URL to review this attempt.
+     * @throws moodle_exception
      */
     public function review_url() {
         return new moodle_url('/mod/ddtaquiz/review.php', array('attempt' => $this->id));
@@ -500,6 +517,7 @@ class attempt {
      * Get the human-readable name for an attempt state.
      * @param string $state one of the state constants.
      * @return string The lang string to describe that state.
+     * @throws coding_exception
      */
     public static function state_name($state) {
         switch ($state) {
@@ -519,6 +537,7 @@ class attempt {
      * @param int $userid the id of the user belonging to this attempt.
      * @param string $state the state of the attempt.
      * @return array the attempts of a quiz belonging to a specific user.
+     * @throws dml_exception
      */
     public static function get_user_attempts($quizid, $userid, $state = 'all') {
         global $DB;
@@ -541,6 +560,8 @@ class attempt {
      * @param ddtaquiz $quiz the quiz for which to check.
      * @param int $userid the id of the user wanting to start a new attempt.
      * @return bool true if a new attempt may be started.
+     * @throws coding_exception
+     * @throws dml_exception
      */
     public static function may_start_new_attempt(ddtaquiz $quiz, $userid) {
         $context = $quiz->get_context();
