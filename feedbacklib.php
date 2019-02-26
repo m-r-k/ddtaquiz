@@ -507,7 +507,7 @@ class feedback_used_question{
      * @param $shift
      * @return feedback_used_question|null
      */
-    public static function load($quiz, $questioninstanceid,$shift,$letter): ?self{
+    public static function load($quiz, $questioninstanceid,$shift,$letter): self{
         $blockElement = block_element::load($quiz, $questioninstanceid);
         if($blockElement instanceof block_element)
             return new self($blockElement, $shift,$letter);

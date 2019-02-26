@@ -749,7 +749,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @return string
      * @throws \coding_exception
      */
-    protected function mq_points_condition($candidates, $accordionId, $mqIndex = '', ?\multiquestions_condition_part $part = null) {
+    protected function mq_points_condition($candidates, $accordionId, $mqIndex = '', \multiquestions_condition_part $part = null) {
         //If no candidate is available display a warning
         if(count($candidates)==0)
         {
