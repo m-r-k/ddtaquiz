@@ -522,9 +522,9 @@ class ddtaquiz_timing
     private $overduehandling;
     private $graceperiod;
 
-    public const AUTOBANDON = 'autoabandon';
-    public const AUTOSUBMIT = 'autosubmit';
-    public const GRACEPERIOD = 'graceperiod';
+    const AUTOBANDON = 'autoabandon';
+    const AUTOSUBMIT = 'autosubmit';
+    const GRACEPERIOD = 'graceperiod';
 
     /**
      * ddtaquiz_timing constructor.
@@ -541,7 +541,7 @@ class ddtaquiz_timing
 
     public static function create(): self
     {
-        return new ddtaquiz_timing(0, self::AUTOSUBMIT, 0);
+        return new ddtaquiz_timing(0, 'autosubmit', 0);
     }
 
     /**

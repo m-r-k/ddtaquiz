@@ -688,6 +688,7 @@ class domain_condition extends condition {
      * @param string $name
      * @param string $replace
      * @param int $type
+     * @param int $grade
      */
     public function __construct($id, $name, $replace, $type, $grade = 0) {
         $this->id = $id;
