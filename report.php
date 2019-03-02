@@ -22,7 +22,7 @@
  */
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/locallib.php');
 
 $id = required_param('id', PARAM_INT);
 $mode = required_param('mode', PARAM_ALPHA);
@@ -46,7 +46,6 @@ $PAGE->set_pagelayout('report');
 $PAGE->set_title($ddtaquiz->get_name());
 $PAGE->set_heading($course->fullname);
 
-//TODO: get modes to display the grade/response overview
 if ($mode == 'responses') {
     $report = new mod_ddtaquiz\report\responses();
 } else if($mode='combined') {

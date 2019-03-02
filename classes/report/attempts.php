@@ -49,7 +49,7 @@ abstract class attempts {
     /** @var string constant used for the options, means all enrolled users. */
     const ENROLLED_ALL = 'enrolled_any';
 
-    /** @var object the quiz context. */
+    /** @var \context the quiz context. */
     protected $context;
 
     /** @var \ddtaquiz $quiz the quiz. */
@@ -93,7 +93,7 @@ abstract class attempts {
 
         list($currentgroup, $students, $groupstudents, $allowed) = $this->load_relevant_students($cm, $course);
 
-        $this->qmsubselect = ''; // TODO: quiz_report_qm_filter_select($quiz);
+        $this->qmsubselect = '';
 
         $this->form = new $formclass($this->get_base_url(),
             array('quiz' => $quiz, 'currentgroup' => $currentgroup, 'context' => $this->context));
@@ -287,7 +287,7 @@ abstract class attempts {
      * @param array $headers the columns headings. Added to.
      * @throws \coding_exception
      */
-    protected function add_grade_columns(\ddtaquiz $quiz, &$columns, &$headers, $includefeedback = true) {
+    protected function add_grade_columns(\ddtaquiz $quiz, &$columns, &$headers) {
         $columns[] = 'sumgrades';
         $headers[] = get_string('grade', 'ddtaquiz') . '/' .
             $quiz->format_grade($quiz->get_maxgrade());
@@ -300,6 +300,7 @@ abstract class attempts {
      * @param array $headers the columns headings.
      * @param attempts_options $options the display options.
      * @param bool $collapsible whether to allow columns in the report to be collapsed.
+     * @throws \moodle_exception
      */
     protected function set_up_table_columns($table, $columns, $headers,
         attempts_options $options, $collapsible) {
@@ -337,6 +338,7 @@ abstract class attempts {
      *
      * @return array of slot => $question object with fields
      *      ->slot, ->id, ->maxmark, ->number, ->length.
+     * @throws \dml_exception
      */
     protected function get_significant_questions() {
         $questionsraw = $this->quiz->get_questions();

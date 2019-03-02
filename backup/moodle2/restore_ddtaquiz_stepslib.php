@@ -34,10 +34,14 @@ defined('MOODLE_INTERNAL') || die();
 
 class restore_ddtaquiz_activity_structure_step extends restore_questions_activity_structure_step {
 
+    protected $currentquizattempt;
+
     /**
      * Defines structure of path elements to be processed during the restore
      *
      * @return array of {@link restore_path_element}
+     * @throws base_step_exception
+     * @throws restore_step_exception
      */
     protected function define_structure() {
 
@@ -73,12 +77,14 @@ class restore_ddtaquiz_activity_structure_step extends restore_questions_activit
      * Process the given restore path element data
      *
      * @param array $data parsed element data
+     * @throws base_step_exception
+     * @throws dml_exception
+     * @throws restore_step_exception
      */
     protected function process_ddtaquiz($data) {
         global $DB;
 
         $data = (object)$data;
-        $oldid = $data->id;
         $oldmainblock = $data->mainblock;
         $data->course = $this->get_courseid();
 
@@ -114,12 +120,10 @@ class restore_ddtaquiz_activity_structure_step extends restore_questions_activit
 
         $data->quiz = $this->get_new_parentid('ddtaquiz');
 
-        $newitemid = $DB->insert_record('ddtaquiz_grades', $data);
+        $DB->insert_record('ddtaquiz_grades', $data);
     }
 
     protected function process_attempt($data) {
-        global $DB;
-
         $data = (object) $data;
 
         $data->quiz = $this->get_new_parentid('ddtaquiz');
@@ -160,7 +164,6 @@ class restore_ddtaquiz_activity_structure_step extends restore_questions_activit
     protected function process_block_element_question($data) {
         global $DB;
 
-        $userinfo = $this->get_setting_value('userinfo');
         $data = (object) $data;
         $oldid = $data->id;
 
@@ -174,7 +177,6 @@ class restore_ddtaquiz_activity_structure_step extends restore_questions_activit
     protected function process_block_element_block($data) {
         global $DB;
 
-        $userinfo = $this->get_setting_value('userinfo');
         $data = (object) $data;
         $oldid = $data->id;
 
@@ -192,7 +194,7 @@ class restore_ddtaquiz_activity_structure_step extends restore_questions_activit
         $data->conditionid = $this->get_mappingid('condition', $data->conditionid);
         $data->on_qinstance = $this->get_mappingid('block_element', $data->on_qinstance);
 
-        $newitemid = $DB->insert_record('ddtaquiz_condition_part', $data);
+        $DB->insert_record('ddtaquiz_condition_part', $data);
     }
 
     protected function process_feedback_block($data) {
@@ -214,12 +216,11 @@ class restore_ddtaquiz_activity_structure_step extends restore_questions_activit
                 array('feedbackblockid', 'questioninstanceid'));
 
         $data = (object) $data;
-        $oldid = $data->id;
 
         $data->feedbackblockid = $this->get_new_parentid('feedback_block');
         $data->questioninstanceid = $this->get_mappingid('block_element', $data->questioninstanceid);
 
-        $newitemid = $DB->insert_record('ddtaquiz_feedback_uses', $data);
+        $DB->insert_record('ddtaquiz_feedback_uses', $data);
     }
 
     /**
@@ -239,9 +240,8 @@ class restore_ddtaquiz_activity_structure_step extends restore_questions_activit
 
         $data = $this->currentquizattempt;
 
-        $oldid = $data->id;
         $data->quba = $newusageid;
 
-        $newitemid = $DB->insert_record('ddtaquiz_attempts', $data);
+        $DB->insert_record('ddtaquiz_attempts', $data);
     }
 }

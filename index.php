@@ -24,8 +24,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/lib.php');
+require_once(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/lib.php');
 
 $id = required_param('id', PARAM_INT); // Course.
 
@@ -70,6 +70,7 @@ if ($usesections) {
 
 $modinfo = get_fast_modinfo($course);
 $currentsection = '';
+/** @var cm_info $cm */
 foreach ($modinfo->instances['ddtaquiz'] as $cm) {
     $row = array();
     if ($usesections) {

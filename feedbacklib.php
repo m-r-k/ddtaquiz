@@ -158,6 +158,7 @@ class feedback {
             if (count($usedqinstances) < 1) {
                 continue;
             }
+            /** @var feedback_used_question $first */
             $first = array_values($usedqinstances)[0];
             if ($first->getBlockElement()->get_id() == $elem->get_id()) {
                 return $block;
@@ -473,6 +474,8 @@ class feedback_block {
         $first = question_bank::load_question($qid, false);
         $mark = $first->defaultmark;
         $sum = 0;
+
+        /** @var block_element $element */
         foreach ($uses as $element) {
             if ($element->is_question()) {
                 $question = question_bank::load_question($element->get_element()->id, false);

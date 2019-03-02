@@ -23,8 +23,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/../../config.php');
-require_once(dirname(__FILE__).'/locallib.php');
+require_once(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/locallib.php');
 
 // Get submitted parameters.
 $cmid = required_param('cmid', PARAM_INT);
@@ -51,6 +51,8 @@ if (attempt::may_start_new_attempt($ddtaquiz, $USER->id)) {
     // Redirect to the attempt page.
     redirect($attempt->attempt_url());
 } else {
+
+    /** @var array $attempts */
     $attempts = attempt::get_user_attempts($ddtaquiz->get_id(), $USER->id);
     if (count($attempts) > 0) {
         redirect($attempts[count($attempts) - 1]->attempt_url());

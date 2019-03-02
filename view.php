@@ -22,10 +22,10 @@
  */
 
 // Load the mandatory configurations and libraries
-require_once(dirname(dirname(dirname(__FILE__))).'/config.php');
-require_once(dirname(__FILE__).'/lib.php');
-require_once(dirname(__FILE__).'/locallib.php');
-require_once($CFG->dirroot . '/mod/ddtaquiz/renderer.php');
+require_once(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/lib.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/locallib.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/renderer.php');
 
 // Course module ID
 $id = optional_param('id', 0, PARAM_INT);
@@ -57,12 +57,14 @@ $event->trigger();
 
 $context = context_module::instance($id);
 
+// PHPStorm shows "->id" as an error, "access protected", but moodle doesn't allow anything else
 if (isset($ddtaquiz->id)) {
     $quizid = $ddtaquiz->id;
 } else {
     print_error('No Quiz found!');
     return;
 }
+
 $quiz = ddtaquiz::load($quizid);
 $mainblock = $quiz->get_main_block();
 
@@ -82,6 +84,7 @@ $viewobj->attempts = $attempts;
 $viewobj->numattempts = count($attempts);
 
 $unfinishedattempts = attempt::get_user_attempts($quizid, $USER->id, 'inprogress');
+/** @var attempt $unfinished */
 $unfinished = end($unfinishedattempts);
 
 // If there are questions, check if the user still has an unfinished attempt.
@@ -113,6 +116,8 @@ if (!$viewobj->quizhasquestions) {
 
 // Print the page header.
 $PAGE->set_url('/mod/ddtaquiz/view.php', array('id' => $cm->id));
+
+// PHPStorm shows "->name" as an error, "access protected", but moodle doesn't allow anything else
 $PAGE->set_title(format_string($ddtaquiz->name));
 $PAGE->set_heading(format_string($course->fullname));
 $output = $PAGE->get_renderer('mod_ddtaquiz');

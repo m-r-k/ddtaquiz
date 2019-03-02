@@ -43,6 +43,7 @@ class backup_ddtaquiz_activity_structure_step extends backup_questions_activity_
      * @param string $name the name of
      * @param string $filename the name of
      * @param int $cmid the id of the course module.
+     * @throws backup_step_exception
      */
     public function __construct($name, $filename, $cmid) {
         $this->cmid = $cmid;
@@ -53,6 +54,11 @@ class backup_ddtaquiz_activity_structure_step extends backup_questions_activity_
      * Defines the backup structure of the module.
      *
      * @return backup_nested_element.
+     * @throws backup_step_exception
+     * @throws base_element_struct_exception
+     * @throws base_step_exception
+     * @throws coding_exception
+     * @throws dml_exception
      */
     protected function define_structure() {
 

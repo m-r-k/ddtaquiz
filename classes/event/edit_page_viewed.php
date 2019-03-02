@@ -62,6 +62,7 @@ class edit_page_viewed extends \core\event\base {
      * Returns localised general event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventeditpageviewed', 'ddtaquiz');
@@ -71,6 +72,7 @@ class edit_page_viewed extends \core\event\base {
      * Returns relevant URL.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url('/mod/ddtaquiz/edit.php', array('cmid' => $this->contextinstanceid));

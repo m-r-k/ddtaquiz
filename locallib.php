@@ -26,10 +26,10 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->dirroot . '/mod/ddtaquiz/blocklib.php');
-require_once($CFG->dirroot . '/mod/ddtaquiz/conditionlib.php');
-require_once($CFG->dirroot . '/mod/ddtaquiz/feedbacklib.php');
-require_once($CFG->dirroot . '/mod/ddtaquiz/attemptlib.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/blocklib.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/conditionlib.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/feedbacklib.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/attemptlib.php');
 
 /**
  * A class encapsulating a ddta quiz.
@@ -151,6 +151,7 @@ class ddtaquiz
      * Get the main block of the quiz.
      *
      * @return block the main block of the quiz.
+     * @throws dml_exception
      */
     public function get_main_block()
     {
@@ -239,6 +240,7 @@ class ddtaquiz
      *
      * @param attempt $attempt the attempt that  the student is currently working on.
      * @return null|int the number of the next slot that the student should work on or null, if no such slot exists.
+     * @throws dml_exception
      */
     public function next_slot(attempt $attempt)
     {
@@ -259,6 +261,7 @@ class ddtaquiz
      *
      * @param int $elementid the id of the element.
      * @return null|int the slot number of the element or null, if the element can not be found.
+     * @throws dml_exception
      */
     public function get_slot_for_element($elementid)
     {
@@ -270,6 +273,7 @@ class ddtaquiz
      * Adds the questions of this quiz to a question usage.
      *
      * @param question_usage_by_activity $quba the question usage to add the questions to.
+     * @throws dml_exception
      */
     public function add_questions_to_quba(question_usage_by_activity $quba)
     {
@@ -280,6 +284,7 @@ class ddtaquiz
      * Returns all questions of this quiz.
      *
      * @return array the block_elements representing the questions.
+     * @throws dml_exception
      */
     public function get_questions()
     {
@@ -290,6 +295,7 @@ class ddtaquiz
      * Returns all elements of this quiz.
      *
      * @return array the block_elements representing the elements.
+     * @throws dml_exception
      */
     public function get_elements()
     {
@@ -304,6 +310,7 @@ class ddtaquiz
         global $DB;
 
         $grade = 0;
+        /** @var block_element $child */
         foreach ($this->get_main_block()->get_children() as $child) {
             if ($child->is_question()) {
                 $question = question_bank::load_question($child->get_element()->id, false);
@@ -338,11 +345,11 @@ class ddtaquiz
         $attempts = attempt::get_user_attempts($this->get_id(), $userid, 'finished');
 
         // Calculate the best grade.
-        // TODO: wie die beste Note berechnen?
         if ($this->grademethod == 0) {
             $bestgrade = end($attempts)->get_sumgrades();
         } else if ($this->grademethod == 1) {
             $max = 0;
+            /** @var attempt $attempt */
             foreach ($attempts as $attempt) {
                 $thisgrade = $attempt->get_sumgrades();
                 if ($thisgrade > $max) {
