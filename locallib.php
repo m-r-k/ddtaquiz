@@ -541,7 +541,7 @@ class ddtaquiz_timing
 
     public static function create(): self
     {
-        return new ddtaquiz_timing(0, 'autosubmit', 0);
+        return new ddtaquiz_timing(0, self::AUTOSUBMIT, 0);
     }
 
     /**
