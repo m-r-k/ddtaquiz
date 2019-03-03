@@ -22,9 +22,9 @@
  */
 
 // Load the mandatory configurations and libraries
-require_once(dirname(__FILE__) . '/../../config.php');
-require_once(dirname(__FILE__).'/locallib.php');
-require_once(dirname(__FILE__).'/attemptlib.php');
+require_once(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/locallib.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/attemptlib.php');
 
 // Get the attempt id from the parameters.
 $attemptid = required_param('attempt', PARAM_INT);

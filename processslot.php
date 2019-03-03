@@ -21,8 +21,8 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-require_once(dirname(__FILE__) . '/../../config.php');
-require_once(dirname(__FILE__).'/locallib.php');
+require_once(__DIR__ . '/../../config.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/locallib.php');
 
 // Get submitted parameters.
 $attemptid = required_param('attempt',  PARAM_INT);
@@ -48,7 +48,6 @@ $nexturl = new \moodle_url($url, array('cmid' => $cmid));
 
 // Check that this attempt belongs to this user.
 if ($attempt->get_userid() != $USER->id) {
-    // TODO: ddtaquiz not quiz...
     throw new moodle_quiz_exception($attempt->get_quiz(), 'notyourattempt');
 }
 

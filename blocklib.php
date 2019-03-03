@@ -119,6 +119,7 @@ class block {
      * Checks whether this is the main block of the quiz.
      *
      * @return bool true if this is the main block of the quiz.
+     * @throws dml_exception
      */
     public function is_main_block() {
         return $this->id == $this->quiz->get_main_block()->get_id();
@@ -308,7 +309,6 @@ class block {
             // Top down search in the block-tree to find the parent.
             return $this->quiz->get_main_block()->search_parent($this->id)->get_id();
         }
-        return false;
     }
 
     /**
@@ -319,6 +319,7 @@ class block {
      * @throws dml_exception
      */
     protected function search_parent($childid) {
+        /** @var block_element $element */
         foreach ($this->get_children() as $element) {
             if ($element->is_block()) {
                 $block = $element->get_element();
@@ -418,6 +419,7 @@ class block {
     protected function get_previous_questions() {
         $parent = $this->quiz->get_main_block()->search_parent($this->id);
         $thisblockelement = null;
+        /** @var block_element $element */
         foreach ($parent->get_children() as $element) {
             if ($element->is_block() && $element->get_element()->get_id() == $this->id) {
                 $thisblockelement = $element;
@@ -453,6 +455,7 @@ class block {
      */
     public function get_slot_for_element($elementid) {
         $slot = $this->startingslot;
+        /** @var block_element $child */
         foreach ($this->get_children() as $child) {
             if ($child->get_id() == $elementid) {
                 return $slot;
@@ -508,6 +511,7 @@ class block {
             return null;
         }
         $slot = $this->startingslot;
+        /** @var block_element $child */
         foreach ($this->get_children() as $child) {
             if ($child->is_question()) {
                 if ($currentslot < $slot) {
@@ -720,6 +724,7 @@ class block_element {
      *
      * @param attempt $attempt the attempt for which to return the grade_grade.
      * @return null|int the achieved grade in the attempt or null, if it has no (complete) mark yet.
+     * @throws dml_exception
      */
     public function get_grade(attempt $attempt) {
         if ($this->is_question()) {
@@ -748,6 +753,7 @@ class block_element {
             //return $this->quiz->get_slot_for_element($this->id) . '. ' . $this->element->get_name();
             return $this->element->get_name();
         }
+        return "";
     }
 
     /**
@@ -755,6 +761,7 @@ class block_element {
      *
      * @return bool True if it may be edited, false otherwise.
      * @throws coding_exception
+     * @throws dml_exception
      */
     public function may_edit() {
         if ($this->is_question()) {
@@ -766,6 +773,9 @@ class block_element {
         if ($this->is_block()) {
             return true;
         }
+
+        // if in doubt don't allow it
+        return false;
     }
 
     /**
@@ -773,6 +783,7 @@ class block_element {
      *
      * @return bool True if it may be viewed, false otherwise.
      * @throws coding_exception
+     * @throws dml_exception
      */
     public function may_view() {
         if ($this->is_question()) {
@@ -783,6 +794,9 @@ class block_element {
         if ($this->is_block()) {
             return true;
         }
+
+        // if in doubt don't allow it
+        return false;
     }
 
     /**
@@ -804,6 +818,8 @@ class block_element {
             unset($blockparams['returnurl']);
             return new moodle_url('edit.php', $blockparams);
         }
+
+        return new moodle_url("");
     }
 
     /**

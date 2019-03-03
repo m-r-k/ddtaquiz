@@ -25,8 +25,8 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-require_once($CFG->libdir . '/externallib.php');
-require_once($CFG->dirroot . '/question/editlib.php');
+require_once($CFG->libdir.'/externallib.php');
+require_once($CFG->dirroot.'/question/editlib.php');
 
 /**
  * DDTA Quiz external functions
@@ -72,7 +72,7 @@ class mod_ddtaquiz_external extends external_api {
      * @throws restricted_context_exception
      */
     public static function get_questionbank($cmid, $bid, $page, $qperpage, $qbs1, $category) {
-        global $PAGE, $DB;
+        global $PAGE;
         $params = self::validate_parameters(self::get_questionbank_parameters(),
             array('cmid' => $cmid, 'bid' => $bid, 'page' => $page, 'qperpage' => $qperpage,
                 'qbs1' => $qbs1, 'category' => $category));

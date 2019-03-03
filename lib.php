@@ -67,12 +67,11 @@ function ddtaquiz_supports($feature) {
  * of the new instance.
  *
  * @param stdClass $ddtaquiz Submitted data from the form in mod_form.php.
- * @param mod_ddtaquiz_mod_form $mform The form instance itself (if needed).
  * @return int The id of the newly inserted ddtaquiz record.
  * @throws coding_exception
  * @throws dml_exception
  */
-function ddtaquiz_add_instance(stdClass $ddtaquiz, mod_ddtaquiz_mod_form $mform = null) {
+function ddtaquiz_add_instance(stdClass $ddtaquiz) {
     global $DB;
 
     $ddtaquiz->timecreated = time();
@@ -97,12 +96,11 @@ function ddtaquiz_add_instance(stdClass $ddtaquiz, mod_ddtaquiz_mod_form $mform 
  * will update an existing instance with new data.
  *
  * @param stdClass $ddtaquiz An object from the form in mod_form.php.
- * @param mod_ddtaquiz_mod_form $mform The form instance itself (if needed).
  * @return boolean Success/Fail.
  * @throws coding_exception
  * @throws dml_exception
  */
-function ddtaquiz_update_instance(stdClass $ddtaquiz, mod_ddtaquiz_mod_form $mform = null) {
+function ddtaquiz_update_instance(stdClass $ddtaquiz) {
     global $DB;
 
     $ddtaquiz->timemodified = time();
@@ -179,13 +177,9 @@ function ddtaquiz_delete_instance($id) {
  * $return->time = the time they did it
  * $return->info = a short text description
  *
- * @param stdClass $course The course record.
- * @param stdClass $user The user record.
- * @param cm_info|stdClass $mod The course module info object or record.
- * @param stdClass $ddtaquiz The ddtaquiz instance record.
  * @return stdClass|null information about what a user has done with a given particular instance of this module.
  */
-function ddtaquiz_user_outline($course, $user, $mod, $ddtaquiz) {
+function ddtaquiz_user_outline() {
 
     $return = new stdClass();
     $return->time = 0;
@@ -211,12 +205,9 @@ function ddtaquiz_user_complete($course, $user, $mod, $ddtaquiz) {
  * Given a course and a time, this module should find recent activity
  * that has occurred in ddtaquiz activities and print it out.
  *
- * @param stdClass $course The course record.
- * @param bool $viewfullnames Should we display full names.
- * @param int $timestart Print activity since this timestamp.
  * @return boolean True if anything was printed, otherwise false.
  */
-function ddtaquiz_print_recent_activity($course, $viewfullnames, $timestart) {
+function ddtaquiz_print_recent_activity() {
     return false;
 }
 
@@ -398,12 +389,9 @@ function ddtaquiz_update_grades(stdClass $ddtaquiz, $userid = 0) {
  * The file area 'intro' for the activity introduction field is added automatically
  * by {@link file_browser::get_file_info_context_module()}.
  *
- * @param stdClass $course
- * @param stdClass $cm
- * @param stdClass $context
  * @return array of [(string)filearea] => (string)description
  */
-function ddtaquiz_get_file_areas($course, $cm, $context) {
+function ddtaquiz_get_file_areas() {
     return array();
 }
 
@@ -437,17 +425,11 @@ function ddtaquiz_get_file_info($browser, $areas, $course, $cm, $context, $filea
  * @param stdClass $course the course object.
  * @param stdClass $cm the course module object.
  * @param stdClass $context the ddtaquiz's context.
- * @param string $filearea the name of the file area.
- * @param array $args extra arguments (itemid, path).
- * @param bool $forcedownload whether or not force download.
- * @param array $options additional options affecting the file serving.
  * @throws coding_exception
  * @throws moodle_exception
  * @throws require_login_exception
  */
-function ddtaquiz_pluginfile($course, $cm, $context, $filearea, array $args, $forcedownload, array $options=array()) {
-    global $DB, $CFG;
-
+function ddtaquiz_pluginfile($course, $cm, $context) {
     if ($context->contextlevel != CONTEXT_MODULE) {
         send_file_not_found();
     }
@@ -465,13 +447,12 @@ function ddtaquiz_pluginfile($course, $cm, $context, $filearea, array $args, $fo
  * This function is called when the context for the page is a ddtaquiz module. This is not called by AJAX
  * so it is safe to rely on the $PAGE.
  *
- * @param settings_navigation $settingsnav complete settings navigation tree.
  * @param navigation_node $ddtaquiznode ddtaquiz administration node.
  * @throws coding_exception
  * @throws moodle_exception
  */
-function ddtaquiz_extend_settings_navigation(settings_navigation $settingsnav, navigation_node $ddtaquiznode=null) {
-    global $PAGE, $CFG, $DB;
+function ddtaquiz_extend_settings_navigation(navigation_node $ddtaquiznode=null) {
+    global $PAGE, $CFG;
 
     require_once($CFG->dirroot . '/question/editlib.php');
 

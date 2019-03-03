@@ -24,7 +24,7 @@
  */
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/locallib.php');
 
 $attemptid = required_param('attempt', PARAM_INT);
 $slot = required_param('slot', PARAM_INT);
@@ -107,8 +107,8 @@ if (data_submitted() && confirm_sesskey()) {
             'courseid' => $cm->course,
             'context' => $context,
             'other' => array(
-                'quizid' => $quiz->id,
-                'attemptid' => $attempt->id,
+                'quizid' => $quiz->get_id(),
+                'attemptid' => $attempt->get_id(),
                 'slot' => $slot
             )
         );

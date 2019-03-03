@@ -85,10 +85,12 @@ class attempt {
     protected $preview;
 
     protected $timecheckstate;
+
     protected $timemodified;
 
 
     // Constructor =============================================================
+
     /**
      * Constructor assuming we already have the necessary data loaded.
      *
@@ -103,6 +105,8 @@ class attempt {
      * @param int $timefinish the time the attempt was finished.
      * @param float $sumgrades the sumof the grades.
      * @param boolean $preview attempt is a preview attempt.
+     * @param $timecheckstate
+     * @param $timemodified
      */
     public function __construct($id, question_usage_by_activity $quba, ddtaquiz $quiz,
             $userid, $attemptnumber, $currentslot = 1, $timestart, $state, $timefinish,
@@ -196,13 +200,6 @@ class attempt {
             'context' => $quiz->get_context()
         );
 
-        // Decide which event we are using.
-        /**if ($attempt->preview) { // TODO: preview
-                $params['other'] = array(
-		        'quizid' => $quizobj->get_quizid()
-            );
-            $event = \mod_ddtaquiz\event\attempt_preview_started::create($params);
-            } else { **/
         $event = \mod_ddtaquiz\event\attempt_started::create($params);
 
         // }
@@ -584,6 +581,7 @@ class attempt {
      *
      * @param ddtaquiz $quiz the quiz to create the usage for.
      * @return question_usage_by_activity the created question usage.
+     * @throws dml_exception
      */
     protected static function create_quba(ddtaquiz $quiz) {
         $quba = question_engine::make_questions_usage_by_activity('mod_ddtaquiz', $quiz->get_context());

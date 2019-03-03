@@ -42,11 +42,13 @@ class condition {
     protected $useand = true;
 
     // Constructor =============================================================
+
     /**
      * Constructor, assuming we already have the necessary data loaded.
      *
      * @param int $id the id of this condition.
      * @param array $parts the parts this condition is made from.
+     * @param $mqParts
      * @param bool $useand whether the parts are connected with and. Otherwise they are connected with or.
      */
     public function __construct($id, $parts,$mqParts, $useand) {
@@ -122,6 +124,7 @@ class condition {
      * @param int $type the type of this condition.
      * @param int $elementid the id of the element this condition references.
      * @param int $grade the grade this condition is relative to.
+     * @throws dml_exception
      */
     public function add_part($type, $elementid, $grade) {
         $part = condition_part::create($this, $type, $elementid, $grade);
@@ -142,11 +145,13 @@ class condition {
     /**
      * Checks whether this condition is met for a certain attempt.
      *
-     * @param object $attempt the attempt to check this part of the condition for.
+     * @param attempt $attempt the attempt to check this part of the condition for.
      * @return bool whether this condition is fullfilled.
+     * @throws dml_exception
      */
     public function is_fullfilled($attempt) {
         if ($this->useand) {
+            /** @var multiquestions_condition_part $part */
             foreach (array_merge($this->parts,$this->mqParts) as $part) {
                 if (!$part->is_fullfilled($attempt)) {
                     return false;
@@ -154,6 +159,7 @@ class condition {
             }
             return true;
         } else {
+            /** @var multiquestions_condition_part $part */
             foreach (array_merge($this->parts,$this->mqParts) as $part) {
                 if ($part->is_fullfilled($attempt)) {
                     return true;
@@ -377,6 +383,7 @@ class condition_part {
      *
      * @param attempt $attempt the attempt to check this part of the condition for.
      * @return bool whether this part of the condition is fullfilled.
+     * @throws dml_exception
      */
     public function is_fullfilled(attempt $attempt) {
         $referencedelement = block_element::load($attempt->get_quiz(), $this->elementid);
@@ -547,6 +554,7 @@ class multiquestions_condition_part {
     /**
      * @param attempt $attempt
      * @return bool
+     * @throws dml_exception
      */
     public function is_fullfilled(attempt $attempt) {
         // total grade of questions of interest
@@ -637,7 +645,7 @@ class multiquestions_condition_part {
             $record->question_id = $elementId;
             //if new , add to database
             if(!in_array($elementId,$currentElements)){
-                $id = $DB->insert_record('ddtaquiz_mq_questions', $record);
+                $this->id = $DB->insert_record('ddtaquiz_mq_questions', $record);
             }else{
                 // if not new remove from array, so it will not be deleted
                 unset($currentElements[array_search($elementId,$currentElements)]);
@@ -691,7 +699,7 @@ class domain_condition extends condition {
      * @param int $grade
      */
     public function __construct($id, $name, $replace, $type, $grade = 0) {
-        $this->id = $id;
+        parent::__construct($id, [], [], 1);
         $this->name = $name;
         $this->replace = $replace;
         $this->type = $type;
@@ -757,6 +765,7 @@ class domain_condition extends condition {
      *
      * @param \attempt $attempt the attempt to check this part of the condition for.
      * @return bool whether this condition is fullfilled.
+     * @throws dml_exception
      */
     public function is_fullfilled($attempt) {
         $grades = $this->get_grading($attempt);
@@ -793,6 +802,8 @@ class domain_condition extends condition {
         global $DB;
         $elements = $attempt->get_quiz()->get_elements();
         $active_elements = [];
+
+        /** @var block_element $element */
         foreach ($elements as $element) {
             $id = $element->get_id();
             $q_instance = $DB->get_record("ddtaquiz_qinstance", ["id" => $id]);
@@ -803,6 +814,8 @@ class domain_condition extends condition {
 
         $achieved_grade = 0;
         $total_grade = 0;
+
+        /** @var block_element $element */
         foreach ($elements as $element) {
             if (in_array($element->get_id(), $active_elements)) {
                 $add_grade = $element->get_grade($attempt);

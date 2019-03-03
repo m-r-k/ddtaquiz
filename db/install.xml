@@ -108,7 +108,7 @@
         <FIELD NAME="domaintype" TYPE="int" LENGTH="5" NOTNULL="false" SEQUENCE="false" COMMENT="0: was displayed 1: &amp;lt; 2: &amp;lt;= 3: &amp;gt; 4: &amp;gt;= 5: ="/>
         <FIELD NAME="domainname" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false"/>
         <FIELD NAME="domainreplace" TYPE="char" LENGTH="100" NOTNULL="false" SEQUENCE="false" COMMENT="Replacement for the short domain name"/>
-        <FIELD NAME="grade" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5"/>
+        <FIELD NAME="domaingrade" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
