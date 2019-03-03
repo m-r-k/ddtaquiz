@@ -38,7 +38,6 @@ require_once($CFG->libdir . '/formslib.php');
 abstract class attempts_form extends \moodleform {
 
     /**
-     * TODO
      * @throws \coding_exception
      */
     protected function definition() {
@@ -61,7 +60,6 @@ abstract class attempts_form extends \moodleform {
     }
 
     /**
-     * TODO (aus mod/quiz)
      * @param \MoodleQuickForm $mform
      * @throws \coding_exception
      */
@@ -89,14 +87,12 @@ abstract class attempts_form extends \moodleform {
     }
 
     /**
-     * TODO (aus mod/quiz)
      * @param \MoodleQuickForm $mform
      */
     protected function other_attempt_fields(\MoodleQuickForm $mform) {
     }
 
     /**
-     * TODO (aus mod/quiz)
      * @param \MoodleQuickForm $mform
      * @throws \coding_exception
      */
@@ -106,14 +102,12 @@ abstract class attempts_form extends \moodleform {
     }
 
     /**
-     * TODO (aus mod/quiz)
      * @param \MoodleQuickForm $mform
      */
     protected function other_preference_fields(\MoodleQuickForm $mform) {
     }
 
     /**
-     * TODO (aus mod/quiz)
      * @param array $data
      * @param array $files
      * @return array

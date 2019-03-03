@@ -64,6 +64,7 @@ class question_manually_graded extends \core\event\base {
      * Returns localised general event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventquestionmanuallygraded', 'ddtaquiz');
@@ -73,6 +74,7 @@ class question_manually_graded extends \core\event\base {
      * Returns relevant URL.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url('/mod/ddtaquiz/comment.php', array('attempt' => $this->other['attemptid'],

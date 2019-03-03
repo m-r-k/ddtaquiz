@@ -24,8 +24,9 @@
 namespace mod_ddtaquiz\output;
 
 defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
-require_once($CFG->dirroot . '/lib/editorlib.php');
+require_once($CFG->libdir.'/editorlib.php');
 
 use \html_writer;
 use \domain_feedback;
@@ -39,12 +40,15 @@ class edit_renderer extends \plugin_renderer_base {
     /**
      * Render the edit page
      *
+     * @param $errorOutput
      * @param \block $block object containing all the block information.
      * @param \moodle_url $pageurl The URL of the page.
      * @param array $pagevars the variables from {@link question_edit_setup()}.
      * @param \feedback $feedback object containing all the feedback information.
      * @return string HTML to output.
-     * @throws
+     * @throws \coding_exception
+     * @throws \dml_exception
+     * @throws \moodle_exception
      */
     public function edit_page($errorOutput, \block $block, \moodle_url $pageurl, array $pagevars, $feedback) {
         $output = '';
@@ -60,7 +64,7 @@ class edit_renderer extends \plugin_renderer_base {
             $headingContent = get_string('editingquizx', 'ddtaquiz', format_string($block->get_name()));
             $headingContent .= html_writer::tag('input', '', array('type' => 'text',
                 'name' => 'blockname', 'value' => $block->get_name(), 'class'=>'col-3 form-control inline rounded ml-3 '));
-            $headingIcon = ''; //TODO: add icons
+            $headingIcon = '';
             $output .= $this->heading(
                 ddtaquiz_bootstrap_render::createHeading(
                     $headingIcon,
@@ -71,7 +75,7 @@ class edit_renderer extends \plugin_renderer_base {
             $headingContent = get_string('editingblock', 'ddtaquiz');
             $headingContent .= html_writer::tag('input', '', array('type' => 'text',
                 'name' => 'blockname', 'value' => $block->get_name(), 'class'=>'col-3 form-control inline rounded ml-3 '));
-            $headingIcon = ''; //TODO: add icons
+            $headingIcon = '';
             $output .= $this->heading(
                 ddtaquiz_bootstrap_render::createHeading(
                     $headingIcon,
@@ -127,8 +131,8 @@ class edit_renderer extends \plugin_renderer_base {
 
         /********************** FeedBack Card  *****************************************/
         if ($block->is_main_block()) {
-            $output .= $this->domain_feedback_block($feedback->get_quiz(), $pageurl);
-            $output .= $this->feedback_block($feedback, $pageurl);
+            $output .= $this->domain_feedback_block($feedback->get_quiz());
+            $output .= $this->feedback_block($feedback);
         }
 
         /********************** close tags, load scripts *****************************************/
@@ -164,9 +168,6 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO: done
-     *
-     *
      * @param \block_element $blockelem
      * @param $pageurl
      * @param $accordionId
@@ -209,10 +210,10 @@ class edit_renderer extends \plugin_renderer_base {
             $edithtml = '';
             $removehtml = '';
             if (!$blockelem->get_quiz()->has_attempts()) {
-                $edithtml .= $this->element_edit_button($blockelem, $pageurl);
-                $removehtml = $this->element_remove_button($blockelem, $pageurl);
+                $edithtml .= $this->element_edit_button($blockelem);
+                $removehtml = $this->element_remove_button($blockelem);
             } else if ($blockelem->is_block()) {
-                $edithtml .= $this->element_edit_button($blockelem, $pageurl);
+                $edithtml .= $this->element_edit_button($blockelem);
             }
 
             $postContent .= \html_writer::div($edithtml . $removehtml, 'blockelementbuttons');
@@ -247,8 +248,6 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO: done
-     *
      * Renders the icon to move questions and blocks.
      *
      * @return string the HTML of the move icon.
@@ -263,8 +262,6 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO: done
-     *
      * Render the description.
      *
      * @param \block_element $blockelem
@@ -272,8 +269,10 @@ class edit_renderer extends \plugin_renderer_base {
      * @param $id
      * @param $triggerId
      * @param $parentAccordionId
+     * @param $parentCounter
      * @return string
-     * @throws
+     * @throws \coding_exception
+     * @throws \moodle_exception
      */
     protected function block_elem_desc(\block_element $blockelem,$pageurl,$id,$triggerId,$parentAccordionId,$parentCounter) {
         $accordionId = 'block-element-accordion-'. $blockelem->get_id();
@@ -301,12 +300,11 @@ class edit_renderer extends \plugin_renderer_base {
      * Outputs the edit button HTML for an element.
      *
      * @param \block_element $element the element to get the button for.
-     * @param \moodle_url $returnurl the URL of the page.
      * @return string HTML to output.
      * @throws
      */
-    public function element_edit_button($element, $returnurl) {
-        global $OUTPUT, $CFG;
+    public function element_edit_button($element) {
+        global $OUTPUT;
         // Minor efficiency saving. Only get strings once, even if there are a lot of icons on one page.
         static $stredit = null;
         static $strview = null;
@@ -323,6 +321,8 @@ class edit_renderer extends \plugin_renderer_base {
         } else if ($element->may_view()) {
             $action = $strview;
             $icon = '/i/info';
+        } else {
+            $icon = '';
         }
 
         // Build the icon.
@@ -336,18 +336,15 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO: done
-     *
      * Outputs the edit button HTML for a feedbackelement.
      *
      * @param \feedback_block $element the element to get the button for.
-     * @param \moodle_url $returnurl the URL of the page.
      * @return string HTML to output.
      *
      * @throws \coding_exception
      */
-    public function feedback_edit_button($element, $returnurl) {
-        global $OUTPUT, $CFG;
+    public function feedback_edit_button($element) {
+        global $OUTPUT;
         // Minor efficiency saving. Only get strings once, even if there are a lot of icons on one page.
         static $stredit = null;
         if ($stredit === null) {
@@ -363,40 +360,32 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO: done
-     *
      * Outputs the remove button HTML for an element.
      *
      * @param \block_element $element the element to get the button for.
-     * @param \moodle_url $pageurl The URL of the page.
      * @return string HTML to output.
      * @throws
      */
-    public function element_remove_button($element, $pageurl) {
+    public function element_remove_button($element) {
         $image = $this->pix_icon('t/delete', get_string('delete'));
         return html_writer::tag('button', $image,
             array('class'=>'btn btn-danger','type' => 'submit', 'name' => 'delete', 'value' => $element->get_id()));
     }
 
     /**
-     * TODO: done
-     *
      * Outputs the remove button HTML for a feedbackelement.
      *
      * @param \feedback_block $element the element to get the button for.
-     * @param \moodle_url $pageurl The URL of the page.
      * @return string HTML to output.
      * @throws
      */
-    public function feedback_element_remove_button($element, $pageurl) {
+    public function feedback_element_remove_button($element) {
         $image = $this->pix_icon('t/delete', get_string('delete'));
         return html_writer::tag('button', $image,
             array('class'=>'btn btn-danger','type' => 'submit', 'name' => 'feedbackdelete', 'value' => $element->get_id()));
     }
 
     /**
-     * TODO: done
-     *
      * Outputs the add menu HTML.
      *
      * @param \block $block object containing all the block information.
@@ -459,7 +448,6 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO:
      * Renders the HTML for the condition block.
      *
      * @param \condition $condition the condition to be rendered.
@@ -482,7 +470,7 @@ class edit_renderer extends \plugin_renderer_base {
         //footer part to add condition for single question
         $pointsConditionBtn = \html_writer::tag('button', get_string('addpointscondition', 'ddtaquiz'),
             array('type' => 'submit','class' => 'btn btn-primary', 'id'=>'addPointsConditionBtn'));
-        //TODO: string ?
+
         $mqPointsConditionBtn = \html_writer::tag('button', 'Add MQ Condition',
             array('type' => 'submit','class' => 'btn btn-primary mr-3', 'id'=>'addMQPointsConditionBtn'));
 
@@ -497,7 +485,6 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO:
      * Renders the HTML for the condition block.
      *
      * @param \domain_condition $condition the condition to be rendered.
@@ -572,7 +559,6 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO: done
      * Renders the HTML for the conjunction type chooser.
      *
      * @param \condition $condition the condition to render this chooser for.
@@ -600,7 +586,6 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO:done
      * Renders the HTML for the condition type chooser.
      *
      * @param array $candidates the block_elements the condition can depend on.
@@ -624,7 +609,6 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO: done
      * @param \condition $condition
      * @param $candidates
      * @return string
@@ -643,9 +627,8 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO: done
      * @param $candidates
-     * @param $part
+     * @param \condition_part $part
      * @return string
      */
     protected function condition_part($candidates, $part) {
@@ -667,9 +650,8 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO: done
      * @param $candidates
-     * @param $part
+     * @param \multiquestions_condition_part $part
      * @return string
      * @throws \coding_exception
      */
@@ -691,7 +673,6 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO: done
      * Renders the HTML for the condition over question points.
      *
      * @param array $candidates the block_elements the condition can depend on.
@@ -741,7 +722,6 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO: done
      * @param $candidates
      * @param $accordionId
      * @param string $mqIndex
@@ -759,7 +739,6 @@ class edit_renderer extends \plugin_renderer_base {
             return ddtaquiz_bootstrap_render::createAlert('danger',$content);
         }
 
-        //TODO: string add
         $preContent = \html_writer::tag('label', 'Grade of all ',
             array('class' => 'conditionelement'));
 
@@ -821,7 +800,6 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO: done
      * @param $candidates
      * @param $mqIndex
      * @param $part
@@ -829,6 +807,7 @@ class edit_renderer extends \plugin_renderer_base {
      */
     protected function mq_question_checkboxes($candidates, $mqIndex, \multiquestions_condition_part $part = null) {
         $elements = [];
+        /** @var \block_element $question */
         foreach ($candidates as $question) {
             $element['id'] =  $question->get_id();
             if ($part && in_array($question->get_id(),$part->get_elements())) {
@@ -857,7 +836,6 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO:done
      * @param $mqIndex
      * @param null $part
      * @return string
@@ -869,8 +847,7 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO:done
-     * @param null $part
+     * @param \condition_part|null $part
      * @return string
      */
     private function comparator_attributes($part = null){
@@ -969,6 +946,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \condition $condition the condition to be rendered.
      * @param array $candidates the block_elements the condition can depend on.
      * @return string the HTML of the condition block.
+     * @throws \coding_exception
      */
     public function show_condition_block($condition, $candidates) {
         $header = \html_writer::tag('h3', get_string('conditions', 'ddtaquiz'), array('class' => 'conditionblockheader'));
@@ -992,6 +970,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \condition $condition the condition to render.
      * @param array $candidates the block_elements the condition can depend on.
      * @return string the HTML of the condition.
+     * @throws \coding_exception
      */
     protected function show_condition($condition, $candidates) {
         $output = '';
@@ -1007,6 +986,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \condition_part $part the part of the condition to render.
      * @param array $candidates the block_elements the condition can depend on.
      * @return string the HTML of the condition part.
+     * @throws \coding_exception
      */
     protected function show_condition_part($part, $candidates) {
         $condition = '';
@@ -1042,19 +1022,16 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO: done
-     *
      * Render the feedback block.
      *
      * @param \feedback $feedback the feedback for which to render the block.
-     * @param \moodle_url $pageurl the url of this page.
      * @return string the HTML of the feedback block.
      *
      * @throws \coding_exception
+     * @throws \dml_exception
      */
-    public function feedback_block($feedback, $pageurl) {
+    public function feedback_block($feedback) {
         $questionCardHeader = html_writer::tag('h3', get_string('feedback', 'ddtaquiz'), array('class' => 'feedbackheader'));
-        $output = '';
 
         // children of Accordion
         $accordionChildren = '';
@@ -1062,7 +1039,7 @@ class edit_renderer extends \plugin_renderer_base {
         $counter = 1;
         foreach ($blocks as $block) {
             $accordionChildren .= html_writer::start_div('card');
-            $accordionChildren .= $this->feedback_block_elem($block, $pageurl,$counter);
+            $accordionChildren .= $this->feedback_block_elem($block, $counter);
             $accordionChildren .= html_writer::end_div();
             $counter++;
         }
@@ -1073,30 +1050,28 @@ class edit_renderer extends \plugin_renderer_base {
             array('type' => 'submit', 'name' => 'addfeedback', 'value' => 1,'class'=>'btn btn-dark card-btn float-right'));
 
         return ddtaquiz_bootstrap_render::createCard($questionCardBody,$questionCardHeader, $questionCardFooter);
-        //return html_writer::div($output, 'feedbackblock');
     }
 
     /**
      * Render the domain feedback block.
      *
      * @param \ddtaquiz $quiz corresponding quiz
-     * @param \moodle_url $pageurl the url of this page.
      * @return string the HTML of the feedback block.
      *
      * @throws \coding_exception
+     * @throws \dml_exception
      */
-    public function domain_feedback_block($quiz, $pageurl) {
+    public function domain_feedback_block($quiz) {
         $questionCardHeader = html_writer::tag('h3', get_string('domainfeedback', 'ddtaquiz'), array('class' => 'feedbackheader'));
-        $output = '';
 
         // children of Accordion
         $accordionChildren = '';
         $feedback = domain_feedback::get_feedback($quiz);
         $blocks = $feedback->get_blocks();
         $counter = 1;
-        foreach ($blocks as $block) { $this->feedback_block_elem($block, $pageurl,$counter);
+        foreach ($blocks as $block) { $this->feedback_block_elem($block, $counter);
             $accordionChildren .= html_writer::start_div('card');
-            $accordionChildren .= $this->feedback_block_elem($block, $pageurl,$counter);;
+            $accordionChildren .= $this->feedback_block_elem($block, $counter);;
             $accordionChildren .= html_writer::end_div();
             $counter++;
         }
@@ -1110,29 +1085,25 @@ class edit_renderer extends \plugin_renderer_base {
     }
 
     /**
-     * TODO: done
-     *
      * Render one element of a feedbackbblock.
      *
      * @param \feedback_block $feedbackelem An element of a block.
-     * @param \moodle_url $pageurl The URL of the page.
+     * @param $counter
      * @return string HTML to display this element.
-     * @throws
+     * @throws \coding_exception
      */
-    public function feedback_block_elem(\feedback_block $feedbackelem, $pageurl,$counter) {
+    public function feedback_block_elem(\feedback_block $feedbackelem, $counter) {
         // constants
         $headerId = 'feedback-element-'. $feedbackelem->get_id(). '-'.microtime();
         $nr = \html_writer::tag('b',$counter);
 
         // elements
         $preContent = '';
-        $content = '';
-        $postContent = '';
 
         // Description of the element.
         $content = \html_writer::div($nr.' '.$feedbackelem->get_name(), 'blockelement');
-        $edithtml = $this->feedback_edit_button($feedbackelem, $pageurl);
-        $removehtml = $this->feedback_element_remove_button($feedbackelem, $pageurl);
+        $edithtml = $this->feedback_edit_button($feedbackelem);
+        $removehtml = $this->feedback_element_remove_button($feedbackelem);
         $postContent = \html_writer::div($edithtml . $removehtml, 'blockelementbuttons');
 
 
@@ -1152,11 +1123,11 @@ class edit_renderer extends \plugin_renderer_base {
      * @param $errorOutput
      * @param \feedback_block $block
      * @param \moodle_url $pageurl
-     * @param array $pagevars
      * @return string
      * @throws \coding_exception
+     * @throws \dml_exception
      */
-    public function edit_feedback_page($errorOutput, \feedback_block $block, \moodle_url $pageurl, array $pagevars) {
+    public function edit_feedback_page($errorOutput, \feedback_block $block, \moodle_url $pageurl) {
         $domain = $block->get_condition() instanceof \domain_condition;
         if ($domain) {
             $candidates = explode(";", $block->get_quiz()->get_domains());
@@ -1224,6 +1195,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \feedback_block $block
      * @return string
      * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function uses_block(\feedback_block $block) {
         $header = \html_writer::tag('h3', get_string('usesquestions', 'ddtaquiz'));
@@ -1250,6 +1222,7 @@ class edit_renderer extends \plugin_renderer_base {
      * @param \feedback_used_question|null $used_question
      * @return string
      * @throws \coding_exception
+     * @throws \dml_exception
      */
     public function uses_element(\feedback_block $block, \feedback_used_question $used_question = null) {
         static $index = 64; // ... 'A' - 1.
@@ -1278,14 +1251,17 @@ class edit_renderer extends \plugin_renderer_base {
      * Outputs the HTML to choose a question whose feedback is replaced by the feedback block.
      *
      * @param \feedback_block $block the block for which to generate the HTML.
-     * @param null|\block_element $selected the selected option.
+     * @param \feedback_used_question|null $used_question
+     * @param $letter
      * @return string HTML to output.
+     * @throws \dml_exception
      */
     public function uses_selector(\feedback_block $block, \feedback_used_question $used_question = null,$letter) {
         $options = '';
 
         static $index = 0;
         $index += 1;
+        /** @var \block_element $element */
         foreach ($block->get_quiz()->get_elements() as $element) {
             $attributes = array('value' => $element->get_id());
             if ($used_question && $used_question->getBlockElement()->get_id() == $element->get_id()) {

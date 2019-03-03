@@ -65,6 +65,7 @@ class report_viewed extends \core\event\base {
      * Return localised event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventreportviewed', 'ddtaquiz');
@@ -74,6 +75,7 @@ class report_viewed extends \core\event\base {
      * Get URL related to the action.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url('/mod/ddtaquiz/report.php', array('id' => $this->contextinstanceid,

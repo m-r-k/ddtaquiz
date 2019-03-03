@@ -75,6 +75,13 @@ class custom_view extends \core_question\bank\view {
      * Note that you can only output this rendered result once per page, as
      * it contains IDs which must be unique.
      *
+     * @param $tabname
+     * @param $page
+     * @param $perpage
+     * @param $cat
+     * @param $recurse
+     * @param $showhidden
+     * @param $showquestiontext
      * @return string HTML code for the form.
      */
     public function render($tabname, $page, $perpage, $cat, $recurse, $showhidden, $showquestiontext) {

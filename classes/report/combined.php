@@ -34,7 +34,7 @@ defined('MOODLE_INTERNAL') || die();
 class combined extends attempts {
 
     public function display($cm, $course, \ddtaquiz $quiz) {
-        global $CFG, $DB, $OUTPUT, $PAGE;
+        global $DB, $OUTPUT;
 
         list($currentgroup, $students, $groupstudents, $allowed) = $this->init('\mod_ddtaquiz\report\combined_form',
             $quiz, $cm, $course);

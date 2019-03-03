@@ -22,13 +22,15 @@
  */
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
-require_once($CFG->dirroot . '/question/editlib.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/locallib.php');
+require_once($CFG->dirroot.'/question/editlib.php');
 
 $blockid = optional_param('bid', 0, PARAM_INT);
 $addquestion = optional_param('addquestion', 0, PARAM_INT);
 $save = optional_param('save', 0, PARAM_INT);
 
+/** @var \moodle_url $thispageurl*/
+/** @var question_edit_contexts $contexts */
 list($thispageurl, $contexts, $cmid, $cm, $quiz, $pagevars) = question_edit_setup('editq', '/mod/ddtaquiz/edit.php', true);
 
 // Check login.
@@ -107,6 +109,7 @@ if ($save) {
 
         $elements = $block->get_elements();
 
+        /** @var block_element $element */
         foreach ($elements as $element) {
             $id = $element->get_id();
             if (!array_key_exists($id, $domains)) {
@@ -185,7 +188,7 @@ if ($save) {
     } else {
         $nexturl = new moodle_url('/mod/ddtaquiz/view.php', array('id' => $cmid));
     }
-    //TODO: should i leave it as session variable
+
     $_SESSION['edit-error'] = $errorOutput;
     redirect($nexturl);
 }

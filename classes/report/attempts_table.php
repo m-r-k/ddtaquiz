@@ -68,6 +68,8 @@ abstract class attempts_table extends \table_sql {
     /** @var object the questions that comprise this quiz.. */
     protected $questions;
 
+    protected $strtimeformat;
+
     /**
      * Constructor
      * @param string $uniqueid
@@ -198,6 +200,12 @@ abstract class attempts_table extends \table_sql {
         return '-'; // Hier hatte die 17/18 Gruppe etwas angefangen, aber nicht fertig bekommen
     }
 
+    /**
+     * Generate the display of the feedback column.
+     *
+     * @param object $attempt the table row being output.
+     * @return string HTML content to go inside the td.
+     */
     public function get_row_class($attempt) {
         if ($this->qmsubselect && $attempt->gradedattempt) {
             return 'gradedattempt';
@@ -313,7 +321,6 @@ abstract class attempts_table extends \table_sql {
             $qubaids = $this->get_qubaids_condition();
         }
         $dm = new \question_engine_data_mapper();
-        $slotcount = $this->quiz->get_slotcount();
         $latesstepdata = $dm->load_questions_usages_latest_steps(
             $qubaids, array_keys($this->questions));
 
@@ -418,14 +425,14 @@ abstract class attempts_table extends \table_sql {
         switch ($this->options->attempts) {
             case attempts::ALL_WITH:
                 // Show all attempts, including students who are no longer in the course.
-                $where = 'quiza.id IS NOT NULL';// TODO:  AND quiza.preview = 0
+                $where = 'quiza.id IS NOT NULL';
                 break;
             case attempts::ENROLLED_WITH:
                 // Show only students with attempts.
                 list($usql, $uparams) = $DB->get_in_or_equal(
                 $reportstudents, SQL_PARAMS_NAMED, 'u');
                 $params += $uparams;
-                $where = "u.id $usql AND quiza.id IS NOT NULL";// TODO: AND quiza.preview = 0
+                $where = "u.id $usql AND quiza.id IS NOT NULL";
                 break;
             case attempts::ENROLLED_WITHOUT:
                 // Show only students without attempts.
@@ -439,8 +446,10 @@ abstract class attempts_table extends \table_sql {
                 list($usql, $uparams) = $DB->get_in_or_equal(
                 $reportstudents, SQL_PARAMS_NAMED, 'u');
                 $params += $uparams;
-                $where = "u.id $usql";// TODO:  AND (quiza.preview = 0 OR quiza.preview IS NULL)
+                $where = "u.id $usql";
                 break;
+            default:
+                $where = "TRUE";
         }
 
         if ($this->options->states) {

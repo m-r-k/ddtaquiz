@@ -158,6 +158,7 @@ class feedback {
             if (count($usedqinstances) < 1) {
                 continue;
             }
+            /** @var feedback_used_question $first */
             $first = array_values($usedqinstances)[0];
             if ($first->getBlockElement()->get_id() == $elem->get_id()) {
                 return $block;
@@ -427,10 +428,12 @@ class feedback_block {
         }
         return null;
     }
+
     /**
      * Adds a question instance to the ones used by this feedback.
      * @param $questioninstanceid
      * @param $shift
+     * @param $letter
      * @throws dml_exception
      */
     public function add_question_instance($questioninstanceid,$shift,$letter) {
@@ -471,6 +474,8 @@ class feedback_block {
         $first = question_bank::load_question($qid, false);
         $mark = $first->defaultmark;
         $sum = 0;
+
+        /** @var block_element $element */
         foreach ($uses as $element) {
             if ($element->is_question()) {
                 $question = question_bank::load_question($element->get_element()->id, false);
@@ -505,9 +510,11 @@ class feedback_used_question{
      * @param $quiz
      * @param $questioninstanceid
      * @param $shift
+     * @param $letter
      * @return feedback_used_question|null
+     * @throws dml_exception
      */
-    public static function load($quiz, $questioninstanceid,$shift,$letter): self{
+    public static function load($quiz, $questioninstanceid,$shift,$letter) {
         $blockElement = block_element::load($quiz, $questioninstanceid);
         if($blockElement instanceof block_element)
             return new self($blockElement, $shift,$letter);

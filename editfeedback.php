@@ -22,8 +22,8 @@
  */
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
-require_once($CFG->dirroot . '/question/editlib.php');
+require_once($CFG->dirroot.'/mod/ddtaquiz/locallib.php');
+require_once($CFG->dirroot.'/question/editlib.php');
 
 $blockid = required_param('bid', PARAM_INT);
 $save = optional_param('save', 0, PARAM_INT);
@@ -103,6 +103,6 @@ $output = $PAGE->get_renderer('mod_ddtaquiz', 'edit');
 
 echo $OUTPUT->header();
 
-echo $output->edit_feedback_page($_SESSION['edit-error'], $feedbackblock, $thispageurl, $pagevars);
+echo $output->edit_feedback_page($_SESSION['edit-error'], $feedbackblock, $thispageurl);
 $_SESSION['edit-error'] = '';
 echo $OUTPUT->footer();

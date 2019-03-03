@@ -63,6 +63,7 @@ class attempt_overdue extends \core\event\base {
      * Returns localised general event name.
      *
      * @return string
+     * @throws \coding_exception
      */
     public static function get_name() {
         return get_string('eventquizattemptabandoned', 'ddtaquiz');
@@ -72,6 +73,7 @@ class attempt_overdue extends \core\event\base {
      * Returns relevant URL.
      *
      * @return \moodle_url
+     * @throws \moodle_exception
      */
     public function get_url() {
         return new \moodle_url('/mod/ddtaquiz/review.php', array('attempt' => $this->objectid));
