@@ -157,16 +157,11 @@ $string['noCandidatesForCondition'] = 'First add at least one question!';
 
 //Direct Feedback
 $string['directfeedbackheader']='Direct Feedback';
+$string['directfeedback']='Direct Feedback';
 $string['directfeedbackbutton']='Direct Feedback';
-$string['specificfeedback']='Spezific feedback';
-$string['specificfeedback_help']='Spezific feedback help text';
-$string['generellfeedback']='Generell feedback';
-$string['generellfeedback_help']='Generell feedback  help text';
-$string['correctanswers']='Correct answer feedback';
-$string['correctanswers_help']='Correct answer feedback  help text';
-$string['correctanswersdesc'] ='Shows the correct anwser in the Feedback';
-$string['generellfeedbackdesc'] ='Shows the general feedback';
-$string['specificfeedbackdesc'] ='Shows the feedabck for a given response';
+$string['directfeedback_help']='Direct feedback  help text';
+$string['directfeedbackdesc'] ='Shows the direct feedback';
+
 
 //Timelimit
 $string['timing'] = 'Timing';

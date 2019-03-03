@@ -18,9 +18,7 @@
         <FIELD NAME="grademethod" TYPE="int" LENGTH="4" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="the method used for grading"/>
         <FIELD NAME="mainblock" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="points to the main block of this quiz"/>
         <FIELD NAME="showgrade" TYPE="int"  LENGTH="1" NOTNULL="true" DEFAULT="1" SEQUENCE="false" COMMENT="if to show grade to users or not"/>
-        <FIELD NAME="specificfeedback" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="show the specific feedback or not"/>
-        <FIELD NAME="generellfeedback" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="show the generell feedback or not"/>
-        <FIELD NAME="correctanswers" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="show the correct feedback or not"/>
+        <FIELD NAME="directfeedback" TYPE="int" LENGTH="1" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="show the direct feedback or not"/>
         <FIELD NAME="timelimit" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="timelimit for an attempt"/>
         <FIELD NAME="overduehandling" TYPE="char" LENGTH="16" NOTNULL="true" DEFAULT="autoabandon" SEQUENCE="false" COMMENT="what to do when time finished"/>
         <FIELD NAME="graceperiod" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="grace period when time is over"/>

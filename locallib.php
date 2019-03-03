@@ -57,13 +57,7 @@ class ddtaquiz
     protected $maxgrade = 0;
     /** @var int
      */
-    protected $specificfeedback = 0;
-    /** @var int
-     */
-    protected $generellfeedback = 0;
-    /** @var int
-     */
-    protected $correctanswers = 0;
+    protected $directfeedback = 0;
 
     protected $domains = "";
     protected $timing = null;
@@ -81,12 +75,10 @@ class ddtaquiz
      * @param int $grademethod the method used for grading.
      * @param int $maxgrade the best attainable grade of this quiz.
      * @param $showgrade
-     * @param int $specificFeedback
-     * @param int $generellFeedback
-     * @param int $correctAnswers
+     * @param int $directfeedback
      * @param string $domains
      */
-    public function __construct($id, $cmid, $name, $mainblockid, $grademethod, $maxgrade, $showgrade, $specificFeedback, $generellFeedback, $correctAnswers, $domains)
+    public function __construct($id, $cmid, $name, $mainblockid, $grademethod, $maxgrade, $showgrade, $directfeedback, $domains)
     {
         $this->id = $id;
         $this->name = $name;
@@ -97,9 +89,7 @@ class ddtaquiz
         $this->maxgrade = $maxgrade;
         $this->showgrade = $showgrade;
         $this->timing = ddtaquiz_timing::create();
-        $this->specificfeedback = $specificFeedback;
-        $this->generellfeedback = $generellFeedback;
-        $this->correctanswers = $correctAnswers;
+        $this->directfeedback = $directfeedback;
         $this->domains = $domains;
     }
 
@@ -118,7 +108,7 @@ class ddtaquiz
         $quiz = $DB->get_record('ddtaquiz', array('id' => $quizid), '*', MUST_EXIST);
         $cm = get_coursemodule_from_instance('ddtaquiz', $quizid, $quiz->course, false, MUST_EXIST);
 
-        $ddtaquiz = new ddtaquiz($quizid, $cm->id, $quiz->name, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade, $quiz->showgrade, $quiz->specificfeedback, $quiz->generellfeedback, $quiz->correctanswers, $quiz->domains);
+        $ddtaquiz = new ddtaquiz($quizid, $cm->id, $quiz->name, $quiz->mainblock, $quiz->grademethod, $quiz->maxgrade, $quiz->showgrade, $quiz->directfeedback, $quiz->domains);
         $ddtaquiz->timing->enable($quiz->timelimit, $quiz->overduehandling, $quiz->graceperiod);
 
         if ($ddtaquiz->get_main_block()->get_name() != $ddtaquiz->get_name()) {
@@ -456,15 +446,8 @@ class ddtaquiz
     }
 
     public function showDirectFeedback(){
-        $feedbacks=array("correctanswers"=>$this->correctanswers,"generellfeedback"=>$this->generellfeedback,"specificfeedback"=>$this->specificfeedback);
 
-        foreach($feedbacks as $key=>$feedback){
-            if(!$feedback){
-                unset($feedbacks[$key]);
-            }
-
-        }
-        return $feedbacks;
+        return $this->directfeedback;
     }
 
     /**

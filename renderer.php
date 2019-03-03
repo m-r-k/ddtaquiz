@@ -353,27 +353,11 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      */
     public function attempt_navigation_buttons(attempt $attempt)
     {
-//        $ddtaquiz = $attempt->get_quiz();
         $output = '';
-//        $output .= html_writer::start_div('container-fluid');
-//        $output .= html_writer::start_div('row');
-//        $output .= html_writer::start_div('col-md-6 text-left');
-//
-//        //Direct feedback button
-//        if (count($ddtaquiz->showDirectFeedback()) != 0) {
-//            $directFeedbackLabel = get_string('directfeedbackbutton', 'ddtaquiz');
-//            $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'directFeedback',
-//                'value' => $directFeedbackLabel, 'class' => 'btn btn-primary text-left', 'id' => 'directFeedbackBtn'));
-//        }
-//        $output .= html_writer::end_div();
-//        $output .= html_writer::start_div('col-md-6 text-right');
         $nextlabel = get_string('nextpage', 'ddtaquiz');
         $output .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'next',
             'value' => $nextlabel, 'class' => 'btn btn-primary text-right', 'id' => 'attemptNextBtn'));
-//        $output .= html_writer::end_div();
-//        $output .= html_writer::end_div();
-//        $output .= html_writer::end_div();
-//        $output .= html_writer::end_div();
+
         return $output;
     }
 
