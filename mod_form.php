@@ -92,15 +92,10 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
             0 => "Don't show",
             1 => "Show",
         );
-        $mform->addElement('select', 'specificfeedback' , get_string('specificfeedback', 'ddtaquiz'),$feedbackDisplayoptions);
-        $mform->setDefault('specificfeedback', $quizconfig->specificFeedback);
-        $mform->addHelpButton('specificfeedback', 'specificfeedback', 'ddtaquiz');
-        $mform->addElement('select', 'generellfeedback' ,  get_string('generellfeedback', 'ddtaquiz'),$feedbackDisplayoptions);
-        $mform->setDefault('generellfeedback', $quizconfig->generellFeedback);
-        $mform->addHelpButton('generellfeedback', 'generellfeedback', 'ddtaquiz');
-        $mform->addElement('select', 'correctanswers' , get_string('correctanswers', 'ddtaquiz'),$feedbackDisplayoptions);
-        $mform->setDefault('correctanswers', $quizconfig->correctAnswers);
-        $mform->addHelpButton('correctanswers', 'correctanswers', 'ddtaquiz');
+        $mform->addElement('select', 'directfeedback' , get_string('directfeedback', 'ddtaquiz'),$feedbackDisplayoptions);
+        $mform->setDefault('directfeedback', $quizconfig->directfeedback);
+        $mform->addHelpButton('directfeedback_help', 'directfeedback_help', 'ddtaquiz');
+
 
 
         //Timing
