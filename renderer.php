@@ -314,7 +314,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $ddtaquiz = $attempt->get_quiz();
         try {
             if (($slot - 1) > 0) {
-                if (count($ddtaquiz->showDirectFeedback()) != 0) {
+                if ($ddtaquiz->showDirectFeedback()) {
                     $directFeedbackBody = $attempt->get_quba()->render_question($slot - 1, $options);
                     $body .= ddtaquiz_bootstrap_render::createModal('Direct Feedback', $directFeedbackBody, '', array('id' => 'directFeedbackModal'));
                     $body .= ddtaquiz_bootstrap_render::createModalTrigger('directFeedbackModal', "button", "Feedback for last question", array('id' => 'ModalButton'));

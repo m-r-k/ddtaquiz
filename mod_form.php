@@ -96,7 +96,7 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
         );
         $mform->addElement('select', 'directfeedback' , get_string('directfeedback', 'ddtaquiz'),$feedbackDisplayoptions);
         $mform->setDefault('directfeedback', $quizconfig->directfeedback);
-        $mform->addHelpButton('directfeedback_help', 'directfeedback_help', 'ddtaquiz');
+        $mform->addHelpButton('directfeedback', 'directfeedback_help', 'ddtaquiz');
 
 
 
