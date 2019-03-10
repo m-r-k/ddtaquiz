@@ -180,6 +180,8 @@ $string['graceperiod_error'] = 'Grace period must be greater then 1 minute.';
 
 $string['eventquizattemptabandoned'] = 'Quiz attempt abandoned';
 
+
+//Domainfeedback
 $string['domainHeader'] = 'Domains';
 $string['domainfeedback'] = 'Domain-specific Feedback';
 $string['adddomainfeedback'] = 'Add feedback';
@@ -188,6 +190,9 @@ $string['editingdomainfeedback'] = 'Editing domain feedback';
 $string['editingdomainfeedbackx'] = 'Editing domain feedback: {$a}';
 $string['gradeatdomain'] = 'Grade for';
 $string['domainHelp'] = 'Enter the domains of your questions (semicolon-separated), to get a domain specific feedback.';
+$string['domainFeedbackAccordionHeaderPre'] = 'Domainfeedback for domain: ';
+$string['QuestionFeedbackAccordionHeaderPre'] = 'Feedback for question: ';
 
+//Showgrade
 $string['showGradeNo'] = "Don't show";
 $string['showGradeYes'] = "Show";
