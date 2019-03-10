@@ -24,7 +24,7 @@
 defined('MOODLE_INTERNAL') || die();
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->dirroot.'/mod/ddtaquiz/locallib.php');
+require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
 
 use mod_ddtaquiz\output\ddtaquiz_bootstrap_render;
 
@@ -427,6 +427,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      *
      * @param attempt $attempt the attempt this review belongs to.
      * @return string HTML to output.
+     * @throws coding_exception
      * @throws dml_exception
      */
     protected function review_domain(attempt $attempt)
@@ -439,12 +440,36 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
             $condition = $block->get_condition();
             if ($condition->is_fullfilled($attempt)) {
                 $grades = $condition->get_grading($attempt);
-                $title= $condition->get_replace() ? $condition->get_replace() : $condition->get_name();
-                $conditionCardHeader = \html_writer::tag('h3', $title, array('class' => 'conditionblockheader'));
-                $conditionCardBody = \html_writer::div("Result: ".$grades[0]." / ".$grades[1], 'result');
+                $title = $condition->get_replace() ? $condition->get_replace() : $condition->get_name();
+                $conditionCardBody = \html_writer::div("Result: " . $grades[0] . " / " . $grades[1], 'result');
                 $conditionCardBody .= \html_writer::div($block->get_feedback_text(), 'conditionpartslist');
-                $conditionCardFooter = "";
-                $output .= ddtaquiz_bootstrap_render::createCard($conditionCardBody,$conditionCardHeader, $conditionCardFooter);
+
+                /**
+                 * Collapsible accordions for domainfeedback
+                 */
+                $collapseId = 'collapse-id';
+                $accordionId = 'feedback-accordion';
+                $headerId = 'accordion-header';
+                $blockClass = 'blockAccordionHeader';
+                $collapseContent = ddtaquiz_bootstrap_render::createAccordionCollapsible(
+                    $collapseId,
+                    $headerId,
+                    $accordionId,
+                    $conditionCardBody
+                );
+
+
+                $container = ddtaquiz_bootstrap_render::createAccordionHeader(
+                        \html_writer::tag('label', get_string('domainFeedbackAccordionHeaderPre', 'ddtaquiz'),
+                            array('class' => 'conditionelement')),
+                        \html_writer::tag('label', $title, ['class' => 'collapsible-highlight']),
+                        "",
+                        ['id' => $headerId, 'class' => $blockClass],
+                        $collapseId
+                    ) .
+                    $collapseContent;
+
+                $output = ddtaquiz_bootstrap_render::createAccordion($accordionId, $container);
             }
         }
         return $output;
@@ -458,6 +483,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * @param question_display_options $options the display options.
      * @param feedback $feedback the specialized feedback.
      * @return string HTML to output.
+     * @throws coding_exception
      * @throws dml_exception
      */
     protected function review_block(block $block, attempt $attempt, $options, $feedback)
@@ -479,11 +505,16 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * @param question_display_options $options the display options.
      * @param feedback $feedback the specialized feedback.
      * @return string HTML to output.
+     * @throws coding_exception
      * @throws dml_exception
      */
     protected function review_block_element($block, $blockelem, $attempt, $options, $feedback)
     {
+
+
         $output = '';
+        $output .= $this->review_block_element_render($block, $blockelem, $attempt, $options, $feedback);
+
         if ($feedback->has_specialized_feedback($blockelem, $attempt)) {
             $specialfeedback = $feedback->get_specialized_feedback_at_element($blockelem, $attempt);
             /** @var specialized_feedback $sf */
@@ -492,9 +523,32 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                 $review = $this->review_parts($parts, $block, $attempt, $options, $feedback);
                 $output .= html_writer::div($review, 'reviewblock');
             }
-        } else {
-            $output .= $this->review_block_element_render($block, $blockelem, $attempt, $options, $feedback);
+
         }
+
+        /**
+         * Collapsible accordions for each feedbackblock
+         */
+        $collapseId = 'collabse-id-review' . $blockelem->get_id();
+        $accordionId = 'review-accordion' . $blockelem->get_id();
+        $headerId = 'review-accordion-header' . $blockelem->get_id();
+        $collapseContent = ddtaquiz_bootstrap_render::createAccordionCollapsible(
+            $collapseId,
+            $headerId,
+            $accordionId,
+            $output
+        );
+        $container = ddtaquiz_bootstrap_render::createAccordionHeader(
+                \html_writer::tag('label', get_string('QuestionFeedbackAccordionHeaderPre', 'ddtaquiz'),
+                    array('class' => 'conditionelement')),
+                \html_writer::tag('label', $blockelem->get_name(), ['class' => 'collapsible-highlight']),
+                "",
+                ['id' => $headerId, 'class' => 'blockAccordionHeader'],
+                $collapseId
+            ) .
+            $collapseContent;
+        $output = ddtaquiz_bootstrap_render::createAccordion($accordionId, $container);
+
         return $output;
     }
 
@@ -507,6 +561,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * @param question_display_options $options the display options.
      * @param feedback $feedback the specialized feedback.
      * @return string HTML to output.
+     * @throws coding_exception
      * @throws dml_exception
      */
     protected function review_block_element_render($block, $blockelem, $attempt, $options, $feedback)
@@ -545,6 +600,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * @param question_display_options $options the display options.
      * @param feedback $feedback the specialized feedback.
      * @return string HTML to output.
+     * @throws coding_exception
      * @throws dml_exception
      */
     protected function review_parts($parts, $block, $attempt, $options, $feedback)
@@ -557,13 +613,13 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                 $output .= html_writer::div($part, 'specialfeedbacktext');
             } else if ($part instanceof feedback_used_question) {
                 $index++;
-                if($part->isShifted()){
-                    $output.=
-                        \html_writer::start_tag('div',['class'=>'shiftedFeedback']).
-                        $this->review_block_element_render($block, $part->getBlockElement(), $attempt, $options, $feedback).
+                if ($part->isShifted()) {
+                    $output .=
+                        \html_writer::start_tag('div', ['class' => 'shiftedFeedback']) .
+                        $this->review_block_element_render($block, $part->getBlockElement(), $attempt, $options, $feedback) .
                         html_writer::end_div();
-                }else{
-                    $output.= $this->review_block_element_render($block, $part->getBlockElement(), $attempt, $options, $feedback);
+                } else {
+                    $output .= $this->review_block_element_render($block, $part->getBlockElement(), $attempt, $options, $feedback);
                 }
             }
         }
