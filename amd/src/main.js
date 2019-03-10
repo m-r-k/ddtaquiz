@@ -67,6 +67,7 @@ define(['jquery'], function($) {
     
         init: function() {
             $(document).ready(function(){
+                $('[data-toggle="tooltip"]').tooltip();
                 $('#addPointsConditionBtn').click(function(e){
                     condition.addcondition(e);
                 });
