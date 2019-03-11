@@ -451,21 +451,23 @@ class condition_part {
 
     public function parseToString(){
         global $DB;
-        $element = $DB->get_record('mdl_ddtaquiz_qinstance', array('id' => $this->elementid), 'name', MUST_EXIST);
+
+        $element = $DB->get_record('ddtaquiz_qinstance', array('id' => $this->get_elementid()), 'blockelement', MUST_EXIST)->blockelement;
+        $question = $DB->get_record('question', array('id' => $element), '*', MUST_EXIST);
 
         switch ($this->type) {
             case self::LESS:
-                return 'Grade of '.$element.' < '.$this->grade;
+                return 'Grade of '.$question->name.' < '.$this->grade."<br>";
             case self::LESS_OR_EQUAL:
-                return 'Grade of '.$element.' <= '.$this->grade;
+                return 'Grade of '.$question->name.' <= '.$this->grade."<br>";
             case self::GREATER:
-                return 'Grade of '.$element.' > '.$this->grade;
+                return 'Grade of '.$question->name.' > '.$this->grade."<br>";
             case self::GREATER_OR_EQUAL:
-                return 'Grade of '.$element.' >= '.$this->grade;
+                return 'Grade of '.$question->name.' >= '.$this->grade."<br>";
             case self::EQUAL:
-                return 'Grade of '.$element.' == '.$this->grade;
+                return 'Grade of '.$question->name.' == '.$this->grade."<br>";
             case self::NOT_EQUAL:
-                return 'Grade of '.$element.' != '.$this->grade;
+                return 'Grade of '.$question->name.' != '.$this->grade."<br>";
             default:
                 debugging('Unsupported condition part type: ' . $this->type);
                 return true;
@@ -636,6 +638,34 @@ class multiquestions_condition_part {
      */
     public function get_elements() {
         return $this->elements;
+    }
+
+    public function parseToString(){
+        global $DB;
+
+        $questionNames=[];
+        foreach ($this->get_elements() as $element) {
+            $questionID= $DB->get_record('ddtaquiz_qinstance', array('id' => $element), 'blockelement', MUST_EXIST)->blockelement;
+            $questionNames[]= $DB->get_record('question', array('id' => $questionID), 'name', MUST_EXIST)->name;
+        }
+        $names=implode(",", $questionNames);
+        switch ($this->type) {
+            case self::LESS:
+                return 'Sum of '.$names.' < '.$this->get_grade()."<br>";
+            case self::LESS_OR_EQUAL:
+                return 'Sum of '.$names.' <= '.$this->get_grade()."<br>";
+            case self::GREATER:
+                return 'Sum of '.$names.' > '.$this->get_grade()."<br>";
+            case self::GREATER_OR_EQUAL:
+                return 'Sum of '.$names.' >= '.$this->get_grade()."<br>";
+            case self::EQUAL:
+                return 'Sum of '.$names.' == '.$this->get_grade()."<br>";
+            case self::NOT_EQUAL:
+                return 'Sum of '.$names.' != '.$this->get_grade()."<br>";
+            default:
+                debugging('Unsupported condition part type: ' . $this->type);
+                return true;
+        }
     }
 
     /**

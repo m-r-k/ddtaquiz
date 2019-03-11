@@ -195,16 +195,21 @@ class edit_renderer extends \plugin_renderer_base
         $content = '';
         $postContent = '';
         $collapseContent = '';
+
+        //get conditions for tooltip
         $tooltip='';
 
         if($blockelem->is_block()) {
-            //TODO: Parse info to string output of condition
             $element=$blockelem->get_element();
-            $cond=$element->get_condition()->get_parts();
+            $singleConditions=$element->get_condition()->get_parts();
 
-           foreach($cond as $condParts)
-               $tooltip.=$condParts->parseToString();
-               //$tooltip .= $condParts->get_type().' '.$condParts->get_elementid().' '.$condParts->get_grade().'\r\n';
+           foreach($singleConditions as $singleCondition)
+               $tooltip.=$singleCondition->parseToString();
+
+
+            $multiConditions=$element->get_condition()->get_mqParts();
+            foreach($multiConditions as $multiCondition)
+                $tooltip.=$multiCondition->parseToString();
         }
 
         // add domain choice to content
@@ -238,7 +243,8 @@ class edit_renderer extends \plugin_renderer_base
         $blockClass = '';
         // render collapsible body if block, with block elements
         if ($blockelem->is_block()) {
-            $content .= html_writer::span($nr . ' ' . $blockelem->get_name(), 'blockelementblock',['data-toggle'=>'tooltip', 'title'=>$tooltip]);
+            //add blockdescription to tooltip
+            $content .= html_writer::span($nr . ' ' . $blockelem->get_name(), 'blockelementblock',['data-html'=>'true','data-toggle'=>'tooltip', 'title'=>$tooltip]);
             /** @var \block $blockelem */
             $blockClass = 'blockAccordionHeader';
             $collapseId = 'collapse-' . $blockelem->get_id();
