@@ -449,6 +449,29 @@ class condition_part {
         return $this->elementid;
     }
 
+    public function parseToString(){
+        global $DB;
+        $element = $DB->get_record('mdl_ddtaquiz_qinstance', array('id' => $this->elementid), 'name', MUST_EXIST);
+
+        switch ($this->type) {
+            case self::LESS:
+                return 'Grade of '.$element.' < '.$this->grade;
+            case self::LESS_OR_EQUAL:
+                return 'Grade of '.$element.' <= '.$this->grade;
+            case self::GREATER:
+                return 'Grade of '.$element.' > '.$this->grade;
+            case self::GREATER_OR_EQUAL:
+                return 'Grade of '.$element.' >= '.$this->grade;
+            case self::EQUAL:
+                return 'Grade of '.$element.' == '.$this->grade;
+            case self::NOT_EQUAL:
+                return 'Grade of '.$element.' != '.$this->grade;
+            default:
+                debugging('Unsupported condition part type: ' . $this->type);
+                return true;
+        }
+    }
+
     /**
      * Updates the part to the new values.
      *
