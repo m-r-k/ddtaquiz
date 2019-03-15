@@ -36,6 +36,11 @@ $context = $ddtaquiz->get_context();
 
 require_capability('mod/ddtaquiz:viewreports', $context);
 
+//TODO: regrading
+if($regrade = optional_param('regrade',0,PARAM_BOOL)){
+    $ddtaquiz->regrade_attempts();
+}
+
 $url = new moodle_url('/mod/ddtaquiz/report.php', array('id' => $cm->id));
 $url->param('mode', $mode);
 $PAGE->set_url($url);

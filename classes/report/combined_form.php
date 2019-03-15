@@ -58,4 +58,12 @@ class combined_form extends attempts_form {
         $mform->addElement('selectyesno', 'displayQuestionName',
             get_string('displayquestionname', 'ddtaquiz'));
     }
+
+    //TODO:regrading
+    protected function extra_options(\MoodleQuickForm $mform)
+    {
+        $mform->addElement('header', 'regradeHeader','Regrade');
+
+        $mform->addElement('submit', 'regrade','Regrade All',['value'=>1]);
+    }
 }

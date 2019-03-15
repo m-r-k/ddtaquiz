@@ -452,6 +452,33 @@ class attempt {
     }
 
     /**
+     * TODO:regrading
+     * @throws dml_transaction_exception
+     */
+    public function regrade_attempt(){
+        global $DB;
+        // Need more time for a quiz with many questions.
+        core_php_time_limit::raise(300);
+
+        $transaction = $DB->start_delegated_transaction();
+
+        foreach ($this->quba->get_slots() as $slot){
+            $question = $this->quba->get_question($slot);
+            $this->quba->regrade_question(
+                $slot,
+                false,
+                $question->defaultmark
+            );
+        }
+        question_engine::save_questions_usage_by_activity($this->quba);
+        $this->update_grade();
+        $transaction->allow_commit();
+
+        // Really, PHP should not need this hint, but without this, we just run out of memory.
+        $transaction = null;
+        gc_collect_cycles();
+    }
+    /**
      * Updates the grade of this attempt.
      */
     public function update_grade() {
@@ -551,7 +578,13 @@ class attempt {
         return $attempts;
     }
 
-    // Regrading
+    /**
+     * TODO:regrading
+     * @param $quizid
+     * @param string $state
+     * @return array
+     * @throws dml_exception
+     */
     public static function get_all_attempts($quizid, $state = 'all') {
         global $DB;
         if ($state == 'all') {
@@ -560,10 +593,11 @@ class attempt {
             $attemptrows = $DB->get_records('ddtaquiz_attempts',
                 array('quiz' => $quizid,  'state' => $state), 'id');
         }
-        $attempts = [];
-        foreach ($attemptrows as $attemptrow){
-            $attempts[$attemptrow->userId][] = $attemptrow;
-        }
+
+        $attempts = array_map(function($attempt) {
+            return attempt::load($attempt->id);
+        },
+            array_values($attemptrows));
         return $attempts;
     }
 

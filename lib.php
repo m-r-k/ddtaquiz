@@ -450,8 +450,9 @@ function ddtaquiz_pluginfile($course, $cm, $context) {
  * @param navigation_node $ddtaquiznode ddtaquiz administration node.
  * @throws coding_exception
  * @throws moodle_exception
+ * TODO: regarding
  */
-function ddtaquiz_extend_settings_navigation(navigation_node $ddtaquiznode=null) {
+function ddtaquiz_extend_settings_navigation($settings, navigation_node $ddtaquiznode=null) {
     global $PAGE, $CFG;
 
     require_once($CFG->dirroot . '/question/editlib.php');
