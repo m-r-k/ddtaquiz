@@ -648,7 +648,7 @@ class multiquestions_condition_part {
             $questionID= $DB->get_record('ddtaquiz_qinstance', array('id' => $element), 'blockelement', MUST_EXIST)->blockelement;
             $questionNames[]= $DB->get_record('question', array('id' => $questionID), 'name', MUST_EXIST)->name;
         }
-        $names=implode(",", $questionNames);
+        $names= ' ('.implode(",", $questionNames) . ') ';
         switch ($this->type) {
             case self::LESS:
                 return 'Sum of '.$names.' < '.$this->get_grade()."<br>";

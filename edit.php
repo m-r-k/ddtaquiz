@@ -76,22 +76,24 @@ if ($save) {
 
 
         // Save the condition.
-        if (array_key_exists('conditionparts', $_POST)) {
-            $block->get_condition()->updateSingleParts($_POST['conditionparts']);
-        }else{
-            $block->get_condition()->updateSingleParts([]);
+        if(!$block->get_quiz()->has_attempts()){
+            if (array_key_exists('conditionparts', $_POST)) {
+                $block->get_condition()->updateSingleParts($_POST['conditionparts']);
+            }else{
+                $block->get_condition()->updateSingleParts([]);
 
-        }
-        if (array_key_exists('conditionMQParts', $_POST)) {
+            }
+            if (array_key_exists('conditionMQParts', $_POST)) {
 
-            $block->get_condition()->updateMQParts($_POST['conditionMQParts']);
-        }else{
-            $block->get_condition()->updateMQParts([]);
+                $block->get_condition()->updateMQParts($_POST['conditionMQParts']);
+            }else{
+                $block->get_condition()->updateMQParts([]);
 
-        }
-        $useand = optional_param('use_and', null, PARAM_INT);
-        if (!is_null($useand)) {
-            $block->get_condition()->set_use_and($useand);
+            }
+            $useand = optional_param('use_and', null, PARAM_INT);
+            if (!is_null($useand)) {
+                $block->get_condition()->set_use_and($useand);
+            }
         }
 
         $domains = [];

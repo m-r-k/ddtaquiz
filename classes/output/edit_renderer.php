@@ -1010,77 +1010,58 @@ class edit_renderer extends \plugin_renderer_base
      */
     public function show_condition_block($condition, $candidates)
     {
-        $header = \html_writer::tag('h3', get_string('conditions', 'ddtaquiz'), array('class' => 'conditionblockheader'));
-        $start = \html_writer::start_tag('ul', array('id' => 'condition-list'));
-        if ($condition->get_useand()) {
-            $option = \html_writer::tag('b', get_string('all', 'ddtaquiz'));
-        } else {
-            $option = \html_writer::tag('b', get_string('atleastone', 'ddtaquiz'));
-        }
-        $conjunction = \html_writer::div(get_string('mustfullfill', 'ddtaquiz') . ' ' . $option . ' ' . get_string('oftheconditions', 'ddtaquiz'), 'conjunction');
-        $conditionlist = \html_writer::div($this->show_condition($condition, $candidates));
+        $conditionCardHeader = \html_writer::tag('h3', get_string('conditions', 'ddtaquiz'), array('class' => 'conditionblockheader'));
+
+        $start = \html_writer::start_tag('ul', array('id' => 'condition-list','class'=>'p-0'));
+            if ($condition->get_useand()) {
+                $option = \html_writer::tag('b', get_string('all', 'ddtaquiz'));
+            } else {
+                $option = \html_writer::tag('b', get_string('atleastone', 'ddtaquiz'));
+            }
+            $conjunction = \html_writer::div(get_string('mustfullfill', 'ddtaquiz') . ' ' . $option . ' ' . get_string('oftheconditions', 'ddtaquiz'), 'bg-secondary p-2 pb-4 pt-4');
+            $conditionlist = \html_writer::div($this->show_condition($condition, $candidates));
         $end = \html_writer::end_tag('ul');
 
-        $container = $header . $start . $conjunction . $conditionlist . $end;
-        return html_writer::div($container, 'conditionblock');
+        $conditionCardBody = $start . $conjunction . $conditionlist . $end;
+        return ddtaquiz_bootstrap_render::createCard($conditionCardBody, $conditionCardHeader);
     }
 
     /**
-     * Renders the HTML for a condition.
-     *
-     * @param \condition $condition the condition to render.
-     * @param array $candidates the block_elements the condition can depend on.
-     * @return string the HTML of the condition.
-     * @throws \coding_exception
+     * @param $condition
+     * @param $candidates
+     * @return string
      */
-    protected function show_condition($condition, $candidates)
+    protected function show_condition(\condition $condition, $candidates)
     {
         $output = '';
+        $output .= html_writer::tag('hr','');
         foreach ($condition->get_parts() as $part) {
-            $output .= $this->show_condition_part($part, $candidates);
+             $output .= $this->show_condition_part($part, $candidates);
+        }
+        $output .= html_writer::tag('hr','');
+        foreach ($condition->get_mqParts() as $part) {
+            $output .= $this->show_multiquestion_condition_part($part, $candidates);
         }
         return $output;
     }
 
     /**
-     * Renders the HTML for a condition part.
-     *
-     * @param \condition_part $part the part of the condition to render.
-     * @param array $candidates the block_elements the condition can depend on.
-     * @return string the HTML of the condition part.
-     * @throws \coding_exception
+     * @param \condition_part $part
+     * @param $candidates
+     * @return string
      */
-    protected function show_condition_part($part, $candidates)
+    protected function show_condition_part(\condition_part $part, $candidates)
     {
         $condition = '';
-        $condition .= get_string('gradeat', 'ddtaquiz') . ' ';
-        foreach ($candidates as $element) {
-            if ($part->get_elementid() == $element->get_id()) {
-                $condition .= \html_writer::tag('b', $element->get_name() . ' ');
-            }
-        }
-        $condition .= get_string('mustbe', 'ddtaquiz') . ' ';
-        switch ($part->get_type()) {
-            case \condition_part::EQUAL:
-                $condition .= \html_writer::tag('b', '=');
-                break;
-            case \condition_part::GREATER:
-                $condition .= \html_writer::tag('b', '>');
-                break;
-            case \condition_part::GREATER_OR_EQUAL:
-                $condition .= \html_writer::tag('b', '&ge;');
-                break;
-            case \condition_part::LESS:
-                $condition .= \html_writer::tag('b', '<');
-                break;
-            case \condition_part::LESS_OR_EQUAL:
-                $condition .= \html_writer::tag('b', '&le;');
-                break;
-            case \condition_part::NOT_EQUAL:
-                $condition .= \html_writer::tag('b', '&ne;');
-                break;
-        }
-        $condition .= \html_writer::tag('b', ' ' . $part->get_grade());
+        $condition .= $part->parseToString();
+        return \html_writer::div($condition, 'part');
+    }
+
+    protected function show_multiquestion_condition_part(\multiquestions_condition_part $part, $candidates)
+    {
+        $condition = '';
+        $condition .= $part->parseToString();
+
         return \html_writer::div($condition, 'part');
     }
 
