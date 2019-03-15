@@ -373,6 +373,58 @@ class ddtaquiz
         ddtaquiz_update_grades($quiz, $userid);
     }
 
+    // Regrading
+
+    public function regrade_attempts(){
+        global $DB;
+
+        $quiz = $DB->get_record('ddtaquiz', array('id' => $this->get_id()), '*', MUST_EXIST);
+
+        // Get all the attempts made by every user.
+        $usersAttempts = attempt::get_all_attempts($this->get_id(), 'finished');
+        foreach ($usersAttempts as $key => $attempts){
+            $userid = $key;
+            // Calculate the best grade.
+            if ($this->grademethod == 0) {
+                $bestgrade = end($attempts)->get_sumgrades();
+            } else if ($this->grademethod == 1) {
+                $max = 0;
+                /** @var attempt $attempt */
+                foreach ($attempts as $attempt) {
+                    $thisgrade = $attempt->get_sumgrades();
+                    if ($thisgrade > $max) {
+                        $max = $thisgrade;
+                    }
+                }
+                $bestgrade = $max;
+            } else if ($this->grademethod == 2) {
+                $bestgrade = end($attempts)->get_sumgrades();
+            } else {
+                $bestgrade = end($attempts)->get_sumgrades();
+            }
+            $bestgrade = $bestgrade * $quiz->grade / $this->get_maxgrade();
+
+            // Save the best grade in the database.
+            if ($grade = $DB->get_record('ddtaquiz_grades',
+                array('quiz' => $quiz->id, 'userid' => $userid))) {
+                $grade->grade = $bestgrade;
+                $grade->timemodified = time();
+                $DB->update_record('ddtaquiz_grades', $grade);
+
+            } else {
+                $grade = new stdClass();
+                $grade->quiz = $quiz->id;
+                $grade->userid = $userid;
+                $grade->grade = $bestgrade;
+                $grade->timemodified = time();
+                $DB->insert_record('ddtaquiz_grades', $grade);
+            }
+
+            ddtaquiz_update_grades($quiz, $userid);
+        }
+
+    }
+
     /**
      * Round a grade to the correct number of decimal places, and format it for display.
      *

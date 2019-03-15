@@ -551,6 +551,22 @@ class attempt {
         return $attempts;
     }
 
+    // Regrading
+    public static function get_all_attempts($quizid, $state = 'all') {
+        global $DB;
+        if ($state == 'all') {
+            $attemptrows = $DB->get_records('ddtaquiz_attempts', array('quiz' => $quizid), 'id');
+        } else {
+            $attemptrows = $DB->get_records('ddtaquiz_attempts',
+                array('quiz' => $quizid,  'state' => $state), 'id');
+        }
+        $attempts = [];
+        foreach ($attemptrows as $attemptrow){
+            $attempts[$attemptrow->userId][] = $attemptrow;
+        }
+        return $attempts;
+    }
+
     /**
      * Determines wether a user may start a new attempt.
      *

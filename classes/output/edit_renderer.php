@@ -126,6 +126,7 @@ class edit_renderer extends \plugin_renderer_base
 
         $questionCardFooter = null;
         $category = question_get_category_id_from_pagevars($pagevars);
+
         if (!$block->get_quiz()->has_attempts()) {
             $addmenu = $this->add_menu($block, $pageurl, $category);
             $questionCardFooter = html_writer::tag('div', $addmenu, ['class' => 'float-right btn btn-dark card-btn', 'id' => 'addQuestionBtnContainer']);
@@ -230,11 +231,14 @@ class edit_renderer extends \plugin_renderer_base
             // edit/delete buttons
             $edithtml = '';
             $removehtml = '';
+
             if (!$blockelem->get_quiz()->has_attempts()) {
-                $edithtml .= $this->element_edit_button($blockelem);
+                $edithtml = $this->element_edit_button($blockelem);
                 $removehtml = $this->element_remove_button($blockelem);
-            } else if ($blockelem->is_block()) {
-                $edithtml .= $this->element_edit_button($blockelem);
+            }else{
+            // STATE:Editing
+            //} else if ($blockelem->is_block() || ) {
+                $edithtml = $this->element_edit_button($blockelem);
             }
 
             $postContent .= \html_writer::div($edithtml . $removehtml, 'blockelementbuttons');
