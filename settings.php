@@ -19,9 +19,9 @@ defined('MOODLE_INTERNAL') || die;
 
 if ($ADMIN->fulltree) {
     //Direct specific feedback
-    $settings->add(new admin_setting_configcheckbox('ddtaquiz/directfeedback',
+    $settings->add(new admin_setting_configselect('ddtaquiz/directfeedback',
         get_string('directfeedback', 'ddtaquiz'),
-        get_string('directfeedbackdesc', 'ddtaquiz'), 1));
+        get_string('directfeedbackdesc', 'ddtaquiz'), 0,array(0=>"Don't show",1=>'Show')));
 
     // Time limit.
     $settings->add(new admin_setting_configduration_with_advanced('ddtaquiz/timelimit',
@@ -52,4 +52,9 @@ if ($ADMIN->fulltree) {
         'Domains',
         'Enter the domains of your questions (semicolon-separated), to get a domain specific feedback.',
         ""));
+
+    //Quiz Modes
+    $settings->add(new admin_setting_configselect('ddtaquiz/quizmode',
+        get_string('quizmode', 'ddtaquiz'),
+        get_string('quizmodedesc', 'ddtaquiz'), 0,array(0=>'DDTA Mode',1=>'BinDif Mode',2=>'Point Mode')));
 }

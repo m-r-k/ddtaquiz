@@ -162,5 +162,19 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
+    if($oldversion < 20190317002){
+        try{
+
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz ADD quizmodes INT(10) AFTER ddtaquiz_feedback_uses"
+            );
+            // Label savepoint reached.
+            upgrade_mod_savepoint(true, 2019031701, 'ddtaquiz');
+        }
+        catch(Exception $e){
+
+        }
+    }
+
     return true;
 }
