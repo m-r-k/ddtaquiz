@@ -94,7 +94,7 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
         );
         $mform->addElement('select', 'directfeedback' , get_string('directfeedback', 'ddtaquiz'),$feedbackDisplayoptions);
         $mform->setDefault('directfeedback', $quizconfig->directfeedback);
-        $mform->addHelpButton('directfeedback', 'directfeedback_help', 'ddtaquiz');
+        $mform->addHelpButton('directfeedback', 'directfeedback', 'ddtaquiz');
 
         //Quiz Modes
         $mform->addElement('header', 'quizModeHeader',get_string('quizmodeheader', 'ddtaquiz') );
@@ -103,9 +103,9 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
             1 => "BinDif Mode",
             2=> "Point Mode",
         );
-        $mform->addElement('select', 'quizmodeSelector' , get_string('quizmode', 'ddtaquiz'),$quizModeDisplayoptions);
-        $mform->setDefault('quizmodeSelector', $quizconfig->quizmode);
-        $mform->addHelpButton('quizmodeSelector', 'quizmode_help', 'ddtaquiz');
+        $mform->addElement('select', 'quizmodes' , get_string('quizmodes', 'ddtaquiz'),$quizModeDisplayoptions);
+        $mform->setDefault('quizmodes', $quizconfig->quizmodes);
+        $mform->addHelpButton('quizmodes', 'quizmodes', 'ddtaquiz');
 
         //Timing
         $mform->addElement('header', 'timing', get_string('timing', 'ddtaquiz'), 'ddtaquiz');

@@ -100,6 +100,14 @@ class ddtaquiz
     }
 
     /**
+     * @return int
+     */
+    public function getQuizmodes(): int
+    {
+        return $this->quizmodes;
+    }
+
+    /**
      * Static function to get a quiz object from a quiz id.
      *
      * @param int $quizid the id of this ddta quiz.

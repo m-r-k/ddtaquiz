@@ -69,7 +69,7 @@ class backup_ddtaquiz_activity_structure_step extends backup_questions_activity_
 
         // Define the root element describing the ddtaquiz instance.
         $ddtaquiz = new backup_nested_element('ddtaquiz', array('id'), array(
-                'name', 'intro', 'introformat', 'grade', 'maxgrade', 'grademethod', 'mainblock','showgrade','$directfeedback','domains'));
+                'name', 'intro', 'introformat', 'grade', 'maxgrade', 'grademethod', 'mainblock','showgrade','$directfeedback','domains','quizmodes'));
 
         // Define elements.
         $grades = new backup_nested_element('grades');

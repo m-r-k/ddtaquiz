@@ -54,7 +54,7 @@ if ($ADMIN->fulltree) {
         ""));
 
     //Quiz Modes
-    $settings->add(new admin_setting_configselect('ddtaquiz/quizmode',
-        get_string('quizmode', 'ddtaquiz'),
+    $settings->add(new admin_setting_configselect('ddtaquiz/quizmodes',
+        get_string('quizmodes', 'ddtaquiz'),
         get_string('quizmodedesc', 'ddtaquiz'), 0,array(0=>'DDTA Mode',1=>'BinDif Mode',2=>'Point Mode')));
 }
