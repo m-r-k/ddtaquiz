@@ -374,7 +374,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
     {
         $output = '';
         $output .= $this->heading(get_string('quizfinished', 'ddtaquiz'));
-        $output .= $this->review_summary_table($summarydata);
+        $output .= $this->review_summary_table($summarydata, $attempt);
         $output .= $this->review_domain($attempt);
         $output .= $this->review_block($attempt->get_quiz()->get_main_block(), $attempt, $options, $feedback);
         $output .= $this->finish_review_button($attempt->get_quiz()->get_cmid());
@@ -386,10 +386,29 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      * Outputs the table containing data from summary data array.
      *
      * @param array $summarydata contains row data for table.
+     * @param attempt $attempt
      * @return string $output containing HTML data.
      */
-    public function review_summary_table($summarydata)
+    public function review_summary_table($summarydata, $attempt = Null)
     {
+
+        $mode = $attempt->get_quiz()->getQuizmodes();
+        $slots = $attempt->get_quba()->get_slots();
+        $correctanswers = 0;
+        $usedQuestions = 0;
+        foreach ($slots as $slot) {
+            $response = $attempt->get_quba()->get_response_summary($slot);
+            if ($response != null) {
+                $grade = $attempt->get_grade_at_slot($slot);
+                $maxgrade = $attempt->get_quba()->get_question_max_mark($slot);
+                if ($grade == $maxgrade)
+                    $correctanswers++;
+                $usedQuestions++;
+            }
+
+        }
+
+
         if (empty($summarydata)) {
             return '';
         }
@@ -399,6 +418,14 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
             'class' => 'generaltable generalbox quizreviewsummary'));
         $output .= html_writer::start_tag('tbody');
         foreach ($summarydata as $rowdata) {
+
+            if ($rowdata['title'] == 'Marks') {
+                if ($mode == 0) {
+                    $rowdata['title'] = 'Correct answers';
+                    $rowdata['content'] = $correctanswers . "/" . $usedQuestions;
+                }
+            }
+
             if ($rowdata['title'] instanceof renderable) {
                 $title = $this->render($rowdata['title']);
             } else {
@@ -457,8 +484,10 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                     $accordionId,
                     $conditionCardBody
                 );
-
-
+                if ($grades[0] != $grades[0])
+                    $blockClass .= " incorrectColor";
+                else
+                    $blockClass .= " correctColor";
                 $container = ddtaquiz_bootstrap_render::createAccordionHeader(
                         \html_writer::tag('label', get_string('domainFeedbackAccordionHeaderPre', 'ddtaquiz'),
                             array('class' => 'conditionelement')),
@@ -525,6 +554,12 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
             }
 
         }
+        //If no feedback is to render than return
+        if($output==""){
+            return "";
+        }
+        //Collabsible color
+        $slot = $block->get_slot_for_element($blockelem->get_id());
 
         /**
          * Collapsible accordions for each feedbackblock
@@ -538,13 +573,32 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
             $accordionId,
             $output
         );
+
+        $label="";
+        if($blockelem->is_block()) {
+            if (stripos( html_to_text($collapseContent),"Incorrect")){
+                $backgroundColor = "incorrectColor";
+            }
+            else
+                $backgroundColor = "correctColor";
+            $label=get_string('blockFeedbackAccordionHeaderPre', 'ddtaquiz');
+        }
+        else{
+            $grade = $attempt->get_grade_at_slot($slot);
+            $maxgrade = $attempt->get_quba()->get_question_max_mark($slot);
+            $backgroundColor = "correctColor";
+            if ($grade != $maxgrade)
+                $backgroundColor = "incorrectColor";
+            $label=get_string('questionFeedbackAccordionHeaderPre', 'ddtaquiz');
+        }
         $container = ddtaquiz_bootstrap_render::createAccordionHeader(
-                \html_writer::tag('label', get_string('QuestionFeedbackAccordionHeaderPre', 'ddtaquiz'),
-                    array('class' => 'conditionelement')),
+                \html_writer::tag('label', $label,
+                    array('class' => 'conditionelement ')),
                 \html_writer::tag('label', $blockelem->get_name(), ['class' => 'collapsible-highlight']),
                 "",
-                ['id' => $headerId, 'class' => 'blockAccordionHeader'],
+                ['id' => $headerId, 'class' => 'blockAccordionHeader ' . $backgroundColor],
                 $collapseId
+
             ) .
             $collapseContent;
         $output = ddtaquiz_bootstrap_render::createAccordion($accordionId, $container);
