@@ -191,8 +191,17 @@ $string['editingdomainfeedbackx'] = 'Editing domain feedback: {$a}';
 $string['gradeatdomain'] = 'Grade for';
 $string['domainHelp'] = 'Enter the domains of your questions (semicolon-separated), to get a domain specific feedback.';
 $string['domainFeedbackAccordionHeaderPre'] = 'Domainfeedback for domain: ';
-$string['QuestionFeedbackAccordionHeaderPre'] = 'Feedback for question: ';
+$string['questionFeedbackAccordionHeaderPre'] = 'Feedback for question: ';
+$string['blockFeedbackAccordionHeaderPre'] = 'Feedback for block: ';
 
 //Showgrade
 $string['showGradeNo'] = "Don't show";
 $string['showGradeYes'] = "Show";
+
+//Quizmodes
+$string['quizmodeheader'] = "Quiz Modi";
+$string['quizmodes'] = "Quiz Modus";
+$string['quizmodes_help'] = "Punkt: Normaler Modus<br>DDTA: Diagnostischer Modus ohne Punktebewertung, sonder Anzeige der Anzahl korrekter Fragen<br>BinDif: Alle Fragen auf einer Seite, der Lehrnende kann aussuchen was er bearbeitet.";
+$string['quizmodedesc'] = "Wähle zwischen 3 verschiedenen Quiz Modi. Normal(Punkte), DDTA und BinDif";
+
+
