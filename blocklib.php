@@ -739,6 +739,21 @@ class block_element {
     }
 
     /**
+     * @return int|number
+     */
+    public function get_maxgrade() {
+        if ($this->is_question()) {
+            $question = question_bank::load_question($this->get_element()->id);
+            return $question->defaultmark;
+        } else if ($this->is_block()) {
+            return $this->element->get_maxgrade();
+        } else {
+            debugging('Unsupported element type: ' . $this->type);
+            return 0;
+        }
+    }
+
+    /**
      * Returns the name of the element.
      * The format is: #. name
      *
