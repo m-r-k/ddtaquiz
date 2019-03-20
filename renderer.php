@@ -607,110 +607,68 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
 
 
         $output = '';
-        $output .= $this->review_block_element_render($block, $blockelem, $attempt, $options, $feedback);
 
+        // review only if specilaized feedback
         if ($feedback->has_specialized_feedback($blockelem, $attempt)) {
             $specialfeedback = $feedback->get_specialized_feedback_at_element($blockelem, $attempt);
             /** @var specialized_feedback $sf */
             foreach ($specialfeedback as $sf) {
+                $achieved = $sf->get_grade($attempt);
+                $max = $sf->get_maxgrade();
+                $diff = $max - $achieved;
+
+                $mark = html_writer::start_div('reviewInfo');
+                $mark .= html_writer::start_div('result');
+                if($diff == $max)
+                    $mark .= 'Incorrect';
+                else if ($diff == 0)
+                    $mark .= 'Correct';
+                else
+                    $mark .= 'Partially Correct';
+                $mark .= html_writer::end_div();
+                if($options->marks == question_display_options::MARK_AND_MAX){
+                    $mark .= html_writer::div(
+                        ('Mark '. $achieved . ' out of '.$max)
+                        ,'reviewMarks');
+                }
+                $mark .= html_writer::end_div();
+
+                $review = $mark;
                 $parts = $sf->get_parts();
-                $review = $this->review_parts($parts, $block, $attempt, $options, $feedback);
+                $review .= $this->review_parts($parts, $block, $attempt, $options, $feedback);
                 $output .= html_writer::div($review, 'reviewblock');
             }
 
         }
-        //If no feedback is to render than return
-        if ($output == "") {
-            return "";
-        }
-        //Collabsible color
-        $slot = $block->get_slot_for_element($blockelem->get_id());
+        // review as normal block if not specialized feedback
+        else{
 
-        /**
-         * Collapsible accordions for each feedbackblock
-         */
-        $collapseId = 'collabse-id-review' . $blockelem->get_id();
-        $accordionId = 'review-accordion' . $blockelem->get_id();
-        $headerId = 'review-accordion-header' . $blockelem->get_id();
-        $collapseContent = ddtaquiz_bootstrap_render::createAccordionCollapsible(
-            $collapseId,
-            $headerId,
-            $accordionId,
-            $output
-        );
-
-
-        if ($blockelem->is_block()) {
-            /** @var block $childblock */
-            $childblock = $blockelem->get_element();
-            $maxgrade = $childblock->get_maxgrade();
-            $grade = $blockelem->get_grade($attempt);
-
-            $label = get_string('blockFeedbackAccordionHeaderPre', 'ddtaquiz');
-
-            //TODO: Fix num of correct answer isntead of grade in Collabisple header
-//            $correct=0;
-//            foreach ($childblock->get_children()as $child){
-//                /** @var block_element $child */
-//                if($child->is_block()) {
-//                    /** @var block $child */
-//                    $maxgrade=$child->get_maxgrade();
-//                    $grade= $child->get_grade($attempt);
-//                    if($maxgrade==$grade)
-//                        $correct++;
-//                }
-//                else{
-//                    /** @var question_attempt $test */
-//                    $test=$child;
-//                    $grade = $attempt->get_grade_at_slot($test->get_slot());
-////                    $maxgrade = $attempt->get_quba()->get_question_max_mark($child->get_element()->get_slot());
-//                }
-//            }
-            // The progress bar.
-//            if($mode==0)
-            $progress = floor(($grade / $maxgrade) * 100);
-//            else
-//                $progress=floor($correct/$childblock->get_slotcount())*100;
-
-
-            $progressbar = \html_writer::div($progress . '%', 'progress-bar bg-success',
-                array('role' => 'progressbar', 'style' => 'width:' . $progress . '%;color:black;', 'class' => 'bg-primary', 'aria-valuenow' => $progress, 'aria-valuemin' => "0", 'aria-valuemax' => "100"));
-            $progressbar .= \html_writer::div((100 - $progress) . '%', 'progress-bar bg-danger',
-                array('role' => 'progressbar', 'style' => 'width:' . (100 - $progress) . '%;color:black;', 'class' => 'bg-primary', 'aria-valuenow' => (100 - $progress), 'aria-valuemin' => "0", 'aria-valuemax' => "100"));
-            $progressBarContainer = html_writer::div($progressbar, 'progress ml-auto', array('style' => 'height: 25px; width:65%'));
-
-            $backgroundColor = "blockBackgroundHeader";
-        } else {
-            $grade = $attempt->get_grade_at_slot($slot);
-            $maxgrade = $attempt->get_quba()->get_question_max_mark($slot);
-            $label = get_string('questionFeedbackAccordionHeaderPre', 'ddtaquiz');
-            $progressBarContainer = "";
-            $backgroundColor = "correctBackgroundHeader";
-            if ($grade != $maxgrade)
-                $backgroundColor = "incorrectBackgroundHeader";
+            $output .= $this->review_block_element_render($block, $blockelem, $attempt, $options, $feedback);
+            /**
+             * Collapsible accordions for each feedbackblock
+             */
+            $collapseId = 'collabse-id-review' . $blockelem->get_id();
+            $accordionId = 'review-accordion' . $blockelem->get_id();
+            $headerId = 'review-accordion-header' . $blockelem->get_id();
+            $collapseContent = ddtaquiz_bootstrap_render::createAccordionCollapsible(
+                $collapseId,
+                $headerId,
+                $accordionId,
+                $output
+            );
+            $container = ddtaquiz_bootstrap_render::createAccordionHeader(
+                    \html_writer::tag('label', get_string('QuestionFeedbackAccordionHeaderPre', 'ddtaquiz'),
+                        array('class' => 'conditionelement')),
+                    \html_writer::tag('label', $blockelem->get_name(), ['class' => 'collapsible-highlight']),
+                    "",
+                    ['id' => $headerId, 'class' => 'blockAccordionHeader'],
+                    $collapseId
+                ) .
+                $collapseContent;
+            $output = ddtaquiz_bootstrap_render::createAccordion($accordionId, $container);
         }
 
-        //Set Postcontent for Header
-        if ($mode != 0)
-            $content = $grade . "/" . $maxgrade;
-        else
-            $content = $grade != $maxgrade ?
-                " " . get_string('questionFeedbackAccordionHeaderPostLabelIncorrect', 'ddtaquiz') :
-                " " . get_string('questionFeedbackAccordionHeaderPostLabelCorrect', 'ddtaquiz');
 
-        $postContent = \html_writer::tag('label', $content, []);
-        $postContent .= $progressBarContainer;
-
-        $container = ddtaquiz_bootstrap_render::createAccordionHeader(
-                \html_writer::tag('label', $label,
-                    array('class' => 'conditionelement precontent')),
-                \html_writer::tag('label', $blockelem->get_name(), ['class' => 'collapsible-highlight']),
-                $postContent,
-                ['id' => $headerId, 'class' => 'blockAccordionHeader' . ' ' . $backgroundColor, 'style' => 'margin-bottom:5px;'],
-                $collapseId
-            ) .
-            $collapseContent;
-        $output = ddtaquiz_bootstrap_render::createAccordion($accordionId, $container);
 
         return $output;
     }
