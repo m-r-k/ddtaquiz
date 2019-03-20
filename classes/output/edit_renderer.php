@@ -1196,7 +1196,7 @@ class edit_renderer extends \plugin_renderer_base
         if ($domain) {
             $candidates = explode(";", $block->get_quiz()->get_domains());
         } else {
-            $candidates = $block->get_quiz()->get_elements();
+            $candidates = $block->get_quiz()->get_questions();
         }
         $output = '';
         //hidden inputs
@@ -1233,6 +1233,7 @@ class edit_renderer extends \plugin_renderer_base
             $output .= $this->uses_block($block);
             $output .= $this->condition_block($block->get_condition(), $candidates);
         }
+
         $output .= $this->feedback_editor($block->get_feedback_text());
 
         $output .=
@@ -1249,6 +1250,7 @@ class edit_renderer extends \plugin_renderer_base
             $output .= $this->condition_type_chooser($candidates);
         }
         $this->page->requires->js_call_amd('mod_ddtaquiz/main', 'init');
+        $this->page->requires->js_call_amd('mod_ddtaquiz/feedback', 'editorQuestions');
 
 
         return $output;
@@ -1372,10 +1374,18 @@ class edit_renderer extends \plugin_renderer_base
 
         $editor = editors_get_preferred_editor();
         $editor->set_text($feedbacktext);
-        $editor->use_editor('feedbacktext', []);
+        $editor->use_editor('feedbacktext', ['autosave' => false]);
         $editorhtml = \html_writer::tag('textarea', s($feedbacktext),
             array('id' => 'feedbacktext', 'name' => 'feedbacktext', 'rows' => 15, 'cols' => 80));
-        $body = \html_writer::div($editorhtml);
+
+        // container of buttons for adding used questions
+        $output = html_writer::div('','mb-3 editorQuestionsContainer');
+
+        $output .= $editorhtml;
+
+        $body = \html_writer::div(
+            $output
+        );
 
         return ddtaquiz_bootstrap_render::createCard(
             $body,

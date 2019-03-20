@@ -298,3 +298,20 @@ div.tooltip-inner {
 	/* If max-width does not work, try using width instead */
 	/*width: 350px;*/
 }
+
+/* TODO:ReviewBlock specialized feedback */
+.reviewblock .info{
+    display: none !important;
+}
+.reviewInfo{
+    position: absolute;
+    width: 7em;
+    padding: .5em;
+    margin-bottom: 1.8em;
+    background-color: #dee2e6;
+    border: 1px solid #cad0d7;
+}
+.reviewInfo>div{
+    font-size: .8em;
+    margin-top: .7em;
+}

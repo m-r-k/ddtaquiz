@@ -513,41 +513,68 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
 
 
         $output = '';
-        $output .= $this->review_block_element_render($block, $blockelem, $attempt, $options, $feedback);
 
+        // review only if specilaized feedback
         if ($feedback->has_specialized_feedback($blockelem, $attempt)) {
             $specialfeedback = $feedback->get_specialized_feedback_at_element($blockelem, $attempt);
             /** @var specialized_feedback $sf */
             foreach ($specialfeedback as $sf) {
+                $achieved = $sf->get_grade($attempt);
+                $max = $sf->get_maxgrade();
+                $diff = $max - $achieved;
+
+                $mark = html_writer::start_div('reviewInfo');
+                $mark .= html_writer::start_div('result');
+                if($diff == $max)
+                    $mark .= 'Incorrect';
+                else if ($diff == 0)
+                    $mark .= 'Correct';
+                else
+                    $mark .= 'Partially Correct';
+                $mark .= html_writer::end_div();
+                if($options->marks == question_display_options::MARK_AND_MAX){
+                    $mark .= html_writer::div(
+                        ('Mark '. $achieved . ' out of '.$max)
+                        ,'reviewMarks');
+                }
+                $mark .= html_writer::end_div();
+
+                $review = $mark;
                 $parts = $sf->get_parts();
-                $review = $this->review_parts($parts, $block, $attempt, $options, $feedback);
+                $review .= $this->review_parts($parts, $block, $attempt, $options, $feedback);
                 $output .= html_writer::div($review, 'reviewblock');
             }
 
         }
+        // review as normal block if not specialized feedback
+        else{
 
-        /**
-         * Collapsible accordions for each feedbackblock
-         */
-        $collapseId = 'collabse-id-review' . $blockelem->get_id();
-        $accordionId = 'review-accordion' . $blockelem->get_id();
-        $headerId = 'review-accordion-header' . $blockelem->get_id();
-        $collapseContent = ddtaquiz_bootstrap_render::createAccordionCollapsible(
-            $collapseId,
-            $headerId,
-            $accordionId,
-            $output
-        );
-        $container = ddtaquiz_bootstrap_render::createAccordionHeader(
-                \html_writer::tag('label', get_string('QuestionFeedbackAccordionHeaderPre', 'ddtaquiz'),
-                    array('class' => 'conditionelement')),
-                \html_writer::tag('label', $blockelem->get_name(), ['class' => 'collapsible-highlight']),
-                "",
-                ['id' => $headerId, 'class' => 'blockAccordionHeader'],
-                $collapseId
-            ) .
-            $collapseContent;
-        $output = ddtaquiz_bootstrap_render::createAccordion($accordionId, $container);
+            $output .= $this->review_block_element_render($block, $blockelem, $attempt, $options, $feedback);
+            /**
+             * Collapsible accordions for each feedbackblock
+             */
+            $collapseId = 'collabse-id-review' . $blockelem->get_id();
+            $accordionId = 'review-accordion' . $blockelem->get_id();
+            $headerId = 'review-accordion-header' . $blockelem->get_id();
+            $collapseContent = ddtaquiz_bootstrap_render::createAccordionCollapsible(
+                $collapseId,
+                $headerId,
+                $accordionId,
+                $output
+            );
+            $container = ddtaquiz_bootstrap_render::createAccordionHeader(
+                    \html_writer::tag('label', get_string('QuestionFeedbackAccordionHeaderPre', 'ddtaquiz'),
+                        array('class' => 'conditionelement')),
+                    \html_writer::tag('label', $blockelem->get_name(), ['class' => 'collapsible-highlight']),
+                    "",
+                    ['id' => $headerId, 'class' => 'blockAccordionHeader'],
+                    $collapseId
+                ) .
+                $collapseContent;
+            $output = ddtaquiz_bootstrap_render::createAccordion($accordionId, $container);
+        }
+
+
 
         return $output;
     }

@@ -22,6 +22,26 @@
 
 define(['jquery'], function($) {
     var index = 0;
+    var checkButtons = function () {
+        var container = $('.editorQuestionsContainer');
+        $(container).html('');
+        var letters = $('.card-body  .usesquestionletter');
+
+        for (var i = 0; i < letters.length; i++) {
+            var letter = letters[i];
+            var value = '[[' + $(letter).text() + ']]';
+            var selector = $(letter).parent().find('.usesquestionselector');
+            var questionName = $(selector).find('option[value="'+$(selector).val()+'"]').text();
+            console.log(questionName);
+            $(container).append(
+                '<div class="d-inline mr-2 mb-2 p-2 bg-secondary questionButtons" data-value="' + value + '">'+value+' => ' + questionName + '</div>'
+            );
+        }
+
+        $('select').change(function (){
+            checkButtons();
+        });
+    };
 	var update_chars = function() {
 		var letter = 'A'.charCodeAt(0);
 		var children = $('.usedquestions').children();
@@ -30,7 +50,9 @@ define(['jquery'], function($) {
             $(children[i]).find('.question-letter').attr('value',letter);
 			letter++;
 		}
+		checkButtons();
 	};
+
     
     return {
     
@@ -55,6 +77,11 @@ define(['jquery'], function($) {
                 e.stopImmediatePropagation();
                 $(this).parents('.usesquestion').remove();
                 update_chars();
+            });
+        },
+        'editorQuestions': function () {
+            $(document).ready(function(){
+                checkButtons();
             });
         }
     };

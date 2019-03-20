@@ -602,6 +602,37 @@ class specialized_feedback {
     }
 
     /**
+     * @param attempt $attempt
+     * @return int|null
+     * @throws dml_exception
+     */
+    public function get_grade(\attempt $attempt){
+        /** @var feedback_used_question[] $parts */
+        $parts = $this->get_parts();
+        $sum = 0;
+        foreach ($parts as $part){
+            if(!is_string($part))
+                $sum += $part->getBlockElement()->get_grade($attempt);
+        }
+        return $sum;
+    }
+
+    /**
+     * @return int|null
+     * @throws dml_exception
+     */
+    public function get_maxgrade(){
+        /** @var feedback_used_question[] $parts */
+        $parts = $this->get_parts();
+        $sum = 0;
+        foreach ($parts as $part){
+            if(!is_string($part))
+                $sum += $part->getBlockElement()->get_maxgrade();
+        }
+        return $sum;
+    }
+
+    /**
      * Checks whether this part is relevant for the special feedback or not.
      *
      * @param string $part the part.
