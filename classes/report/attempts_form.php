@@ -57,8 +57,15 @@ abstract class attempts_form extends \moodleform {
 
         $mform->addElement('submit', 'submitbutton',
             get_string('showreport', 'ddtaquiz'));
+
+        //TODO:regrading
+        $this->extra_options($mform);
     }
 
+    //TODO:regrading
+    protected function extra_options(\MoodleQuickForm $mform){
+
+    }
     /**
      * @param \MoodleQuickForm $mform
      * @throws \coding_exception

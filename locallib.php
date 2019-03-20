@@ -388,6 +388,22 @@ class ddtaquiz
     }
 
     /**
+     * TODO: regrading
+     * @throws dml_exception
+     * @throws dml_transaction_exception
+     */
+    public function regrade_attempts(){
+        // Get all the attempts made by every user.
+        /** @var attempt[] $attempts */
+        $attempts = attempt::get_all_attempts($this->get_id());
+        /** @var attempt $attempt */
+        foreach ($attempts as $attempt){
+            $attempt->regrade_attempt();
+        }
+        $this->update_maxgrade();
+    }
+
+    /**
      * Round a grade to the correct number of decimal places, and format it for display.
      *
      * @param float $grade The grade to round.
