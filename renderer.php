@@ -539,6 +539,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      */
     protected function review_block_element($block, $blockelem, $attempt, $options, $feedback)
     {
+        $mode = $attempt->get_quiz()->getQuizmodes();
 
 
         $output = '';
@@ -574,31 +575,76 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
             $output
         );
 
-        $label="";
+
+
         if($blockelem->is_block()) {
-            if (stripos( html_to_text($collapseContent),"Incorrect")){
-                $backgroundColor = "incorrectColor";
-            }
-            else
-                $backgroundColor = "correctColor";
+            /** @var block $childblock */
+            $childblock = $blockelem->get_element();
+            $maxgrade=$childblock->get_maxgrade();
+            $grade= $blockelem->get_grade($attempt);
+
             $label=get_string('blockFeedbackAccordionHeaderPre', 'ddtaquiz');
+
+//            $correct=0;
+//            foreach ($childblock->get_children()as $child){
+//                /** @var block_element $child */
+//                if($child->is_block()) {
+//                    /** @var block $child */
+//                    $maxgrade=$child->get_maxgrade();
+//                    $grade= $child->get_grade($attempt);
+//                    if($maxgrade==$grade)
+//                        $correct++;
+//                }
+//                else{
+//                    /** @var question_attempt $test */
+//                    $test=$child;
+//                    $grade = $attempt->get_grade_at_slot($test->get_slot());
+////                    $maxgrade = $attempt->get_quba()->get_question_max_mark($child->get_element()->get_slot());
+//                }
+//            }
+            // The progress bar.
+//            if($mode==0)
+                $progress = floor( ($grade/$maxgrade)*100);
+//            else
+//                $progress=floor($correct/$childblock->get_slotcount())*100;
+
+
+            $progressbar = \html_writer::div($progress.'%', 'progress-bar bg-success',
+                array('role' => 'progressbar', 'style' => 'width:'.$progress.'%;color:black;', 'class' => 'bg-primary','aria-valuenow'=>$progress, 'aria-valuemin'=>"0", 'aria-valuemax'=>"100"));
+            $progressbar .= \html_writer::div((100-$progress).'%', 'progress-bar bg-danger',
+                array('role' => 'progressbar', 'style' => 'width:'.(100-$progress).'%;color:black;', 'class' => 'bg-primary','aria-valuenow'=>(100-$progress), 'aria-valuemin'=>"0", 'aria-valuemax'=>"100"));
+            $progressBarContainer = html_writer::div($progressbar, 'progress' ,array('style'=>'height: 25px; width:50%;margin-left:50px'));
+
+            $backgroundColor = "blockBackgroundHeader";
         }
         else{
             $grade = $attempt->get_grade_at_slot($slot);
             $maxgrade = $attempt->get_quba()->get_question_max_mark($slot);
-            $backgroundColor = "correctColor";
-            if ($grade != $maxgrade)
-                $backgroundColor = "incorrectColor";
             $label=get_string('questionFeedbackAccordionHeaderPre', 'ddtaquiz');
+            $progressBarContainer="";
+            $backgroundColor = "correctBackgroundHeader";
+            if($grade!=$maxgrade)
+                $backgroundColor = "incorrectBackgroundHeader";
         }
-        $container = ddtaquiz_bootstrap_render::createAccordionHeader(
+
+        //Set Postcontent for Header
+        if($mode!=0)
+            $content=$grade."/".$maxgrade;
+        else
+            $content=$grade!=$maxgrade?
+                " ".get_string('questionFeedbackAccordionHeaderPostLabelIncorrect', 'ddtaquiz'):
+                " ".get_string('questionFeedbackAccordionHeaderPostLabelCorrect', 'ddtaquiz');
+
+        $postContent=\html_writer::tag('label',$content,['style'=>'margin-left: 50px;']);
+        $postContent.=$progressBarContainer;
+
+            $container = ddtaquiz_bootstrap_render::createAccordionHeader(
                 \html_writer::tag('label', $label,
                     array('class' => 'conditionelement ')),
-                \html_writer::tag('label', $blockelem->get_name(), ['class' => 'collapsible-highlight']),
-                "",
-                ['id' => $headerId, 'class' => 'blockAccordionHeader ' . $backgroundColor],
+                \html_writer::tag('label', $blockelem->get_name(), ['class' => 'collapsible-highlight','style'=>'margin-left:10px']),
+                $postContent,
+                ['id' => $headerId, 'class' => 'blockAccordionHeader ' . $backgroundColor, 'style'=>'margin-bottom:5px;'],
                 $collapseId
-
             ) .
             $collapseContent;
         $output = ddtaquiz_bootstrap_render::createAccordion($accordionId, $container);

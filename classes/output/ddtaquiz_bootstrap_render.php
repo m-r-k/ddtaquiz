@@ -117,7 +117,7 @@ class ddtaquiz_bootstrap_render extends \html_writer
                 'id' => (is_array($attr) && array_key_exists('id',$attr))?$attr['id']:'',
                 'class' => (is_array($attr) && array_key_exists('class',$attr))?$attr['class']:'',
             ]).
-            self::start_tag('h5',['class'=>'mb-0 domain-wrapper']).
+            self::start_tag('h5',['class'=>'mb-0 domain-wrapper','style'=> 'display: flex; justify-content: left;' ]).
             $preContent;
 
         if($collapseId){

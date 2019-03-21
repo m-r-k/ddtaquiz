@@ -298,9 +298,15 @@ div.tooltip-inner {
 	/* If max-width does not work, try using width instead */
 	/*width: 350px;*/
 }
-.incorrectColor {
-	background-color: #ff6e56 !important;
+.questionBackgroundHeader {
+	background-color: #f7f7f7 !important;
 }
-.correctColor{
-	background:#5aff5e!important;
+.blockBackgroundHeader{
+	background: #cccccc !important;
+}
+.correctBackgroundHeader{
+	background: #5cb85c !important;
+}
+.incorrectBackgroundHeader{
+	background: #d9534f !important;
 }

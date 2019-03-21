@@ -203,5 +203,7 @@ $string['quizmodeheader'] = "Quiz Modi";
 $string['quizmodes'] = "Quiz Modus";
 $string['quizmodes_help'] = "Punkt: Normaler Modus<br>DDTA: Diagnostischer Modus ohne Punktebewertung, sonder Anzeige der Anzahl korrekter Fragen<br>BinDif: Alle Fragen auf einer Seite, der Lehrnende kann aussuchen was er bearbeitet.";
 $string['quizmodedesc'] = "Wähle zwischen 3 verschiedenen Quiz Modi. Normal(Punkte), DDTA und BinDif";
+$string['questionFeedbackAccordionHeaderPostLabelCorrect'] = "Correct";
+$string['questionFeedbackAccordionHeaderPostLabelIncorrect'] = "Incorrect";
 
 

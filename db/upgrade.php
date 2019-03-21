@@ -162,7 +162,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190317002){
+    if($oldversion < 20190321000){
         try{
 
             $DB->execute(
