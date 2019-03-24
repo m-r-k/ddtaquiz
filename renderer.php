@@ -585,6 +585,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
 
             $label=get_string('blockFeedbackAccordionHeaderPre', 'ddtaquiz');
 
+            //TODO: Fix num of correct answer isntead of grade in Collabisple header
 //            $correct=0;
 //            foreach ($childblock->get_children()as $child){
 //                /** @var block_element $child */
@@ -613,7 +614,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                 array('role' => 'progressbar', 'style' => 'width:'.$progress.'%;color:black;', 'class' => 'bg-primary','aria-valuenow'=>$progress, 'aria-valuemin'=>"0", 'aria-valuemax'=>"100"));
             $progressbar .= \html_writer::div((100-$progress).'%', 'progress-bar bg-danger',
                 array('role' => 'progressbar', 'style' => 'width:'.(100-$progress).'%;color:black;', 'class' => 'bg-primary','aria-valuenow'=>(100-$progress), 'aria-valuemin'=>"0", 'aria-valuemax'=>"100"));
-            $progressBarContainer = html_writer::div($progressbar, 'progress' ,array('style'=>'height: 25px; width:50%;margin-left:50px'));
+            $progressBarContainer = html_writer::div($progressbar, 'progress ml-auto' ,array('style'=>'height: 25px; width:65%'));
 
             $backgroundColor = "blockBackgroundHeader";
         }
@@ -635,15 +636,15 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                 " ".get_string('questionFeedbackAccordionHeaderPostLabelIncorrect', 'ddtaquiz'):
                 " ".get_string('questionFeedbackAccordionHeaderPostLabelCorrect', 'ddtaquiz');
 
-        $postContent=\html_writer::tag('label',$content,['style'=>'margin-left: 50px;']);
+        $postContent=\html_writer::tag('label',$content,[]);
         $postContent.=$progressBarContainer;
 
             $container = ddtaquiz_bootstrap_render::createAccordionHeader(
                 \html_writer::tag('label', $label,
-                    array('class' => 'conditionelement ')),
-                \html_writer::tag('label', $blockelem->get_name(), ['class' => 'collapsible-highlight','style'=>'margin-left:10px']),
+                    array('class' => 'conditionelement precontent')),
+                \html_writer::tag('label', $blockelem->get_name(), ['class' => 'collapsible-highlight']),
                 $postContent,
-                ['id' => $headerId, 'class' => 'blockAccordionHeader ' . $backgroundColor, 'style'=>'margin-bottom:5px;'],
+                ['id' => $headerId, 'class' => 'blockAccordionHeader' . $backgroundColor, 'style'=>'margin-bottom:5px;'],
                 $collapseId
             ) .
             $collapseContent;

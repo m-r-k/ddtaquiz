@@ -213,9 +213,6 @@ class edit_renderer extends \plugin_renderer_base
                 $tooltip.=$multiCondition->parseToString();
         }
 
-        // add domain choice to content
-        $quizconfig = $blockelem->get_quiz()->get_domains();
-        $postContent .= ddtaquiz_bootstrap_render::createDomainCheckboxes($blockelem->get_id(), explode(";", $quizconfig));
 
         // add only if main block
         if ($isMain) {
@@ -231,17 +228,21 @@ class edit_renderer extends \plugin_renderer_base
             // edit/delete buttons
             $edithtml = '';
             $removehtml = '';
+            $domainshtml='';
+
 
             if (!$blockelem->get_quiz()->has_attempts()) {
                 $edithtml = $this->element_edit_button($blockelem);
                 $removehtml = $this->element_remove_button($blockelem);
+                if($blockelem->is_question())
+                $domainshtml=$this->domains_button($blockelem);
             }else{
             // STATE:Editing
             //} else if ($blockelem->is_block() || ) {
                 $edithtml = $this->element_edit_button($blockelem);
             }
 
-            $postContent .= \html_writer::div($edithtml . $removehtml, 'blockelementbuttons');
+            $postContent = \html_writer::div($domainshtml.$edithtml . $removehtml, 'blockelementbuttons ml-auto');
         }
 
         $blockClass = '';
@@ -489,6 +490,26 @@ class edit_renderer extends \plugin_renderer_base
 
         return html_writer::tag('span', $this->render($menu),
             array('class' => 'add-menu-outer'));
+    }
+
+    /**
+     * @param \block_element $element the element to get the button for.
+     * @return string
+     * @throws \coding_exception
+     */
+    public function domains_button($element){
+
+
+        $quizconfig = $element->get_quiz()->get_domains();
+
+        $domainstable= ddtaquiz_bootstrap_render::createDomainCheckboxes($element->get_id(), explode(";", $quizconfig));
+
+        $image = $this->pix_icon('t/delete', get_string('delete'));
+        $confirmButton = html_writer::tag('button', 'Confirm',array('class' => 'btn btn-success', 'data-dismiss'=>'modal'));
+        $body = ddtaquiz_bootstrap_render::createModal('Set up the domains for question: '.$element->get_name(), $domainstable, $confirmButton, array('id' => 'confirm-domains'.$element->get_id(),'one-button'=>true,'size'=>'modal-lg','position'=>'modal-dialog-centered'));
+        $body .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-domains'.$element->get_id(), "submit", $image, array('class' => 'btn btn-danger'));
+
+        return $body;
     }
 
     /**
