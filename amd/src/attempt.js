@@ -38,44 +38,45 @@ function timingFromSeconds(textBefore, timestamp){
     return textBefore + ' <b>' +hours+':'+minutes + ':' + seconds +'</b>';
 }
 
-
-/**
- * Function that is called with an button of a single question in the bindif mode. It redirects to finishing the question without reloading the page
- * @param slot
- * @param attemptID
- * @param cmid
- */
-function myAjax(slot,attemptID,cmid) {
-    var url = $("a[id*=finishSingleQuestionBtn]").attr('url');
-    slot = slot.replace(/\./g, "");
-    attemptID = attemptID.replace(/\./g, "");
-    cmid = cmid.replace(/\./g, "");
-    $.ajax({
-        type: "POST",
-        url: url,
-        data: {
-            action: 'delete_single',
-            slot: slot,
-            attemptID: attemptID,
-            cmid: cmid,
-        },
-        success: function (html) {
-            location.reload();
-        }
-
-    });
-}
-
 define(['jquery'], function ($) {
 
     return {
 
         init: function () {
             $(document).ready(function () {
-                $('#attemptNextBtn').click(function (e) {
+                $('#attemptNextBtn').click(function () {
                     $('#responseform').submit();
                 });
                  $('#ModalButton').click();
+
+                 $('#confirmFinishBtn').click(function(){
+                     var questions=$('.binDifContainer');
+                     var sum=0;
+                     questions.each(function(){
+                        var elementHasAnswer=false;
+
+                         $(this).find('input:text, input:password, input:file, select, textarea')
+                             .each(function() {
+                                 if($(this).val()!=='') {
+                                     elementHasAnswer = true;
+                                 }
+                             });
+                         $(this).find('input:radio, input:checkbox').each(function() {
+                             if($(this).prop('checked') || $(this).prop('selected')) {
+                                 elementHasAnswer = true;
+                             }
+                         });
+
+                         if(elementHasAnswer) {
+                             sum = sum + parseInt($(this).attr('max-points'));
+                         }
+                     });
+                     var outputField=$('.points-overview-bindif');
+
+                     var output=sum.toString()+'/'+outputField.attr('minPoints');
+
+                     outputField.text(output);
+                 });
             });
 
         },

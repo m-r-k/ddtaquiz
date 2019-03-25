@@ -137,6 +137,7 @@ class edit_renderer extends \plugin_renderer_base
         /********************** FeedBack Card  *****************************************/
         if ($block->is_main_block()) {
             $output .= $this->domain_feedback_block($feedback->get_quiz());
+            if($block->get_quiz()->getQuizmodes()!=1)
             $output .= $this->feedback_block($feedback);
         }
 

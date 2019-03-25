@@ -341,7 +341,6 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
             $footer
         );
     }
-    
 
     public function bin_dif_page(attempt $attempt, $options, $cmid)
     {
@@ -357,17 +356,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                 'id' => 'responseform'));
 
         $body .= html_writer::start_tag('div');
-        $attemptID = $attempt->get_id();
-        $url = new \moodle_url('/mod/ddtaquiz/singleQuestion.php');
         for ($count = 1; $count <= $slots; $count++) {
-
-            $body .= $attempt->get_quba()->render_question($count, $options);
-//TODO: find a way to finish single questions to find out how many points are left
-//            $body.= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'finishsinglequestion',
-//                'value' => get_string('finishSQ', 'ddtaquiz'), 'class' => 'btn btn-primary text-right', 'id' => 'finishSingleQuestionBtn'.$count,'url'=>$url,'onclick'=>"myAjax('.$count.','.$attemptID.','.$cmid.')"));
-
-//$body.=html_writer::tag('a', get_string('finishSQ', 'ddtaquiz'),array('role'=>'button','slotscount'=>$slots,
-//    'class' => 'btn btn-primary text-right','onclick'=>"myAjax('.$count.','.$attemptID.','.$cmid.')", 'id' => 'finishSingleQuestionBtn'.$count,'url'=>$url));
+            $body.= html_writer::div($attempt->get_quba()->render_question($count, $options), 'binDifContainer',array('max-points'=>$attempt->get_quba()->get_question_max_mark($count)));
         }
 
         // Some hidden fields to track what is going on.
@@ -379,16 +369,13 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $body .= html_writer::end_tag('div');
         $body .= html_writer::end_tag('form');
 
-        $doublecheckbutton = '';
 
-        $doublecheckbutton .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'finish',
+        $doublecheckbutton = html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'finish',
             'value' => get_string('finishbindifquiz', 'ddtaquiz'), 'class' => 'btn btn-primary text-right', 'id' => 'attemptNextBtn'));
 
-
-        $achievedPoints = $attempt->get_sumgrades();
         $minPoints = $attempt->get_quiz()->getMinpointsforbindif();
-        $footer = ddtaquiz_bootstrap_render::createModal('Are you sure?', 'Attempt will be finished! You need at least ' . $minPoints . ' points to succeed.<br> Currently you have: ' . $achievedPoints . ' / ' . $minPoints, $doublecheckbutton, array('id' => 'confirm-finish-attempt'));
-        $footer .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-finish-attempt', "submit", get_string('finishbindifquiz', 'ddtaquiz'), array('class' => 'btn btn-danger'));
+        $footer = ddtaquiz_bootstrap_render::createModal('Are you sure?', 'Attempt will be finished! You need at least ' . $minPoints . ' points to succeed.<br> The maximum of points possible with the questions you have answered is: ' .html_writer::div('','points-overview-bindif',array('minPoints'=>$minPoints)), $doublecheckbutton, array('id' => 'confirm-finish-attempt'));
+        $footer .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-finish-attempt', "submit", get_string('finishbindifquiz', 'ddtaquiz'), array('class' => 'btn btn-danger','id'=>'confirmFinishBtn'));
 
 
         $this->page->requires->js_call_amd('mod_ddtaquiz/attempt', 'init');
