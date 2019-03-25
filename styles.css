@@ -306,10 +306,11 @@ div.tooltip-inner {
 	background: #cccccc !important;
 }
 .correctBackgroundHeader{
-	background: #5cb85c !important;
+	background: #5fa85f !important;
 }
 .incorrectBackgroundHeader{
-	background: #d9534f !important;
+	background: #ff7874 !important;
+
 }
 
 .domain-checkbox{
@@ -321,4 +322,7 @@ div.tooltip-inner {
 }
 .maincontent{
 	width:10%;
+}
+#finishSingleQuestionBtn{
+	margin-bottom:25px;
 }

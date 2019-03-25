@@ -205,5 +205,9 @@ $string['quizmodes_help'] = "Punkt: Normaler Modus<br>DDTA: Diagnostischer Modus
 $string['quizmodedesc'] = "Wähle zwischen 3 verschiedenen Quiz Modi. Normal(Punkte), DDTA und BinDif";
 $string['questionFeedbackAccordionHeaderPostLabelCorrect'] = "Correct";
 $string['questionFeedbackAccordionHeaderPostLabelIncorrect'] = "Incorrect";
+$string['finishbindifquiz']="Finish attempt";
+$string['minpointsforbindif']="A student must get at least that much points to succeed";
+$string['minpointsforbindifname']="Minimal needed points for bindif mode";
+$string['finishSQ']="Finish this question";
 
 

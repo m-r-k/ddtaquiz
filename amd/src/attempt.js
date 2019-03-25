@@ -38,15 +38,44 @@ function timingFromSeconds(textBefore, timestamp){
     return textBefore + ' <b>' +hours+':'+minutes + ':' + seconds +'</b>';
 }
 
+
+/**
+ * Function that is called with an button of a single question in the bindif mode. It redirects to finishing the question without reloading the page
+ * @param slot
+ * @param attemptID
+ * @param cmid
+ */
+function myAjax(slot,attemptID,cmid) {
+    var url = $("a[id*=finishSingleQuestionBtn]").attr('url');
+    slot = slot.replace(/\./g, "");
+    attemptID = attemptID.replace(/\./g, "");
+    cmid = cmid.replace(/\./g, "");
+    $.ajax({
+        type: "POST",
+        url: url,
+        data: {
+            action: 'delete_single',
+            slot: slot,
+            attemptID: attemptID,
+            cmid: cmid,
+        },
+        success: function (html) {
+            location.reload();
+        }
+
+    });
+}
+
 define(['jquery'], function ($) {
+
     return {
+
         init: function () {
             $(document).ready(function () {
                 $('#attemptNextBtn').click(function (e) {
                     $('#responseform').submit();
                 });
                  $('#ModalButton').click();
-
             });
 
         },

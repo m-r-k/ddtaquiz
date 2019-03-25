@@ -60,5 +60,9 @@ if(!$ddtaquiz->show_grades())
     $options->marks = question_display_options::HIDDEN;
 
 echo $OUTPUT->header();
-echo $output->attempt_page($attempt, $attempt->get_current_slot(), $options, $cmid);
+if($attempt->get_quiz()->getQuizmodes()==1)
+    echo $output->bin_dif_page($attempt,$options,$cmid);
+else
+    echo $output->attempt_page($attempt, $attempt->get_current_slot(), $options, $cmid);
+
 echo $OUTPUT->footer();

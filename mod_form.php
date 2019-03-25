@@ -106,6 +106,9 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
         $mform->addElement('select', 'quizmodes' , get_string('quizmodes', 'ddtaquiz'),$quizModeDisplayoptions);
         $mform->setDefault('quizmodes', $quizconfig->quizmodes);
         $mform->addHelpButton('quizmodes', 'quizmodes', 'ddtaquiz');
+        $mform->addElement('text', 'minpointsforbindif', get_string('minpointsforbindifname', 'ddtaquiz'));
+        $mform->setType('minpointsforbindif', PARAM_INT);
+        $mform->setDefault('minpointsforbindif', $quizconfig->minpointsforbindif);
 
         //Timing
         $mform->addElement('header', 'timing', get_string('timing', 'ddtaquiz'), 'ddtaquiz');

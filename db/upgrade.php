@@ -175,6 +175,19 @@ function xmldb_ddtaquiz_upgrade($oldversion)
 
         }
     }
+    if($oldversion < 20190322000){
+        try{
+
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz ADD minpointsforbindif INT(10) AFTER quizmodes"
+            );
+            // Label savepoint reached.
+            upgrade_mod_savepoint(true, 20190322000, 'ddtaquiz');
+        }
+        catch(Exception $e){
+
+        }
+    }
 
     return true;
 }

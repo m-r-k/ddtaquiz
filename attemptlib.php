@@ -373,6 +373,41 @@ class attempt {
     }
 
     /**
+     * Processes the slot.
+     *
+     * @param int $timenow the current time.
+     * @param int $slot
+     * @throws dml_transaction_exception
+     */
+    public function process_bindif_slot($timenow,$slot=-1) {
+        global $DB;
+
+
+        $transaction = $DB->start_delegated_transaction();
+
+        $quba = $this->get_quba();
+
+        $quba->process_all_actions($timenow);
+        if($slot===-1)
+        $quba->finish_all_questions($timenow);
+        else
+            $quba->finish_question($slot, $timenow);
+//        $slotcount=$this->get_quiz()->get_slotcount();
+//
+//            for ($count = 1; $count <= $slotcount; $count++) {
+//                    $quba->finish_question($count, $timenow);
+//            }
+
+        question_engine::save_questions_usage_by_activity($quba);
+
+        $transaction->allow_commit();
+//
+//        $this->next_slot();
+    }
+
+
+
+    /**
      * Checks if this attempt is finished.
      *
      * @return boolean wether this attempt is finished.

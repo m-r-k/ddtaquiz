@@ -56,5 +56,16 @@ if ($ADMIN->fulltree) {
     //Quiz Modes
     $settings->add(new admin_setting_configselect('ddtaquiz/quizmodes',
         get_string('quizmodes', 'ddtaquiz'),
-        get_string('quizmodedesc', 'ddtaquiz'), 0,array(0=>'DDTA Mode',1=>'BinDif Mode',2=>'Point Mode')));
+        get_string('quizmodedesc', 'ddtaquiz'),
+        0,
+        array(0=>'DDTA Mode',1=>'BinDif Mode',2=>'Point Mode')));
+
+    $settings->add(new admin_setting_configtext('ddtaquiz/minpointsforbindif',
+        get_string('minpointsforbindifname', 'ddtaquiz'),
+        get_string('minpointsforbindif', 'ddtaquiz'),
+        100,
+        PARAM_INT));
+
+
+
 }

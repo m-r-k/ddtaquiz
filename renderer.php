@@ -316,7 +316,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
             if (($slot - 1) > 0) {
                 if ($ddtaquiz->showDirectFeedback()) {
                     $directFeedbackBody = $attempt->get_quba()->render_question($slot - 1, $options);
-                    $body .= ddtaquiz_bootstrap_render::createModal('Direct Feedback', $directFeedbackBody, '', array('id' => 'directFeedbackModal'));
+                    $body .= ddtaquiz_bootstrap_render::createModal('Direct Feedback', $directFeedbackBody, '', array('id' => 'directFeedbackModal', 'size' => 'modal-lg'));
                     $body .= ddtaquiz_bootstrap_render::createModalTrigger('directFeedbackModal', "button", "Feedback for last question", array('id' => 'ModalButton'));
                 }
             }
@@ -341,6 +341,74 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
             $footer
         );
     }
+    
+
+    public function bin_dif_page(attempt $attempt, $options, $cmid)
+    {
+        $processurl = new \moodle_url('/mod/ddtaquiz/processslot.php');
+        $slots = $attempt->get_quiz()->get_slotcount();
+
+        $time = html_writer::div(html_writer::div('', 'timeDiv'), 'text-right');
+        $header = \html_writer::div($time, '');
+
+        $body = html_writer::start_tag('form',
+            array('action' => $processurl, 'method' => 'post',
+                'enctype' => 'multipart/form-data', 'accept-charset' => 'utf-8',
+                'id' => 'responseform'));
+
+        $body .= html_writer::start_tag('div');
+        $attemptID = $attempt->get_id();
+        $url = new \moodle_url('/mod/ddtaquiz/singleQuestion.php');
+        for ($count = 1; $count <= $slots; $count++) {
+
+            $body .= $attempt->get_quba()->render_question($count, $options);
+//TODO: find a way to finish single questions to find out how many points are left
+//            $body.= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'finishsinglequestion',
+//                'value' => get_string('finishSQ', 'ddtaquiz'), 'class' => 'btn btn-primary text-right', 'id' => 'finishSingleQuestionBtn'.$count,'url'=>$url,'onclick'=>"myAjax('.$count.','.$attemptID.','.$cmid.')"));
+
+//$body.=html_writer::tag('a', get_string('finishSQ', 'ddtaquiz'),array('role'=>'button','slotscount'=>$slots,
+//    'class' => 'btn btn-primary text-right','onclick'=>"myAjax('.$count.','.$attemptID.','.$cmid.')", 'id' => 'finishSingleQuestionBtn'.$count,'url'=>$url));
+        }
+
+        // Some hidden fields to track what is going on.
+        $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'attempt',
+            'value' => $attempt->get_id()));
+        $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'cmid',
+            'value' => $cmid));
+
+        $body .= html_writer::end_tag('div');
+        $body .= html_writer::end_tag('form');
+
+        $doublecheckbutton = '';
+
+        $doublecheckbutton .= html_writer::empty_tag('input', array('type' => 'submit', 'name' => 'finish',
+            'value' => get_string('finishbindifquiz', 'ddtaquiz'), 'class' => 'btn btn-primary text-right', 'id' => 'attemptNextBtn'));
+
+
+        $achievedPoints = $attempt->get_sumgrades();
+        $minPoints = $attempt->get_quiz()->getMinpointsforbindif();
+        $footer = ddtaquiz_bootstrap_render::createModal('Are you sure?', 'Attempt will be finished! You need at least ' . $minPoints . ' points to succeed.<br> Currently you have: ' . $achievedPoints . ' / ' . $minPoints, $doublecheckbutton, array('id' => 'confirm-finish-attempt'));
+        $footer .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-finish-attempt', "submit", get_string('finishbindifquiz', 'ddtaquiz'), array('class' => 'btn btn-danger'));
+
+
+        $this->page->requires->js_call_amd('mod_ddtaquiz/attempt', 'init');
+        if ($attempt->get_quiz()->timing_activated()) {
+            $this->page->requires->js_call_amd('mod_ddtaquiz/attempt', 'startTime', [
+                'abandon' => $attempt->get_quiz()->to_abandon(),
+                'timestamp' => $attempt->get_timeleft(),
+                'graceperiod' => $attempt->get_graceperiod(),
+                'url' => $attempt->attempt_url()->raw_out()
+            ]);
+        }
+
+
+        return ddtaquiz_bootstrap_render::createCard(
+            $body,
+            $header,
+            $footer
+        );
+    }
+
 
     /**
      * Generates the attempt navigation buttons.
@@ -556,7 +624,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
 
         }
         //If no feedback is to render than return
-        if($output==""){
+        if ($output == "") {
             return "";
         }
         //Collabsible color
@@ -576,14 +644,13 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         );
 
 
-
-        if($blockelem->is_block()) {
+        if ($blockelem->is_block()) {
             /** @var block $childblock */
             $childblock = $blockelem->get_element();
-            $maxgrade=$childblock->get_maxgrade();
-            $grade= $blockelem->get_grade($attempt);
+            $maxgrade = $childblock->get_maxgrade();
+            $grade = $blockelem->get_grade($attempt);
 
-            $label=get_string('blockFeedbackAccordionHeaderPre', 'ddtaquiz');
+            $label = get_string('blockFeedbackAccordionHeaderPre', 'ddtaquiz');
 
             //TODO: Fix num of correct answer isntead of grade in Collabisple header
 //            $correct=0;
@@ -605,46 +672,45 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
 //            }
             // The progress bar.
 //            if($mode==0)
-                $progress = floor( ($grade/$maxgrade)*100);
+            $progress = floor(($grade / $maxgrade) * 100);
 //            else
 //                $progress=floor($correct/$childblock->get_slotcount())*100;
 
 
-            $progressbar = \html_writer::div($progress.'%', 'progress-bar bg-success',
-                array('role' => 'progressbar', 'style' => 'width:'.$progress.'%;color:black;', 'class' => 'bg-primary','aria-valuenow'=>$progress, 'aria-valuemin'=>"0", 'aria-valuemax'=>"100"));
-            $progressbar .= \html_writer::div((100-$progress).'%', 'progress-bar bg-danger',
-                array('role' => 'progressbar', 'style' => 'width:'.(100-$progress).'%;color:black;', 'class' => 'bg-primary','aria-valuenow'=>(100-$progress), 'aria-valuemin'=>"0", 'aria-valuemax'=>"100"));
-            $progressBarContainer = html_writer::div($progressbar, 'progress ml-auto' ,array('style'=>'height: 25px; width:65%'));
+            $progressbar = \html_writer::div($progress . '%', 'progress-bar bg-success',
+                array('role' => 'progressbar', 'style' => 'width:' . $progress . '%;color:black;', 'class' => 'bg-primary', 'aria-valuenow' => $progress, 'aria-valuemin' => "0", 'aria-valuemax' => "100"));
+            $progressbar .= \html_writer::div((100 - $progress) . '%', 'progress-bar bg-danger',
+                array('role' => 'progressbar', 'style' => 'width:' . (100 - $progress) . '%;color:black;', 'class' => 'bg-primary', 'aria-valuenow' => (100 - $progress), 'aria-valuemin' => "0", 'aria-valuemax' => "100"));
+            $progressBarContainer = html_writer::div($progressbar, 'progress ml-auto', array('style' => 'height: 25px; width:65%'));
 
             $backgroundColor = "blockBackgroundHeader";
-        }
-        else{
+        } else {
             $grade = $attempt->get_grade_at_slot($slot);
             $maxgrade = $attempt->get_quba()->get_question_max_mark($slot);
-            $label=get_string('questionFeedbackAccordionHeaderPre', 'ddtaquiz');
-            $progressBarContainer="";
+            $label = get_string('questionFeedbackAccordionHeaderPre', 'ddtaquiz');
+            $progressBarContainer = "";
             $backgroundColor = "correctBackgroundHeader";
-            if($grade!=$maxgrade)
+            if ($grade != $maxgrade)
                 $backgroundColor = "incorrectBackgroundHeader";
         }
 
         //Set Postcontent for Header
-        if($mode!=0)
-            $content=$grade."/".$maxgrade;
+        if ($mode != 0)
+            $content = $grade . "/" . $maxgrade;
         else
-            $content=$grade!=$maxgrade?
-                " ".get_string('questionFeedbackAccordionHeaderPostLabelIncorrect', 'ddtaquiz'):
-                " ".get_string('questionFeedbackAccordionHeaderPostLabelCorrect', 'ddtaquiz');
+            $content = $grade != $maxgrade ?
+                " " . get_string('questionFeedbackAccordionHeaderPostLabelIncorrect', 'ddtaquiz') :
+                " " . get_string('questionFeedbackAccordionHeaderPostLabelCorrect', 'ddtaquiz');
 
-        $postContent=\html_writer::tag('label',$content,[]);
-        $postContent.=$progressBarContainer;
+        $postContent = \html_writer::tag('label', $content, []);
+        $postContent .= $progressBarContainer;
 
-            $container = ddtaquiz_bootstrap_render::createAccordionHeader(
+        $container = ddtaquiz_bootstrap_render::createAccordionHeader(
                 \html_writer::tag('label', $label,
                     array('class' => 'conditionelement precontent')),
                 \html_writer::tag('label', $blockelem->get_name(), ['class' => 'collapsible-highlight']),
                 $postContent,
-                ['id' => $headerId, 'class' => 'blockAccordionHeader' . $backgroundColor, 'style'=>'margin-bottom:5px;'],
+                ['id' => $headerId, 'class' => 'blockAccordionHeader' . ' ' . $backgroundColor, 'style' => 'margin-bottom:5px;'],
                 $collapseId
             ) .
             $collapseContent;

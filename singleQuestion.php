@@ -24,9 +24,11 @@
 require_once(__DIR__ . '/../../config.php');
 require_once($CFG->dirroot.'/mod/ddtaquiz/locallib.php');
 
+
 // Get submitted parameters.
-$attemptid = required_param('attempt',  PARAM_INT);
+$attemptid = required_param('attemptID',  PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);
+$slot= required_param('slot',  PARAM_INT);
 
 $timenow = time();
 
@@ -42,21 +44,10 @@ require_login($course, false, $cm);
 
 $attempt = attempt::load($attemptid);
 
-// Set $nexturl.
-$url = $attempt->attempt_url();
-$nexturl = new \moodle_url($url, array('cmid' => $cmid));
+
 
 // Check that this attempt belongs to this user.
 if ($attempt->get_userid() != $USER->id) {
     throw new moodle_quiz_exception($attempt->get_quiz(), 'notyourattempt');
 }
-//TODO: finish quiz
-if($attempt->get_quiz()->getQuizmodes()==1) {
-    $attempt->process_bindif_slot($timenow);
-    $attempt->finish_attempt($timenow, 'finished');
-}
-else {
-// Process slot.
-    $attempt->process_slot($timenow);
-}
-redirect($nexturl);
+$attempt->process_bindif_slot($timenow,$slot);
