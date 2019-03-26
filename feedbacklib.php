@@ -610,8 +610,9 @@ class specialized_feedback {
         $parts = $this->get_parts();
         $sum = 0;
         foreach ($parts as $part){
-            if(!is_string($part))
+            if(!is_string($part)){
                 $sum += $part->getBlockElement()->get_grade($attempt);
+            }
         }
         return $sum;
     }
@@ -623,10 +624,20 @@ class specialized_feedback {
     public function get_maxgrade(){
         /** @var feedback_used_question[] $parts */
         $parts = $this->get_parts();
+        $complexQuestions = $parts[0]->getBlockElement()->get_quiz()->get_main_block()->get_children();
+        $complexQuestions = array_filter($complexQuestions,function($child){
+            return $child->is_question();
+        });
+        $complexQuestions = array_map(function($question){
+            return $question->get_id();
+        },$complexQuestions);
+
         $sum = 0;
         foreach ($parts as $part){
-            if(!is_string($part))
-                $sum += $part->getBlockElement()->get_maxgrade();
+            if(!is_string($part)){
+                if(!in_array($part->getBlockElement()->get_id(),$complexQuestions))
+                    $sum += $part->getBlockElement()->get_maxgrade();
+            }
         }
         return $sum;
     }
