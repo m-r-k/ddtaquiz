@@ -35,6 +35,8 @@ use mod_ddtaquiz\output\ddtaquiz_bootstrap_render;
  */
 class mod_ddtaquiz_renderer extends plugin_renderer_base
 {
+
+    #region view index section
     /**
      * Generates the view page.
      *
@@ -51,56 +53,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $output .= $this->view_table($quiz, $viewobj);
         $output .= $this->view_page_buttons($viewobj);
         return $output;
+
     }
-
-    /**
-     * Renders the review question pop-up.
-     *
-     * @param attempt $attempt an instance of attempt.
-     * @param int $slot which question to display.
-     * @param question_display_options $options the display options.
-     * @param array $summarydata contains all table data.
-     * @return string $output containing html data.
-     */
-    public function review_question_page(attempt $attempt, $slot, question_display_options $options, $summarydata)
-    {
-        $output = '';
-        $output .= $this->heading($attempt->get_quiz()->get_name());
-        $output .= $this->review_summary_table($summarydata);
-        $output .= $attempt->get_quba()->render_question($slot, $options);
-        $output .= $this->close_window_button();
-        return $output;
-    }
-
-    /**
-     * Renders the grade and comment question pop-up.
-     *
-     * @param attempt $attempt an instance of attempt.
-     * @param int $slot which question to display.
-     * @param question_display_options $options the display options.
-     * @param array $summarydata contains all table data.
-     * @return string $output containing html data.
-     * @throws coding_exception
-     * @throws moodle_exception
-     */
-    public function grade_question_page(attempt $attempt, $slot, question_display_options $options, $summarydata)
-    {
-        $output = '';
-        $output .= $this->heading($attempt->get_quiz()->get_name());
-        $output .= $this->review_summary_table($summarydata);
-
-        $url = new moodle_url('/mod/ddtaquiz/comment.php');
-        $output .= \html_writer::start_tag('form', array('method' => 'post', 'action' => $url->out()));
-        $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'attempt', 'value' => $attempt->get_id()));
-        $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'slot', 'value' => $slot));
-        $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
-        $output .= $attempt->get_quba()->render_question($slot, $options);
-        $output .= \html_writer::tag('input', '', array('type' => 'submit', 'id' => 'id_submitbutton',
-            'name' => 'submit', 'value' => get_string('save', 'ddtaquiz')));
-        $output .= \html_writer::end_tag('form');
-        return $output;
-    }
-
     /**
      * Generates the table of data
      *
@@ -266,7 +220,60 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $button->class .= ' quizstartbuttondiv';
         return $this->render($button);
     }
+#endregion
 
+    #region never used?
+    /**
+     * Renders the review question pop-up.
+     *
+     * @param attempt $attempt an instance of attempt.
+     * @param int $slot which question to display.
+     * @param question_display_options $options the display options.
+     * @param array $summarydata contains all table data.
+     * @return string $output containing html data.
+     */
+    public function review_question_page(attempt $attempt, $slot, question_display_options $options, $summarydata)
+    {
+        $output = '';
+        $output .= $this->heading($attempt->get_quiz()->get_name());
+        $output .= $this->review_summary_table($summarydata);
+        $output .= $attempt->get_quba()->render_question($slot, $options);
+        $output .= $this->close_window_button();
+        return $output;
+    }
+
+    /**
+     * Renders the grade and comment question pop-up.
+     *
+     * @param attempt $attempt an instance of attempt.
+     * @param int $slot which question to display.
+     * @param question_display_options $options the display options.
+     * @param array $summarydata contains all table data.
+     * @return string $output containing html data.
+     * @throws coding_exception
+     * @throws moodle_exception
+     */
+    public function grade_question_page(attempt $attempt, $slot, question_display_options $options, $summarydata)
+    {
+        $output = '';
+        $output .= $this->heading($attempt->get_quiz()->get_name());
+        $output .= $this->review_summary_table($summarydata);
+
+        $url = new moodle_url('/mod/ddtaquiz/comment.php');
+        $output .= \html_writer::start_tag('form', array('method' => 'post', 'action' => $url->out()));
+        $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'attempt', 'value' => $attempt->get_id()));
+        $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'slot', 'value' => $slot));
+        $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'sesskey', 'value' => sesskey()));
+        $output .= $attempt->get_quba()->render_question($slot, $options);
+        $output .= \html_writer::tag('input', '', array('type' => 'submit', 'id' => 'id_submitbutton',
+            'name' => 'submit', 'value' => get_string('save', 'ddtaquiz')));
+        $output .= \html_writer::end_tag('form');
+        return $output;
+    }
+
+#endregion
+
+    #region Attempt Section
     /**
      * Generates the page of the attempt.
      *
@@ -410,6 +417,11 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         return $output;
     }
 
+
+
+    #endregion
+
+    #region review section
     /**
      * Builds the review page.
      *
@@ -792,6 +804,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $button = new single_button($url, $buttontext);
         return $this->render($button);
     }
+    #endregion
 }
 
 /**
