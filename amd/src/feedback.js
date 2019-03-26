@@ -20,21 +20,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery'], function($) {
+define(['jquery'], function ($) {
     var index = 0;
-	var update_chars = function() {
-		var letter = 'A'.charCodeAt(0);
-		var children = $('.usedquestions').children();
-		for (var i = 0; i < children.length; i++) {
-			$(children[i]).find('.usesquestionletter').html(String.fromCharCode(letter));
-            $(children[i]).find('.question-letter').attr('value',letter);
-			letter++;
-		}
-	};
-    
+    var update_chars = function () {
+        var letter = 'A'.charCodeAt(0);
+        var children = $('.usedquestions').children();
+        for (var i = 0; i < children.length; i++) {
+            $(children[i]).find('.usesquestionletter').html(String.fromCharCode(letter));
+            $(children[i]).find('.question-letter').attr('value', letter);
+            letter++;
+        }
+    };
+
     return {
-    
-        init: function() {
+
+        init: function () {
             $('.addusedquestion').click(function (e) {
                 e.preventDefault();
                 var newusespart = $('.usesquestioncontainer').find('.usesquestion').clone(true);
@@ -43,14 +43,14 @@ define(['jquery'], function($) {
                 //var lastletter = $('.usesquestioncontainer').find('.usesquestionletter').html();
                 //$('.usesquestioncontainer').find('.usesquestionletter').html(String.fromCharCode(lastletter.charCodeAt(0) + 1));
                 newusespart.find('.usesquestionselector').attr('name', 'usesquestions[newparts' + index + '][questionId]');
-                newusespart.find('.shift-checkbox').attr('name','usesquestions[newparts' + index + '][shift]');
-                newusespart.find('.question-letter').attr('name','usesquestions[newparts' + index + '][letter]');
+                newusespart.find('.shift-checkbox').attr('name', 'usesquestions[newparts' + index + '][shift]');
+                newusespart.find('.question-letter').attr('name', 'usesquestions[newparts' + index + '][letter]');
 
                 update_chars();
                 // Increase submit index
                 index++;
             });
-            $('.usesdelete').click(function(e) {
+            $('.usesdelete').click(function (e) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
                 $(this).parents('.usesquestion').remove();

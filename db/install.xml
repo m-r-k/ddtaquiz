@@ -24,6 +24,7 @@
         <FIELD NAME="graceperiod" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="grace period when time is over"/>
         <FIELD NAME="domains" TYPE="char" LENGTH="255" NOTNULL="true" DEFAULT=" " SEQUENCE="false" COMMENT="Domains for Domainspecific Feedback"/>
         <FIELD NAME="quizmodes" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="Quizmodes"/>
+        <FIELD NAME="minpointsforbindif" TYPE="int" LENGTH="10" NOTNULL="true" DEFAULT="100" SEQUENCE="false" COMMENT="Minimal points needed"/>
       </FIELDS>
       <KEYS>
         <KEY NAME="primary" TYPE="primary" FIELDS="id"/>

@@ -20,22 +20,24 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-function timingFromSeconds(textBefore, timestamp){
-
-    var minutes = parseInt(timestamp/60);
-    var hours = parseInt(minutes/60);
+function timingFromSeconds(textBefore, timestamp) {
+    var minutes = parseInt(timestamp / 60);
+    var hours = parseInt(minutes / 60);
     var seconds = parseInt(timestamp - (minutes * 60));
     minutes = parseInt(minutes - (hours * 60));
 
     // add a 0 infront if smaller than 10
-    if(minutes < 10)
+    if (minutes < 10) {
         minutes = '0' + minutes;
-    if(seconds < 10)
+    }
+    if (seconds < 10) {
         seconds = '0' + seconds;
-    if(hours < 10)
+    }
+    if (hours < 10) {
         hours = '0' + hours;
+    }
 
-    return textBefore + ' <b>' +hours+':'+minutes + ':' + seconds +'</b>';
+    return textBefore + ' <b>' + hours + ':' + minutes + ':' + seconds + '</b>';
 }
 
 define(['jquery'], function ($) {
@@ -48,61 +50,67 @@ define(['jquery'], function ($) {
                     $('#responseform').submit();
                 });
 
-                 $('#confirmFinishBtn').click(function(){
-                     var questions=$('.binDifContainer');
-                     var sum=0;
-                     questions.each(function(){
-                        var elementHasAnswer=false;
+                $('#confirmFinishBtn').click(function () {
+                    var questions = $('.binDifContainer');
+                    var sum = 0;
+                    questions.each(function () {
+                        var elementHasAnswer = false;
 
-                         $(this).find('input:text, input:password, input:file, select, textarea')
-                             .each(function() {
-                                 if($(this).val()!=='') {
-                                     elementHasAnswer = true;
-                                 }
-                             });
-                         $(this).find('input:radio, input:checkbox').each(function() {
-                             if($(this).prop('checked') || $(this).prop('selected')) {
-                                 elementHasAnswer = true;
-                             }
-                         });
+                        $(this).find('input:text, input:password, input:file, select, textarea')
+                            .each(function () {
+                                if ($(this).val() !== '') {
+                                    elementHasAnswer = true;
+                                }
+                            });
+                        $(this).find('input:radio, input:checkbox').each(function () {
+                            if ($(this).prop('checked') || $(this).prop('selected')) {
+                                elementHasAnswer = true;
+                            }
+                        });
 
-                         if(elementHasAnswer) {
-                             sum = sum + parseInt($(this).attr('max-points'));
-                         }
-                     });
-                     var outputField=$('.points-overview-bindif');
+                        if (elementHasAnswer) {
+                            sum = sum + parseInt($(this).attr('max-points'));
+                        }
+                    });
+                    var outputField = $('.points-overview-bindif');
 
-                     var output=sum.toString()+'/'+outputField.attr('minPoints');
+                    var output = sum.toString() + '/' + outputField.attr('minPoints');
 
-                     outputField.text(output);
-                 });
+                    outputField.text(output);
+                });
             });
 
         },
-        'startTime': function(abandon, timestamp,graceperiod,url){
+        'startTime': function (abandon, timestamp, graceperiod, url) {
             // set interval for timing
-            var interval = setInterval(function(){
+            var interval = setInterval(function () {
                 timestamp -= 1; // minus one second
-                $('.timeDiv').html(timingFromSeconds('Time left:' ,timestamp));
+                $('.timeDiv').html(timingFromSeconds('Time left:', timestamp));
 
             }, 1000);// repeat every second
 
-            if(graceperiod> 0){
-                setTimeout(function(){
+            if (graceperiod > 0) {
+                setTimeout(function () {
                     clearInterval(interval);
-                    setInterval(function(){
+                    setInterval(function () {
                         graceperiod -= 1;
 
-                        $('.timeDiv').html(timingFromSeconds('Auto submit in :' , graceperiod));
+                        $('.timeDiv').html(timingFromSeconds('Auto submit in :', graceperiod));
 
                     }, 1000);
-                    setTimeout(function(){ $('#attemptNextBtn').click(); }, graceperiod * 1000);
-                }, timestamp  * 1000);
-            }else{
-                if(abandon){
-                    setTimeout(function(){ window.location = url; }, timestamp * 1000);
-                }else{
-                    setTimeout(function(){ $('#attemptNextBtn').click(); }, timestamp * 1000);
+                    setTimeout(function () {
+                        $('#attemptNextBtn').click();
+                    }, graceperiod * 1000);
+                }, timestamp * 1000);
+            } else {
+                if (abandon) {
+                    setTimeout(function () {
+                        window.location = url;
+                    }, timestamp * 1000);
+                } else {
+                    setTimeout(function () {
+                        $('#attemptNextBtn').click();
+                    }, timestamp * 1000);
                 }
             }
         }

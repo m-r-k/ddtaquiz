@@ -42,7 +42,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
-    if ($oldversion < 20190325000) {
+    if ($oldversion < 20190326001) {
         try {
 
             // Update all records in 'course_modules' for labels to have showdescription = 1.
@@ -50,13 +50,13 @@ function xmldb_ddtaquiz_upgrade($oldversion)
                 "ALTER TABLE mdl_ddtaquiz ADD directfeedback INT(1) NOT NULL DEFAULT 1 AFTER mainblock"
             );
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019022616, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 20190326001, 'ddtaquiz');
         } catch (Exception $e) {
 
         }
     }
 
-    if ($oldversion < 20190325000) {
+    if ($oldversion < 20190326001) {
         try {
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD timelimit BIGINT(10) NOT NULL DEFAULT 0 AFTER timemodified"
@@ -71,13 +71,13 @@ function xmldb_ddtaquiz_upgrade($oldversion)
 
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019022600, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 20190326001, 'ddtaquiz');
         } catch (Exception $e) {
 
         }
     }
 
-    if($oldversion < 20190325000){
+    if($oldversion < 20190326001){
         try{
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD domains VARCHAR(255) NOT NULL DEFAULT ' ' AFTER  mainblock"
@@ -87,14 +87,14 @@ function xmldb_ddtaquiz_upgrade($oldversion)
             );
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019022600, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 20190326001, 'ddtaquiz');
         }
         catch(Exception $e){
 
         }
     }
 
-    if($oldversion < 20190325000){
+    if($oldversion < 20190326001){
         try{
 
             $DB->execute(
@@ -102,14 +102,14 @@ function xmldb_ddtaquiz_upgrade($oldversion)
             );
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019022600, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 20190326001, 'ddtaquiz');
         }
         catch(Exception $e){
 
         }
     }
 
-    if($oldversion < 20190325000){
+    if($oldversion < 20190326001){
         try{
 
             $DB->execute(
@@ -123,14 +123,14 @@ function xmldb_ddtaquiz_upgrade($oldversion)
             );
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019022600, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 20190326001, 'ddtaquiz');
         }
         catch(Exception $e){
 
         }
     }
 
-    if($oldversion < 20190325000){
+    if($oldversion < 20190326001){
         try{
 
             $DB->execute(
@@ -138,51 +138,51 @@ function xmldb_ddtaquiz_upgrade($oldversion)
             );
 
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019022600, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 20190326001, 'ddtaquiz');
         }
         catch(Exception $e){
 
         }
     }
 
-    if($oldversion < 20190325000){
+    if($oldversion < 20190326001){
         try{
 
             $DB->execute(
-                "ALTER TABLE ddtaquiz_feedback_uses ADD shift INT(1) AFTER questioninstanceid"
+                "ALTER TABLE mdl_ddtaquiz_feedback_uses ADD shift INT(1) AFTER questioninstanceid"
             );
             $DB->execute(
-                "ALTER TABLE ddtaquiz_feedback_uses ADD letter VARCHAR(16) AFTER shift"
+                "ALTER TABLE mdl_ddtaquiz_feedback_uses ADD letter VARCHAR(16) AFTER shift"
             );
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019022603, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 20190326001, 'ddtaquiz');
         }
         catch(Exception $e){
 
         }
     }
 
-    if($oldversion < 20190325000){
+    if($oldversion < 20190326001){
         try{
 
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD quizmodes INT(10) AFTER ddtaquiz_feedback_uses"
             );
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 2019031701, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 20190326001, 'ddtaquiz');
         }
         catch(Exception $e){
 
         }
     }
-    if($oldversion < 20190325000){
+    if($oldversion < 20190326001){
         try{
 
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD minpointsforbindif INT(10) AFTER quizmodes"
             );
             // Label savepoint reached.
-            upgrade_mod_savepoint(true, 20190322000, 'ddtaquiz');
+            upgrade_mod_savepoint(true, 20190326001, 'ddtaquiz');
         }
         catch(Exception $e){
 

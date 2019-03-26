@@ -20,17 +20,17 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery'], function($) {
+define(['jquery'], function ($) {
     return {
-        init: function() {
+        init: function () {
             //make the add block button submit all changes and a request for a new block
-            $('.addnewblock').click(function(e) {
+            $('.addnewblock').click(function (e) {
                 e.preventDefault();
                 var input = $('<input>')
                     .attr('type', 'hidden')
                     .attr('name', 'addnewblock').val(1);
                 $('#blockeditingform').append($(input));
-               $('#blockeditingform').submit(); 
+                $('#blockeditingform').submit();
             });
         }
     };

@@ -20,42 +20,45 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery'], function($) {
+define(['jquery'], function ($) {
     var condition = {
-        singleConditionIndex : 0,
-        mqConditionIndex : 0,
-        addcondition : function(e) {
+        singleConditionIndex: 0,
+        mqConditionIndex: 0,
+        addcondition: function (e) {
             e.preventDefault();
             e.stopImmediatePropagation();
             var newcondition = $('.pointsconditioncontainer').find('.conditionpart').clone(true);
             this.singleConditionIndex++;
             newcondition.find('.conditionpoints').attr('name', 'conditionparts[newparts' + this.singleConditionIndex + '][points]');
             newcondition.find('.conditiontype').attr('name', 'conditionparts[newparts' + this.singleConditionIndex + '][type]');
-            newcondition.find('.conditionquestion').attr('name', 'conditionparts[newparts' + this.singleConditionIndex + '][question]');
+            newcondition.find('.conditionquestion').attr(
+                'name', 'conditionparts[newparts' +
+                this.singleConditionIndex + '][question]'
+            );
             newcondition.appendTo('.conditionpartslist');
         },
-        addMQCondition : function(e) {
+        addMQCondition: function (e) {
             e.preventDefault();
             e.stopImmediatePropagation();
             var newcondition = $('.mq-pointsconditioncontainer').find('.mq-conditionpart').clone(true);
             var index = ++this.mqConditionIndex;
-            var headingId = 'mq-heading-newpart'+index+'-'+$.now();
-            var collapseId = 'mq-collapse-newpart'+index+'-'+$.now();
-            newcondition.find('.card-header').first().attr('id',headingId);
+            var headingId = 'mq-heading-newpart' + index + '-' + $.now();
+            var collapseId = 'mq-collapse-newpart' + index + '-' + $.now();
+            newcondition.find('.card-header').first().attr('id', headingId);
             newcondition.find('.collapse').first().attr({
-                'id' : collapseId,
-                'aria-labelledby':headingId,
+                'id': collapseId,
+                'aria-labelledby': headingId,
             });
             newcondition.find('span[data-toggle="collapse"]').first().attr({
-                'data-target':"#" + collapseId,
-                'aria-controls':collapseId
+                'data-target': "#" + collapseId,
+                'aria-controls': collapseId
             });
             newcondition.find('.conditionpoints').attr('name', 'conditionMQParts[newparts' + index + '][points]');
             newcondition.find('.conditiontype').attr('name', 'conditionMQParts[newparts' + index + '][type]');
-            newcondition.find('.custom-control-input').each(function(){
-                var id = 'mq-checkbox-'+$(this).val()+'-'+ $.now();
-                newcondition.find("label[for='"+$(this).attr('id')+"']").attr('for',id);
-                $(this).attr('name', 'conditionMQParts[newparts' + index + '][questions]['+$(this).val()+']');
+            newcondition.find('.custom-control-input').each(function () {
+                var id = 'mq-checkbox-' + $(this).val() + '-' + $.now();
+                newcondition.find("label[for='" + $(this).attr('id') + "']").attr('for', id);
+                $(this).attr('name', 'conditionMQParts[newparts' + index + '][questions][' + $(this).val() + ']');
                 $(this).attr('id', id);
             });
 
@@ -64,18 +67,18 @@ define(['jquery'], function($) {
     };
     return {
 
-    
-        init: function() {
-            $(document).ready(function(){
+
+        init: function () {
+            $(document).ready(function () {
                 $('[data-toggle="tooltip"]').tooltip();
-                $('#addPointsConditionBtn').click(function(e){
+                $('#addPointsConditionBtn').click(function (e) {
                     condition.addcondition(e);
                 });
-                $('#addMQPointsConditionBtn').click(function(e){
+                $('#addMQPointsConditionBtn').click(function (e) {
                     condition.addMQCondition(e);
                 });
 
-                $('.conditionpartdelete').click(function(e) {
+                $('.conditionpartdelete').click(function (e) {
                     e.preventDefault();
                     e.stopImmediatePropagation();
                     $(this).parents('.conditionpart').remove();

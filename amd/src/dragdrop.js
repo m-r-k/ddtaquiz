@@ -20,9 +20,9 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'jqueryui'], function($) { 
+define(['jquery', 'jqueryui'], function ($) {
     return {
-        init: function() {
+        init: function () {
             $('#block-children-list').sortable({
                 handle: '.editing_move'
             });

@@ -20,30 +20,30 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'core/ajax'], function($, ajax) {
+define(['jquery', 'core/ajax'], function ($, ajax) {
     $(document.body).addClass('jschooser');
     var questionbank_chooser = {
-         // The panel widget
+        // The panel widget
         panel: null,
         addButton: null,
         loading: null,
 
-        
-        prepare_chooser : function(panelId, addButtonId, loadingId) {
-            this.panel = $('#'+panelId);
-            this.addButton = $('#'+addButtonId);
-            this.loading = $('#'+loadingId);
+
+        prepare_chooser: function (panelId, addButtonId, loadingId) {
+            this.panel = $('#' + panelId);
+            this.addButton = $('#' + addButtonId);
+            this.loading = $('#' + loadingId);
 
 
             $(this.panel).find('.modal-body').html(this.loading);
         },
 
-        init_question_bank_modal : function(panelId, addButtonId, loadingId) {
+        init_question_bank_modal: function (panelId, addButtonId, loadingId) {
             this.prepare_chooser(panelId, addButtonId, loadingId);
             this.load();
         },
-        
-        get_href_param : function(href, paramname) {
+
+        get_href_param: function (href, paramname) {
             var paramstr = href.split('?')[1];
             var paramsarr = paramstr.split('&');
             for (var i = 0; i < paramsarr.length; i++) {
@@ -54,50 +54,50 @@ define(['jquery', 'core/ajax'], function($, ajax) {
             }
             return null;
         },
-        
-        questionbank_loaded : function(response) {
+
+        questionbank_loaded: function (response) {
             $(this.panel).find('.modal-body').html(response);
 
             $(this.panel).find('.modulespecificbuttonscontainer').html('');
             $(this.panel).find('.tag-condition-container').html('');
 
-            $('.addfromquestionbank').click(function(e) {
+            $('.addfromquestionbank').click(function (e) {
                 e.preventDefault();
                 var input = $('<input>')
                     .attr('type', 'hidden')
                     .attr('name', 'addfromquestionbank').val($(this).data('id'));
                 $('#blockeditingform').append($(input));
-               $('#blockeditingform').submit(); 
+                $('#blockeditingform').submit();
             });
-            $(this.addButton).click(function(e) {
+            $(this.addButton).click(function (e) {
                 e.preventDefault();
                 var selected = $('input:checkbox:checked[name^="q"]');
                 for (var i = 0; i < selected.length; i++) {
-                	var name = $(selected[i]).attr('name');
-	                var input = $('<input>')
-	                    .attr('type', 'hidden')
-	                    .attr('name', name).val('1');
-	                $('#blockeditingform').append($(input));
+                    var name = $(selected[i]).attr('name');
+                    var input = $('<input>')
+                        .attr('type', 'hidden')
+                        .attr('name', name).val('1');
+                    $('#blockeditingform').append($(input));
                 }
                 var button = $('<input>')
-	                .attr('type', 'hidden')
-	                .attr('name', 'add').val('1');
-	            $('#blockeditingform').append($(button));
-                $('#blockeditingform').submit(); 
+                    .attr('type', 'hidden')
+                    .attr('name', 'add').val('1');
+                $('#blockeditingform').append($(button));
+                $('#blockeditingform').submit();
             });
             $('.questionname').click(this.link_clicked);
             $('.questionbankcontent').find('a').click($.proxy(this.link_clicked, this));
             $('#id_selectacategory').change($.proxy(this.category_changed, this));
-            
+
 
         },
-        
-        category_changed : function(e) {
+
+        category_changed: function (e) {
             e.preventDefault();
             this.load();
         },
-        
-        link_clicked : function(e) {
+
+        link_clicked: function (e) {
             e.preventDefault();
             var page = this.get_href_param(e.target.href, 'qpage');
             var perpage = this.get_href_param(e.target.href, 'qperpage');
@@ -106,8 +106,8 @@ define(['jquery', 'core/ajax'], function($, ajax) {
                 this.load(page, perpage, qbs1);
             }
         },
-        
-        load : function(page, perpage, qbs1) {
+
+        load: function (page, perpage, qbs1) {
             var args = {};
             args.cmid = $('.questionbank').data('cmid');
             args.bid = $('.questionbank').data('bid');
@@ -123,18 +123,18 @@ define(['jquery', 'core/ajax'], function($, ajax) {
             args.category = $('#id_selectacategory').val();
             //this.panel.bodyNode.setHTML($('div.questionbankloading').parent().html());
             var promises = ajax.call([{
-                methodname: 'mod_ddtaquiz_get_questionbank', 
+                methodname: 'mod_ddtaquiz_get_questionbank',
                 args: args
             }]);
             promises[0].done($.proxy(this.questionbank_loaded, this)).fail($.proxy(this.questionbank_load_failed, this));
         },
-        
-        questionbank_load_failed : function() {
+
+        questionbank_load_failed: function () {
             $(this.panel).find('.modal-body').html('Error fetching from question bank');
         }
     };
     return {
-        init: function(panelId, addButtonId, loadingId) {
+        init: function (panelId, addButtonId, loadingId) {
             questionbank_chooser.init_question_bank_modal(panelId, addButtonId, loadingId);
         }
     };
