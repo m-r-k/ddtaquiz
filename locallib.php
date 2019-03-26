@@ -404,7 +404,6 @@ class ddtaquiz
     }
 
     /**
-     * TODO: regrading
      * @throws dml_exception
      * @throws dml_transaction_exception
      */

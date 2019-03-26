@@ -36,7 +36,6 @@ $context = $ddtaquiz->get_context();
 
 require_capability('mod/ddtaquiz:viewreports', $context);
 
-//TODO: regrading
 if($regrade = optional_param('regrade',0,PARAM_BOOL)){
     $ddtaquiz->regrade_attempts();
 }

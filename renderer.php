@@ -295,7 +295,6 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                 'id' => 'responseform'));
 
         $body .= html_writer::start_tag('div');
-
         $body .= $attempt->get_quba()->render_question($slot, $options);
 
 
@@ -307,21 +306,17 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'cmid',
             'value' => $cmid));
 
+        if (($attempt->get_quba()->get_question_attempt($slot)->get_state() == \question_state::$todo) && $attempt->get_quiz()->showDirectFeedback())
+            $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'directFeedback',
+                'value' => true));
+        else
+            $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'directFeedback',
+                'value' => false));
+
+
         $body .= html_writer::end_tag('div');
         $body .= html_writer::end_tag('form');
 
-        //Direct Feedback
-        $ddtaquiz = $attempt->get_quiz();
-        try {
-            if (($slot - 1) > 0) {
-                if ($ddtaquiz->showDirectFeedback()) {
-                    $directFeedbackBody = $attempt->get_quba()->render_question($slot - 1, $options);
-                    $body .= ddtaquiz_bootstrap_render::createModal('Direct Feedback', $directFeedbackBody, '', array('id' => 'directFeedbackModal', 'size' => 'modal-lg'));
-                    $body .= ddtaquiz_bootstrap_render::createModalTrigger('directFeedbackModal', "button", "Feedback for last question", array('id' => 'ModalButton'));
-                }
-            }
-        } catch (Exception $e) {
-        }
 
         $footer = $this->attempt_navigation_buttons();
         $this->page->requires->js_call_amd('mod_ddtaquiz/attempt', 'init');
@@ -357,7 +352,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
 
         $body .= html_writer::start_tag('div');
         for ($count = 1; $count <= $slots; $count++) {
-            $body.= html_writer::div($attempt->get_quba()->render_question($count, $options), 'binDifContainer',array('max-points'=>$attempt->get_quba()->get_question_max_mark($count)));
+            $body .= html_writer::div($attempt->get_quba()->render_question($count, $options), 'binDifContainer', array('max-points' => $attempt->get_quba()->get_question_max_mark($count)));
         }
 
         // Some hidden fields to track what is going on.
@@ -365,6 +360,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
             'value' => $attempt->get_id()));
         $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'cmid',
             'value' => $cmid));
+        $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'directFeedback',
+            'value' => false));
 
         $body .= html_writer::end_tag('div');
         $body .= html_writer::end_tag('form');
@@ -374,8 +371,8 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
             'value' => get_string('finishbindifquiz', 'ddtaquiz'), 'class' => 'btn btn-primary text-right', 'id' => 'attemptNextBtn'));
 
         $minPoints = $attempt->get_quiz()->getMinpointsforbindif();
-        $footer = ddtaquiz_bootstrap_render::createModal('Are you sure?', 'Attempt will be finished! You need at least ' . $minPoints . ' points to succeed.<br> The maximum of points possible with the questions you have answered is: ' .html_writer::div('','points-overview-bindif',array('minPoints'=>$minPoints)), $doublecheckbutton, array('id' => 'confirm-finish-attempt'));
-        $footer .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-finish-attempt', "submit", get_string('finishbindifquiz', 'ddtaquiz'), array('class' => 'btn btn-danger','id'=>'confirmFinishBtn'));
+        $footer = ddtaquiz_bootstrap_render::createModal('Are you sure?', 'Attempt will be finished! You need at least ' . $minPoints . ' points to succeed.<br> The maximum of points possible with the questions you have answered is: ' . html_writer::div('', 'points-overview-bindif', array('minPoints' => $minPoints)), $doublecheckbutton, array('id' => 'confirm-finish-attempt'));
+        $footer .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-finish-attempt', "submit", get_string('finishbindifquiz', 'ddtaquiz'), array('class' => 'btn btn-danger', 'id' => 'confirmFinishBtn'));
 
 
         $this->page->requires->js_call_amd('mod_ddtaquiz/attempt', 'init');

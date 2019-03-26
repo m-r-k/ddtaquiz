@@ -22,12 +22,12 @@
  */
 
 require_once(__DIR__ . '/../../config.php');
-require_once($CFG->dirroot.'/mod/ddtaquiz/locallib.php');
+require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
 
 // Get submitted parameters.
-$attemptid = required_param('attempt',  PARAM_INT);
+$attemptid = required_param('attempt', PARAM_INT);
 $cmid = required_param('cmid', PARAM_INT);
-
+$showDirectFeedback = required_param('directFeedback', PARAM_INT);
 $timenow = time();
 
 if (!$cm = get_coursemodule_from_id('ddtaquiz', $cmid)) {
@@ -50,13 +50,7 @@ $nexturl = new \moodle_url($url, array('cmid' => $cmid));
 if ($attempt->get_userid() != $USER->id) {
     throw new moodle_quiz_exception($attempt->get_quiz(), 'notyourattempt');
 }
-//TODO: finish quiz
-if($attempt->get_quiz()->getQuizmodes()==1) {
-    $attempt->process_bindif_slot($timenow);
-    $attempt->finish_attempt($timenow, 'finished');
-}
-else {
-// Process slot.
-    $attempt->process_slot($timenow);
-}
+
+$attempt->process_slot($timenow, $attempt->get_quiz()->getQuizmodes(), $showDirectFeedback);
+
 redirect($nexturl);

@@ -353,9 +353,14 @@ class attempt {
      * Processes the slot.
      *
      * @param int $timenow the current time.
+     * @param int $mode
+     * @param int $directFeedback
+     * @throws coding_exception
+     * @throws dml_exception
      * @throws dml_transaction_exception
+     * @throws moodle_exception
      */
-    public function process_slot($timenow) {
+    public function process_slot($timenow,$mode=0,$directFeedback=0) {
         global $DB;
 
         $transaction = $DB->start_delegated_transaction();
@@ -363,41 +368,20 @@ class attempt {
         $quba = $this->get_quba();
 
         $quba->process_all_actions($timenow);
-        $quba->finish_question($this->currentslot, $timenow);
-
+        if($mode===1) {
+            $quba->finish_all_questions($timenow);
+            $this->finish_attempt($timenow, 'finished');
+        }
+        else {
+            $quba->finish_question($this->currentslot, $timenow);
+        }
         question_engine::save_questions_usage_by_activity($quba);
 
         $transaction->allow_commit();
 
+        if(!$directFeedback)
         $this->next_slot();
     }
-
-    /**
-     * Processes the slot.
-     *
-     * @param int $timenow the current time.
-     * @param int $slot
-     * @throws dml_transaction_exception
-     */
-    public function process_bindif_slot($timenow) {
-        global $DB;
-
-        $transaction = $DB->start_delegated_transaction();
-
-        $quba = $this->get_quba();
-
-        $quba->process_all_actions($timenow);
-
-        $quba->finish_all_questions($timenow);
-
-        question_engine::save_questions_usage_by_activity($quba);
-
-        $transaction->allow_commit();
-
-//        $this->next_slot();
-    }
-
-
 
     /**
      * Checks if this attempt is finished.
@@ -479,7 +463,6 @@ class attempt {
     }
 
     /**
-     * TODO:regrading
      * @throws dml_transaction_exception
      */
     public function regrade_attempt(){
@@ -606,7 +589,6 @@ class attempt {
     }
 
     /**
-     * TODO:regrading
      * @param $quizid
      * @param string $state
      * @return array

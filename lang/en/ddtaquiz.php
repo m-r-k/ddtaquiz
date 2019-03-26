@@ -146,7 +146,7 @@ $string['timecompleted'] = 'Completed';
 $string['timetaken'] = 'Time taken';
 $string['usesquestions'] = 'This feedback replaces the feedback of the following questions';
 
-//TODO: ddtaquiz snippet for navigation dropdown
+
 $string['combinedview'] = 'Combined';
 $string['displaycorrectanswers'] = 'Display correct answers';
 $string['displayResponses'] = 'Display responses';
@@ -193,6 +193,8 @@ $string['domainHelp'] = 'Enter the domains of your questions (semicolon-separate
 $string['domainFeedbackAccordionHeaderPre'] = 'Domainfeedback for domain: ';
 $string['questionFeedbackAccordionHeaderPre'] = 'Feedback for question: ';
 $string['blockFeedbackAccordionHeaderPre'] = 'Feedback for block: ';
+$string['domainEdit'] = 'Setup domains';
+
 
 //Showgrade
 $string['showGradeNo'] = "Don't show";

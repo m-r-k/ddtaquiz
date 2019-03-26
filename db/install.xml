@@ -158,7 +158,7 @@
         <KEY NAME="questioninstanceid" TYPE="foreign" FIELDS="questioninstanceid" REFTABLE="ddtaquiz_qinstance" REFFIELDS="id"/>
       </KEYS>
     </TABLE>
-    <!-- TODO:new entries-->
+
     <TABLE NAME="ddtaquiz_mq_condition_part" COMMENT="multiquestions part of conditions">
       <FIELDS>
           <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
@@ -184,7 +184,6 @@
           <KEY NAME="question_id" TYPE="foreign" FIELDS="question_id" REFTABLE="ddtaquiz_qinstance" REFFIELDS="id" COMMENT=""/>
       </KEYS>
     </TABLE>
-    <!-- TODO:end of new  entries -->
   </TABLES>
 
 </XMLDB>

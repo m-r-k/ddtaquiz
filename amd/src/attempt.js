@@ -47,7 +47,6 @@ define(['jquery'], function ($) {
                 $('#attemptNextBtn').click(function () {
                     $('#responseform').submit();
                 });
-                 $('#ModalButton').click();
 
                  $('#confirmFinishBtn').click(function(){
                      var questions=$('.binDifContainer');
@@ -90,7 +89,6 @@ define(['jquery'], function ($) {
 
             if(graceperiod> 0){
                 setTimeout(function(){
-                    //TODO what to display when time over
                     clearInterval(interval);
                     setInterval(function(){
                         graceperiod -= 1;

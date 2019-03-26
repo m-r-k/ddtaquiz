@@ -258,7 +258,6 @@ class feedback_block {
     }
 
     /**
-     * TODO::reduce code
      * Updates the values of this feedback.
      * @param $name
      * @param $feedbacktext

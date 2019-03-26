@@ -450,7 +450,6 @@ function ddtaquiz_pluginfile($course, $cm, $context) {
  * @param navigation_node $ddtaquiznode ddtaquiz administration node.
  * @throws coding_exception
  * @throws moodle_exception
- * TODO: regarding
  */
 function ddtaquiz_extend_settings_navigation($settings, navigation_node $ddtaquiznode=null) {
     global $PAGE, $CFG;
@@ -505,7 +504,6 @@ function ddtaquiz_extend_settings_navigation($settings, navigation_node $ddtaqui
         navigation_node::TYPE_SETTING,
         null, null, new pix_icon('i/item', '')));
 
-        //TODO: Add the new dropdown entry for combined view
         $url = new moodle_url('/mod/ddtaquiz/report.php',
             array('id' => $PAGE->cm->id, 'mode' => 'combined'));
         $reportnode->add_node(navigation_node::create(get_string('combinedview', 'ddtaquiz'), $url,

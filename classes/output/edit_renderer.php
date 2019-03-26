@@ -97,12 +97,8 @@ class edit_renderer extends \plugin_renderer_base
             }
         }
 
-
         /********************** Questions Card  *****************************************/
         $questionCardHeader = \html_writer::tag('h3', get_string('questions', 'ddtaquiz'), array('class' => 'questionheader'));
-
-
-
 
     // children of Accordion
         $accordionChildren = '';
@@ -505,10 +501,10 @@ class edit_renderer extends \plugin_renderer_base
 
         $domainstable= ddtaquiz_bootstrap_render::createDomainCheckboxes($element->get_id(), explode(";", $quizconfig));
 
-        $image = $this->pix_icon('t/delete', get_string('delete'));
+        $image = $this->pix_icon('t/edit', get_string('domainEdit','ddtaquiz'));
         $confirmButton = html_writer::tag('button', 'Confirm',array('class' => 'btn btn-success', 'data-dismiss'=>'modal'));
         $body = ddtaquiz_bootstrap_render::createModal('Set up the domains for question: '.$element->get_name(), $domainstable, $confirmButton, array('id' => 'confirm-domains'.$element->get_id(),'one-button'=>true,'size'=>'modal-lg','position'=>'modal-dialog-centered'));
-        $body .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-domains'.$element->get_id(), "submit", $image, array('class' => 'btn btn-danger'));
+        $body .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-domains'.$element->get_id(), "submit", $image, array('class' => 'btn btn-primary'));
 
         return $body;
     }
@@ -1224,7 +1220,7 @@ class edit_renderer extends \plugin_renderer_base
             $headingContent = get_string('editingfeedback', 'ddtaquiz');
         }
         $headingContent .= html_writer::tag('input', '', array('class' => ' col-3 form-control inline rounded ml-3 ', 'type' => 'text', 'name' => 'blockname', 'value' => $block->get_name()));
-        $headingIcon = ''; //TODO: add icons
+        $headingIcon = '';
         $output .= $this->heading(
             ddtaquiz_bootstrap_render::createHeading(
                 $headingIcon,
@@ -1366,7 +1362,6 @@ class edit_renderer extends \plugin_renderer_base
     }
 
     /**
-     * TODO: done
      * Generates the HTML for the feeback text editor.
      *
      * @param string $feedbacktext the feedback text to put in at the start.

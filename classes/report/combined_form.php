@@ -59,7 +59,6 @@ class combined_form extends attempts_form {
             get_string('displayquestionname', 'ddtaquiz'));
     }
 
-    //TODO:regrading
     protected function extra_options(\MoodleQuickForm $mform)
     {
         $mform->addElement('header', 'regradeHeader','Regrade');
