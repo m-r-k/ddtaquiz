@@ -477,14 +477,15 @@ class edit_renderer extends \plugin_renderer_base
         $menu->add($questionbank);
         $menu->prioritise = true;
 
-        // Button to add a block.
-        $addblockurl = new \moodle_url($pageurl, array('addblock' => 1));
-        $addablock = new \action_menu_link_secondary($addblockurl,
-            new \pix_icon('t/add', get_string('addablock', 'ddtaquiz'), 'moodle', array('class' => 'iconsmall', 'title' => '')),
-            get_string('addablock', 'ddtaquiz'),
-            array('class' => 'cm-edit-action addnewblock'));
-        $menu->add($addablock);
-
+        if($block->get_quiz()->getQuizmodes()!=1) {
+            // Button to add a block.
+            $addblockurl = new \moodle_url($pageurl, array('addblock' => 1));
+            $addablock = new \action_menu_link_secondary($addblockurl,
+                new \pix_icon('t/add', get_string('addablock', 'ddtaquiz'), 'moodle', array('class' => 'iconsmall', 'title' => '')),
+                get_string('addablock', 'ddtaquiz'),
+                array('class' => 'cm-edit-action addnewblock'));
+            $menu->add($addablock);
+        }
         return html_writer::tag('span', $this->render($menu),
             array('class' => 'add-menu-outer'));
     }
