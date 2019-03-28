@@ -1,3 +1,5 @@
+
+
 # DDTA Quiz for Moodle
 The "DDTA Quiz" (Digital Diagnostive Test Assignment) activity is a plugin for the open-source learning platform Moodle.
 Like the standard "Quiz" activity, a teacher can create a test for students to take.
@@ -24,3 +26,9 @@ but for a combination of multiple questions.
 Continuing the example of the parabola, a student might not have found the extremum, but was able to 
 find the derivative and the roots of the derivative. In this case the feedback could include an 
 explanation of how to determine the extremum from the roots of the derivative.
+
+# Init
+
+Inside amd folder run this command :
+
+    $ grunt amd --force
