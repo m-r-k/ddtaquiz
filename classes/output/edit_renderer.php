@@ -65,7 +65,7 @@ class edit_renderer extends \plugin_renderer_base
         if ($block->is_main_block()) {
             $headingContent = get_string('editingquizx', 'ddtaquiz', format_string($block->get_name()));
             $headingContent .= html_writer::tag('input', '', array('type' => 'text',
-                'name' => 'blockname', 'value' => $block->get_name(), 'class' => 'col-3 form-control inline rounded ml-3 '));
+                'name' => 'blockname', 'value' => $block->get_name(), 'class' => 'col-3 form-control inline rounded ml-4 '));
             $headingIcon = '';
             $output .= $this->heading(
                 ddtaquiz_bootstrap_render::createHeading(
@@ -76,7 +76,7 @@ class edit_renderer extends \plugin_renderer_base
         } else {
             $headingContent = get_string('editingblock', 'ddtaquiz');
             $headingContent .= html_writer::tag('input', '', array('type' => 'text',
-                'name' => 'blockname', 'value' => $block->get_name(), 'class' => 'col-3 form-control inline rounded ml-3 '));
+                'name' => 'blockname', 'value' => $block->get_name(), 'class' => 'col-3 form-control inline rounded ml-4 '));
             $headingIcon = '';
             $output .= $this->heading(
                 ddtaquiz_bootstrap_render::createHeading(
@@ -398,9 +398,9 @@ class edit_renderer extends \plugin_renderer_base
     {
         $image = $this->pix_icon('t/delete', get_string('delete'));
         $confirmDeleteButton = html_writer::tag('button', 'Confirm',
-            array('class' => 'btn btn-danger', 'type' => 'submit', 'name' => 'delete', 'value' => $element->get_id()));
+            array('class' => 'btn btn-danger ml-4', 'type' => 'submit', 'name' => 'delete', 'value' => $element->get_id()));
         $body = ddtaquiz_bootstrap_render::createModal('Are you sure?', $element->get_name() . ' will be deleted!', $confirmDeleteButton, array('id' => 'confirm-question-delete'.$element->get_id()));
-        $body .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-question-delete'.$element->get_id(), "submit", $image, array('class' => 'btn btn-danger'));
+        $body .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-question-delete'.$element->get_id(), "submit", $image, array('class' => 'btn btn-danger ml-4'));
         return $body;
 
     }
@@ -417,9 +417,9 @@ class edit_renderer extends \plugin_renderer_base
 
         $image = $this->pix_icon('t/delete', get_string('delete'));
         $confirmDeleteButton = html_writer::tag('button', 'Confirm',
-            array('class' => 'btn btn-danger', 'type' => 'submit', 'name' => 'feedbackdelete', 'value' => $element->get_id()));
+            array('class' => 'btn btn-danger ml-4', 'type' => 'submit', 'name' => 'feedbackdelete', 'value' => $element->get_id()));
         $body = ddtaquiz_bootstrap_render::createModal('Are you sure?', $element->get_name() . ' will be deleted!', $confirmDeleteButton, array('id' => 'confirm-feedback-delete'.$element->get_id()));
-        $body .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-feedback-delete'.$element->get_id(), "submit", $image, array('class' => 'btn btn-danger'));
+        $body .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-feedback-delete'.$element->get_id(), "submit", $image, array('class' => 'btn btn-danger ml-4'));
 
         return $body;
 
@@ -598,7 +598,7 @@ class edit_renderer extends \plugin_renderer_base
             $strdelete = get_string('delete');
             $image = $this->pix_icon('t/delete', $strdelete);
             $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
-                'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger float-right', 'data-action' => 'delete'));
+                'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-4 float-right', 'data-action' => 'delete'));
 
             $conditionpart = ddtaquiz_bootstrap_render::createAccordionHeader(
                 $preContent,
@@ -781,7 +781,7 @@ class edit_renderer extends \plugin_renderer_base
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
         $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
-            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger float-right', 'data-action' => 'delete'));
+            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-4 float-right', 'data-action' => 'delete'));
 
         return ddtaquiz_bootstrap_render::createAccordionHeader(
             $preContent,
@@ -831,7 +831,7 @@ class edit_renderer extends \plugin_renderer_base
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
         $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
-            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger float-right', 'data-action' => 'delete'));
+            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-4 float-right', 'data-action' => 'delete'));
 
         $collapseId = 'mq-collapse-' . $mqIndex . '-' . microtime();
         $headingId = 'mq-heading-' . $mqIndex . '-' . microtime();
@@ -1171,7 +1171,7 @@ class edit_renderer extends \plugin_renderer_base
         $content = \html_writer::div($nr . ' ' . $feedbackelem->get_name(), 'blockelement');
         $edithtml = $this->feedback_edit_button($feedbackelem);
         $removehtml = $this->feedback_element_remove_button($feedbackelem);
-        $postContent = \html_writer::div($edithtml . $removehtml, 'blockelementbuttons');
+        $postContent = \html_writer::div($edithtml . $removehtml, 'blockelementbuttons ml-auto');
 
 
         // return as accordion header + accordion body , expected to be part of an accordion
@@ -1220,7 +1220,7 @@ class edit_renderer extends \plugin_renderer_base
         } else {
             $headingContent = get_string('editingfeedback', 'ddtaquiz');
         }
-        $headingContent .= html_writer::tag('input', '', array('class' => ' col-3 form-control inline rounded ml-3 ', 'type' => 'text', 'name' => 'blockname', 'value' => $block->get_name()));
+        $headingContent .= html_writer::tag('input', '', array('class' => ' col-3 form-control inline rounded ml-4 ', 'type' => 'text', 'name' => 'blockname', 'value' => $block->get_name()));
         $headingIcon = '';
         $output .= $this->heading(
             ddtaquiz_bootstrap_render::createHeading(
@@ -1307,7 +1307,7 @@ class edit_renderer extends \plugin_renderer_base
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
         $postContent = $this->action_link('#', $image, null, array('title' => $strdelete,
-            'class' => 'cm-edit-action editing_delete element-remove-button usesdelete btn btn-danger float-right', 'data-action' => 'delete'));
+            'class' => 'cm-edit-action editing_delete element-remove-button usesdelete btn ml-4 btn-danger float-right', 'data-action' => 'delete'));
 
         return ddtaquiz_bootstrap_render::createAccordionHeader(
             $preContent,
