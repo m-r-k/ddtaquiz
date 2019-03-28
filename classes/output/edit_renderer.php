@@ -781,7 +781,7 @@ class edit_renderer extends \plugin_renderer_base
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
         $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
-            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-4 float-right', 'data-action' => 'delete'));
+            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-4 ml-auto', 'data-action' => 'delete'));
 
         return ddtaquiz_bootstrap_render::createAccordionHeader(
             $preContent,
@@ -831,7 +831,8 @@ class edit_renderer extends \plugin_renderer_base
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
         $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
-            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-4 float-right', 'data-action' => 'delete'));
+            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-4 ml-auto', 'data-action' => 'delete'));
+
 
         $collapseId = 'mq-collapse-' . $mqIndex . '-' . microtime();
         $headingId = 'mq-heading-' . $mqIndex . '-' . microtime();
@@ -1253,8 +1254,8 @@ class edit_renderer extends \plugin_renderer_base
         } else {
             $output .= $this->condition_type_chooser($candidates);
         }
-        $this->page->requires->js_call_amd('mod_ddtaquiz/main', 'init');
         $this->page->requires->js_call_amd('mod_ddtaquiz/feedback', 'editorQuestions');
+        $this->page->requires->js_call_amd('mod_ddtaquiz/main', 'init');
 
 
         return $output;
@@ -1293,7 +1294,7 @@ class edit_renderer extends \plugin_renderer_base
      * @param \feedback_used_question|null $used_question
      * @return string
      * @throws \coding_exception
-     * @throws \dml_exception
+     * @throws
      */
     public function uses_element(\feedback_block $block, \feedback_used_question $used_question = null)
     {
@@ -1326,7 +1327,7 @@ class edit_renderer extends \plugin_renderer_base
      * @param \feedback_used_question|null $used_question
      * @param $letter
      * @return string HTML to output.
-     * @throws \dml_exception
+     * @throws
      */
     public function uses_selector(\feedback_block $block, \feedback_used_question $used_question = null, $letter)
     {

@@ -72,10 +72,12 @@ define(['jquery'], function ($) {
             $(document).ready(function () {
                 $('[data-toggle="tooltip"]').tooltip();
                 $('#addPointsConditionBtn').click(function (e) {
+                    console.log('clicked');
                     condition.addcondition(e);
                 });
                 $('#addMQPointsConditionBtn').click(function (e) {
                     condition.addMQCondition(e);
+                    console.log('clicked');
                 });
 
                 $('.conditionpartdelete').click(function (e) {
