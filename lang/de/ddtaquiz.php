@@ -133,3 +133,4 @@ $string['summaryofattempts'] = 'Zusammenfassung Ihrer bisherigen Versuche';
 $string['timecompleted'] = 'Beendet am';
 $string['timetaken'] = 'Verbrauchte Zeit';
 $string['usesquestions'] = 'Dieses Feedback ersetzt das Feedback der folgenden Fragen';
+

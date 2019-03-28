@@ -277,4 +277,31 @@ class ddtaquiz_bootstrap_render extends \html_writer
 
         return $output;
     }
+
+    public static function createCheckBox($label, $attr):string{
+        $output = self::start_div('custom-control custom-checkbox mr-3 ml-3');
+        $id = 'custom-checkbox' . microtime();
+
+        $attr = [
+            'type' => 'checkbox',
+            'class' => 'custom-control-input',
+            'name' => $attr['name'],
+            'value' => array_key_exists('value',$attr)?$attr['value']:'',
+            'id' => array_key_exists('id',$attr)?$attr['id']:$id
+        ];
+
+        $output .=
+            self::start_div('') .
+            self::tag('input', '', $attr
+            ) .
+            self::tag('label', $label, [
+                'class' => "custom-control-label",
+                'for' => $attr['id']
+            ]) .
+            self::end_div();
+
+        $output .= self::end_div();
+
+        return $output;
+    }
 }

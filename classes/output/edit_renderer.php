@@ -1307,7 +1307,7 @@ class edit_renderer extends \plugin_renderer_base
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
         $postContent = $this->action_link('#', $image, null, array('title' => $strdelete,
-            'class' => 'cm-edit-action editing_delete element-remove-button usesdelete btn ml-4 btn-danger float-right', 'data-action' => 'delete'));
+            'class' => 'cm-edit-action editing_delete element-remove-button usesdelete btn ml-4 btn-danger ml-auto', 'data-action' => 'delete'));
 
         return ddtaquiz_bootstrap_render::createAccordionHeader(
             $preContent,
@@ -1345,24 +1345,23 @@ class edit_renderer extends \plugin_renderer_base
         }
         if ($used_question) {
             if ($used_question->isShifted())
-                $checkbox = html_writer::tag('input', '', ['type' => 'checkbox', 'class' => 'shift-checkbox', 'name' => 'usesquestions[' . $index . '][shift]', 'checked' => 'true']);
+                $checkbox = ddtaquiz_bootstrap_render::createCheckBox(get_string('feedbackShift','ddtaquiz'), ['type' => 'checkbox', 'class' => 'shift-checkbox', 'name' => 'usesquestions[' . $index . '][shift]', 'checked' => 'true']);
             else
-                $checkbox = html_writer::tag('input', '', ['type' => 'checkbox', 'class' => 'shift-checkbox', 'name' => 'usesquestions[' . $index . '][shift]']);
+                $checkbox = ddtaquiz_bootstrap_render::createCheckBox(get_string('feedbackShift','ddtaquiz'), ['type' => 'checkbox', 'class' => 'shift-checkbox', 'name' => 'usesquestions[' . $index . '][shift]']);
             return
                 html_writer::tag('input', '', ['hidden' => true, 'class' => 'question-letter', 'value' => $letter, 'name' => 'usesquestions[' . $index . '][letter]']) .
                 \html_writer::tag('select', $options,
                     array('class' => 'usesquestionselector custom-select', 'name' => 'usesquestions[' . $index . '][questionId]')) .
-                html_writer::tag('label', 'Shift: ', ['class' => 'mr-2 ml-5']) .
                 $checkbox;
         } else {
             return
                 html_writer::tag('input', '', ['hidden' => true, 'class' => 'question-letter', 'value' => $letter]) .
                 \html_writer::tag('select', $options,
                     array('class' => 'usesquestionselector custom-select')) .
-                html_writer::tag('label', 'Shift: ', ['class' => 'mr-2 ml-5']) .
-                html_writer::tag('input', '', ['type' => 'checkbox', 'class' => 'shift-checkbox']);
+                ddtaquiz_bootstrap_render::createCheckBox(get_string('feedbackShift','ddtaquiz'), ['type' => 'checkbox', 'class' => 'shift-checkbox']);
         }
     }
+
 
     /**
      * Generates the HTML for the feeback text editor.

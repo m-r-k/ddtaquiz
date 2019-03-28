@@ -213,3 +213,9 @@ $string['minpointsforbindifname']="Minimal needed points for bindif mode";
 $string['finishSQ']="Finish this question";
 
 
+
+$string['feedbackShift']="Shift: ";
+
+
+
+
