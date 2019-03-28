@@ -582,9 +582,14 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      */
     protected function review_block(block $block, attempt $attempt, $options, $feedback)
     {
+        $modes=$block->get_quiz()->getQuizmodes();
         $output = '';
+        //TODO: check blocks in bindif
+        /**@var block_element $child*/
         foreach ($block->get_children() as $child) {
-            $output .= $this->review_block_element($block, $child, $attempt, $options, $feedback);
+            if(($child->get_grade($attempt)&&$modes==0)||$modes!=0) {
+                $output .= $this->review_block_element($block, $child, $attempt, $options, $feedback);
+            }
         }
         return $output;
     }
@@ -737,7 +742,16 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                     $backgroundColor = "incorrectBackgroundHeader";
             }
 
+            //Set Postcontent for Header
+            if ($mode != 0)
+                $content = $grade . "/" . $maxgrade;
+            else
+                $content = $grade != $maxgrade ?
+                    " " . get_string('questionFeedbackAccordionHeaderPostLabelIncorrect', 'ddtaquiz') :
+                    " " . get_string('questionFeedbackAccordionHeaderPostLabelCorrect', 'ddtaquiz');
 
+            $postContent = \html_writer::tag('label', $content, []);
+            $postContent .= $progressBarContainer;
 
             $container = ddtaquiz_bootstrap_render::createAccordionHeader(
                     \html_writer::tag('label', $label,
