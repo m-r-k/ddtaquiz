@@ -55,6 +55,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         return $output;
 
     }
+
     /**
      * Generates the table of data
      *
