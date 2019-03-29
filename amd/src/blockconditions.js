@@ -88,7 +88,7 @@ define(['jquery'], function ($) {
             $('.addblockcondition').click(function (e) {
                 conditiontypechooser.display_chooserdialogue(e);
             });
-            //make the delete buttons on conditionparts work
+            // make the delete buttons on conditionparts work
             $('.conditionpartdelete').click(function (e) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
