@@ -312,30 +312,31 @@ div.tooltip-inner {
     background-color: #dee2e6;
     border: 1px solid #cad0d7;
 }
+
 .reviewInfo>div{
     font-size: .8em;
     margin-top: .7em;
+}
+.questionBackgroundHeader {
+	background-color: #f7f7f7 !important;
+}
+.blockBackgroundHeader{
+	background: #cccccc !important;
+}
+.correctBackgroundHeader{
+	background: #5fa85f !important;
+}
+.incorrectBackgroundHeader {
+	background: #ff7874 !important;
+}
+
+.domain-checkbox{
+	width:25%;
+}
+
+.precontent{
+	width:15%;
 }
 .maincontent{
 	width:10%;
-}
-#finishSingleQuestionBtn{
-	margin-bottom:25px;
-}
-
-/* TODO:ReviewBlock specialized feedback */
-.reviewblock .info{
-    display: none !important;
-}
-.reviewInfo{
-    position: absolute;
-    width: 7em;
-    padding: .5em;
-    margin-bottom: 1.8em;
-    background-color: #dee2e6;
-    border: 1px solid #cad0d7;
-}
-.reviewInfo>div{
-    font-size: .8em;
-    margin-top: .7em;
 }

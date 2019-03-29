@@ -79,14 +79,15 @@ class ddtaquiz_bootstrap_render extends \html_writer
         return $output;
     }
 
-    public static function createModalTrigger($modalId, $triggerType, $triggerText, $attr): string
+    public static function createModalTrigger($modalId, $triggerType, $triggerText, $attr,$backdrop="true"): string
     {
         $output = '';
         $output .= self::start_tag($triggerType, [
             'id' => (is_array($attr) && array_key_exists('id', $attr)) ? $attr['id'] : ('modalTrigger' . time()),
             'class' => (is_array($attr) && array_key_exists('class', $attr)) ? $attr['class'] : ('btn btn-primary'),
             'data-toggle' => "modal",
-            'data-target' => "#" . $modalId
+            'data-target' => "#" . $modalId,
+            'data-backdrop'=>$backdrop,
         ]);
         $output .= $triggerText;
         $output .= self::end_tag($triggerType);

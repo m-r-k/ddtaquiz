@@ -476,7 +476,7 @@ class edit_renderer extends \plugin_renderer_base
         );
         $menu->add($questionbank);
         $menu->prioritise = true;
-
+        if($block->get_quiz()->getQuizmodes()!=1) {
         // Button to add a block.
         $addblockurl = new \moodle_url($pageurl, array('addblock' => 1));
         $addablock = new \action_menu_link_secondary($addblockurl,
@@ -484,7 +484,7 @@ class edit_renderer extends \plugin_renderer_base
             get_string('addablock', 'ddtaquiz'),
             array('class' => 'cm-edit-action addnewblock'));
         $menu->add($addablock);
-
+        }
         return html_writer::tag('span', $this->render($menu),
             array('class' => 'add-menu-outer'));
     }
@@ -829,8 +829,19 @@ class edit_renderer extends \plugin_renderer_base
 
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
-        $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
+//        $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
+//            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger float-right', 'data-action' => 'delete'));
+
+
+
+        $confirmDeleteButton =  $this->action_link('#', $image, null, array('title' => $strdelete,
             'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger float-right', 'data-action' => 'delete'));
+        $postContent .= ddtaquiz_bootstrap_render::createModal('Are you sure?', 'Question ' . chr($mqIndex) . ' will be deleted!', $confirmDeleteButton, array('id' => 'confirm-fbquestion-delete' . chr($mqIndex)));
+        $postContent .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-fbquestion-delete' . chr($mqIndex), "submit", $image, array('class' => 'btn btn-danger'),"false");
+
+
+
+
 
         $collapseId = 'mq-collapse-' . $mqIndex . '-' . microtime();
         $headingId = 'mq-heading-' . $mqIndex . '-' . microtime();
@@ -1305,8 +1316,14 @@ class edit_renderer extends \plugin_renderer_base
 
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
-        $postContent = $this->action_link('#', $image, null, array('title' => $strdelete,
-            'class' => 'cm-edit-action editing_delete element-remove-button usesdelete btn btn-danger float-right', 'data-action' => 'delete'));
+
+        $confirmDeleteButton = $this->action_link('#', 'Delete', null, array('title' => $strdelete,
+                'class' => 'cm-edit-action editing_delete element-remove-button usesdelete btn btn-danger float-right', 'data-action' => 'delete','data-dismiss'=>"modal"));
+            $postContent = ddtaquiz_bootstrap_render::createModal('Are you sure?', 'Question ' . chr($index) . ' will be deleted!', $confirmDeleteButton, array('id' => 'confirm-fbquestion-delete' . chr($index)));
+            $postContent .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-fbquestion-delete' . chr($index), "submit", $image, array('class' => 'btn btn-danger'),"false");
+
+
+
 
         return ddtaquiz_bootstrap_render::createAccordionHeader(
             $preContent,

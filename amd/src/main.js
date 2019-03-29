@@ -70,7 +70,10 @@ define(['jquery'], function ($) {
 
         init: function () {
             $(document).ready(function () {
-                $('[data-toggle="tooltip"]').tooltip();
+                var tmp=$('[data-toggle="tooltip"]');
+                if(tmp.tooltip) {
+                    tmp.tooltip();
+                }
                 $('#addPointsConditionBtn').click(function (e) {
                     condition.addcondition(e);
                 });

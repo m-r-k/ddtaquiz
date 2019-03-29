@@ -32,9 +32,9 @@ define(['jquery'], function ($) {
             var value = '[[' + $(letter).text() + ']]';
             var selector = $(letter).parent().find('.usesquestionselector');
             var questionName = $(selector).find('option[value="'+$(selector).val()+'"]').text();
-            console.log(questionName);
             $(container).append(
-                '<div class="d-inline mr-2 mb-2 p-2 bg-secondary questionButtons" data-value="' + value + '">'+value+' => ' + questionName + '</div>'
+                '<div class="d-inline mr-2 mb-2 p-2 bg-secondary questionButtons" data-value="' + value + '">'+value+' => '
+                + questionName + '</div>'
             );
         }
 

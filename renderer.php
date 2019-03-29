@@ -587,7 +587,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         //TODO: check blocks in bindif
         /**@var block_element $child*/
         foreach ($block->get_children() as $child) {
-            if(($child->get_grade($attempt)&&$modes==0)||$modes!=0) {
+            if(($child->get_grade($attempt)&&$modes==1)||$modes!=1) {
                 $output .= $this->review_block_element($block, $child, $attempt, $options, $feedback);
             }
         }
@@ -668,29 +668,6 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                 $accordionId,
                 $output
             );
-            $container = ddtaquiz_bootstrap_render::createAccordionHeader(
-                    \html_writer::tag('label', get_string('QuestionFeedbackAccordionHeaderPre', 'ddtaquiz'),
-                        array('class' => 'conditionelement')),
-                    \html_writer::tag('label', $blockelem->get_name(), ['class' => 'collapsible-highlight']),
-                    "",
-                    ['id' => $headerId, 'class' => 'blockAccordionHeader'],
-                    $collapseId
-                ) .
-                $collapseContent;
-            $output = ddtaquiz_bootstrap_render::createAccordion($accordionId, $container);
-            /**
-             * Collapsible accordions for each feedbackblock
-             */
-            $collapseId = 'collabse-id-review' . $blockelem->get_id();
-            $accordionId = 'review-accordion' . $blockelem->get_id();
-            $headerId = 'review-accordion-header' . $blockelem->get_id();
-            $collapseContent = ddtaquiz_bootstrap_render::createAccordionCollapsible(
-                $collapseId,
-                $headerId,
-                $accordionId,
-                $output
-            );
-
 
             if ($blockelem->is_block()) {
                 /** @var block $childblock */
