@@ -70,17 +70,13 @@ define(['jquery'], function ($) {
 
         init: function () {
             $(document).ready(function () {
-                var tmp=$('[data-toggle="tooltip"]');
-                if(tmp.tooltip) {
-                    tmp.tooltip();
-                }
+                $('[data-toggle="tooltip"]').tooltip();
+
                 $('#addPointsConditionBtn').click(function (e) {
-                    console.log('clicked');
                     condition.addcondition(e);
                 });
                 $('#addMQPointsConditionBtn').click(function (e) {
                     condition.addMQCondition(e);
-                    console.log('clicked');
                 });
 
                 $('.conditionpartdelete').click(function (e) {

@@ -28,8 +28,10 @@ defined('MOODLE_INTERNAL') || die();
 require_once($CFG->dirroot . '/mod/ddtaquiz/locallib.php');
 require_once($CFG->libdir . '/editorlib.php');
 
+use condition_part;
 use \html_writer;
 use \domain_feedback;
+use multiquestions_condition_part;
 
 /**
  * The renderer for the ddta quiz module.
@@ -201,13 +203,18 @@ class edit_renderer extends \plugin_renderer_base
             $element=$blockelem->get_element();
             $singleConditions=$element->get_condition()->get_parts();
 
-           foreach($singleConditions as $singleCondition)
-               $tooltip.=$singleCondition->parseToString();
+           foreach($singleConditions as $singleCondition) {
+               /**@var condition_part $singleCondition*/
+
+               $tooltip .= $singleCondition->parseToString();
+               }
 
 
             $multiConditions=$element->get_condition()->get_mqParts();
-            foreach($multiConditions as $multiCondition)
-                $tooltip.=$multiCondition->parseToString();
+            foreach($multiConditions as $multiCondition) {
+                /**@var multiquestions_condition_part $multiCondition*/
+                $tooltip .= $multiCondition->parseToString();
+            }
         }
 
 
@@ -784,7 +791,7 @@ class edit_renderer extends \plugin_renderer_base
         $confirmDeleteButton = $this->action_link('#', $image, null, array('title' => $strdelete,
             'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-4 ml-auto', 'data-action' => 'delete'));
         $postContent .= ddtaquiz_bootstrap_render::createModal('Are you sure?', 'Question ' . chr($index) . ' will be deleted!', $confirmDeleteButton, array('id' => 'confirm-fbquestion-delete' . chr($index)));
-        $postContent .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-fbquestion-delete' . chr(index), "submit", $image, array('class' => 'btn btn-danger cm-edit-action editing_delete element-remove-button  ml-5 ml-auto'),"false");
+        $postContent .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-fbquestion-delete' . chr($index), "submit", $image, array('class' => 'btn btn-danger cm-edit-action editing_delete element-remove-button  ml-5 ml-auto'),"false");
 
 
 
