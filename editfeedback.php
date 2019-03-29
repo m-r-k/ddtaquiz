@@ -78,9 +78,14 @@ if ($save) {
         try {
             if (array_key_exists('conditionparts', $_POST)) {
                 $feedbackblock->get_condition()->updateSingleParts($_POST['conditionparts']);
+            }else{
+                $feedbackblock->get_condition()->updateSingleParts([]);// delete when non existent
+
             }
             if (array_key_exists('conditionMQParts', $_POST)) {
                 $feedbackblock->get_condition()->updateMQParts($_POST['conditionMQParts']);
+            }else{
+                $feedbackblock->get_condition()->updateMQParts([]); // delete when non existent
             }
             $useand = optional_param('use_and', null, PARAM_INT);
             if (!is_null($useand)) {

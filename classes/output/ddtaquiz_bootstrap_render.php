@@ -133,7 +133,7 @@ class ddtaquiz_bootstrap_render extends \html_writer
                 'id' => (is_array($attr) && array_key_exists('id', $attr)) ? $attr['id'] : '',
                 'class' => (is_array($attr) && array_key_exists('class', $attr)) ? $attr['class'] : '',
             ]) .
-            self::start_tag('h5', ['class' => 'mb-0 ', 'style' => 'display: flex; justify-content: left;']) .
+            self::start_tag('h5', ['class' => 'mb-0 align-items-center', 'style' => 'display: flex; justify-content: left;']) .
             $preContent;
 
         if ($collapseId) {
@@ -274,6 +274,35 @@ class ddtaquiz_bootstrap_render extends \html_writer
                 ]) .
                 self::end_div();
         }
+        $output .= self::end_div();
+
+        return $output;
+    }
+
+    public static function createCheckBox($label, $attr):string{
+        $output = self::start_div('custom-control custom-checkbox mr-3 ml-3');
+        $id = 'custom-checkbox' . microtime();
+
+        $options = [
+            'type' => 'checkbox',
+            'class' => 'custom-control-input',
+            'name' => array_key_exists('name',$attr)?$attr['name']:'',
+            'value' => array_key_exists('value',$attr)?$attr['value']:'',
+            'id' => array_key_exists('id',$attr)?$attr['id']:$id
+        ];
+        if(array_key_exists('checked',$attr))
+            $options['checked'] = 'true';
+
+        $output .=
+            self::start_div('') .
+            self::tag('input', '', $options
+            ) .
+            self::tag('label', $label, [
+                'class' => "custom-control-label",
+                'for' => $options['id']
+            ]) .
+            self::end_div();
+
         $output .= self::end_div();
 
         return $output;

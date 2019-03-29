@@ -75,10 +75,12 @@ define(['jquery'], function ($) {
                     tmp.tooltip();
                 }
                 $('#addPointsConditionBtn').click(function (e) {
+                    console.log('clicked');
                     condition.addcondition(e);
                 });
                 $('#addMQPointsConditionBtn').click(function (e) {
                     condition.addMQCondition(e);
+                    console.log('clicked');
                 });
 
                 $('.conditionpartdelete').click(function (e) {
