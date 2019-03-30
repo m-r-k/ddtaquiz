@@ -858,37 +858,36 @@ class edit_renderer extends \plugin_renderer_base
             return ddtaquiz_bootstrap_render::createAlert('danger', $content);
         }
 
-        $preContent = \html_writer::tag('label', 'Grade of all ',
-            array('class' => 'conditionelement'));
-
-        $content = \html_writer::link('#', 'Selected Questions',
-            array('class' => 'conditionelement',));
-
-        $postContent = ' ' . \html_writer::tag('label', get_string('mustbe', 'ddtaquiz'),
-                array('class' => 'conditionelement'));
+        $content =
+            html_writer::start_div('w-100').
+            \html_writer::tag('label', 'Grade of all ', array('class' => 'conditionelement')).
+            \html_writer::tag('a', 'Selected Questions',array('class' => 'conditionelement text-primary btn btn-link',)).
+            \html_writer::tag('label', get_string('mustbe', 'ddtaquiz'),array('class' => 'conditionelement'));
 
 
-        $postContent .= \html_writer::tag('span', $this->comparator_mq_selector($mqIndex, $part));
+        $content .= \html_writer::tag('span', $this->comparator_mq_selector($mqIndex, $part));
         $value = 0;
         if ($part) {
             $value = $part->get_grade();
         }
-        $postContent .= ' ' . \html_writer::tag('input', '',
+        $content .= ' ' . \html_writer::tag('input', '',
                 array('class' => 'conditionelement conditionpoints form-control inline', 'name' => 'conditionMQParts[' . $mqIndex . '][points]',
                     'type' => 'number', 'value' => $value));
+
+        $content .= html_writer::end_div();
 
 
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
-        $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
-            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-4 float-right', 'data-action' => 'delete'));
+        $postContent = $this->action_link('#', $image, null, array('title' => $strdelete,
+            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-auto', 'data-action' => 'delete'));
 
 
         $collapseId = 'mq-collapse-' . $mqIndex . '-' . microtime();
         $headingId = 'mq-heading-' . $mqIndex . '-' . microtime();
         return
             ddtaquiz_bootstrap_render::createAccordionHeader(
-                $preContent,
+                '',
                 $content,
                 $postContent,
                 ['id' => $headingId],
