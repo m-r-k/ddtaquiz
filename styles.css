@@ -340,3 +340,9 @@ div.tooltip-inner {
 .maincontent{
 	width:10%;
 }
+
+
+.info .state{
+    font-weight: bold;
+    margin-bottom: 10px;
+}
