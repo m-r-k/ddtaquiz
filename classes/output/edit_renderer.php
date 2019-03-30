@@ -762,7 +762,7 @@ class edit_renderer extends \plugin_renderer_base
         $image = $this->pix_icon('t/delete', $strdelete);
 
         $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
-            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-4 float-right', 'data-action' => 'delete'));
+            'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-auto', 'data-action' => 'delete'));
 
 
         return ddtaquiz_bootstrap_render::createAccordionHeader(
@@ -790,7 +790,9 @@ class edit_renderer extends \plugin_renderer_base
             $content = \html_writer::tag('label', get_string('noCandidatesForCondition', 'ddtaquiz'));
             $conditionpart = ddtaquiz_bootstrap_render::createAlert('danger', $content);
         } else {
-            $preContent = \html_writer::tag('label', get_string('gradeatdomain', 'ddtaquiz'),
+            $preContent =
+                html_writer::start_div('w-100 justify-content-center') .
+                \html_writer::tag('label', get_string('gradeatdomain', 'ddtaquiz'),
                 array('class' => 'conditionelement col-1'));
 
             $options = '';
@@ -803,37 +805,41 @@ class edit_renderer extends \plugin_renderer_base
             }
             $option_select = \html_writer::tag('select', $options,
                 array('class' => 'conditiondomain custom-select', 'name' => 'domainname'));
-            $content = \html_writer::tag('span', $option_select, array('class' => 'col-1'));
-            $content .= ' ' . \html_writer::tag('label', get_string('domainrangestart', 'ddtaquiz'),
+            $preContent .= \html_writer::tag('span', $option_select, array('class' => 'col-1'));
+            $preContent .= ' ' . \html_writer::tag('label', get_string('domainrangestart', 'ddtaquiz'),
                     array('class' => 'conditionelement col-2', 'for' => 'domaingrade'));
 
-            $postContent = ' ' . \html_writer::tag('input', '',
+            $preContent .= ' ' . \html_writer::tag('input', '',
                     array('class' => 'conditionelement conditionpoints form-control inline col-1', 'name' => 'domaingrade',
                         'type' => 'number', 'value' => $condition->get_grade()));
-            $postContent .= ' ' . \html_writer::tag('label', get_string('domainrangebetween', 'ddtaquiz'),
+            $preContent .= ' ' . \html_writer::tag('label', get_string('domainrangebetween', 'ddtaquiz'),
                     array('class' => 'conditionelement col-1', 'for' => 'domaingrade2'));
-            $postContent .= ' ' . \html_writer::tag('input', '',
+            $preContent .= ' ' . \html_writer::tag('input', '',
                     array('class' => 'conditionelement conditionpoints2 form-control inline col-1', 'name' => 'domaingrade2',
-                        'type' => 'number', 'value' => $condition->get_grade2()));
-            $postContent .= ' ' . \html_writer::tag('label', 'Replace name for student view: ',
+                        'type' => 'number', 'value' => $condition->get_grade2())).
+                        html_writer::empty_tag('br');
+
+            $preContent .=
+                \html_writer::tag('label', 'Replace name for student view: ',
                     array('class' => 'conditionelement col-2', 'name' => 'domainreplacelabel',
                         'for' => 'domainreplace'));
 
-            $postContent .= ' ' . \html_writer::tag('input', '',
+            $preContent .= ' ' . \html_writer::tag('input', '',
                     array('class' => 'conditionelement conditionreplace form-control inline col-2', 'name' => 'domainreplace',
-                        'value' => $condition->get_replace()));
+                        'value' => $condition->get_replace())).
+                html_writer::end_div();
 
             $strdelete = get_string('delete');
             $image = $this->pix_icon('t/delete', $strdelete);
-            $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
-                'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-4 float-right', 'data-action' => 'delete'));
+            $postContent = $this->action_link('#', $image, null, array('title' => $strdelete,
+                'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-auto', 'data-action' => 'delete'));
 
             $postContent .= \html_writer::tag('input', '',
                 array('class' => 'conditionid', 'name' => 'id', 'value' => $condition->get_id()));
 
             $conditionpart = ddtaquiz_bootstrap_render::createAccordionHeader(
                 $preContent,
-                $content,
+                '',
                 $postContent
             );
             return $conditionpart;
@@ -891,7 +897,8 @@ class edit_renderer extends \plugin_renderer_base
                 $content,
                 $postContent,
                 ['id' => $headingId],
-                $collapseId
+                $collapseId,
+                'w-75'
             ) .
             ddtaquiz_bootstrap_render::createAccordionCollapsible($collapseId, $headingId, $accordionId,
                 $this->mq_question_checkboxes($candidates, $mqIndex, $part)

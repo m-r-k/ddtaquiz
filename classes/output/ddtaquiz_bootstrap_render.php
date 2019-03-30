@@ -125,7 +125,7 @@ class ddtaquiz_bootstrap_render extends \html_writer
         return $output;
     }
 
-    public static function createAccordionHeader($preContent, $content, $postContent, $attr = null, $collapseId = null): string
+    public static function createAccordionHeader($preContent, $content, $postContent, $attr = null, $collapseId = null,$contentClass = ''): string
     {
         $output =
             self::start_div('card-header', [
@@ -138,7 +138,7 @@ class ddtaquiz_bootstrap_render extends \html_writer
         if ($collapseId) {
             $output .=
                 self::start_tag('span', [
-                    'class'=>'maincontent w-75',
+                    'class'=>'maincontent ' . $contentClass,
                     'data-toggle' => "collapse",
                     'data-target' => "#" . $collapseId,
                     'aria-expanded' => "true",
