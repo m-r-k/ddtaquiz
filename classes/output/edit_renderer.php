@@ -58,12 +58,12 @@ class edit_renderer extends \plugin_renderer_base
         $output = '';
 
         /********************** Initializing  *****************************************/
-        $output .= html_writer::start_tag('form',
-            array('method' => 'POST', 'id' => 'blockeditingform', 'action' => $pageurl->out()));
-        $output .= html_writer::tag('input', '',
-            array('type' => 'hidden', 'name' => 'cmid', 'value' => $pageurl->get_param('cmid')));
-        $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'bid', 'value' => $block->get_id()));
-        $output .= html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'save', 'value' => 1));
+        $output .=
+            html_writer::start_tag('form', array('method' => 'POST', 'id' => 'blockeditingform', 'action' => $pageurl->out())).
+            html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'cmid', 'value' => $pageurl->get_param('cmid'))).
+            html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'bid', 'value' => $block->get_id())).
+            html_writer::tag('input', '', array('type' => 'hidden', 'name' => 'save', 'value' => 1));
+
         if ($block->is_main_block()) {
             $headingContent = html_writer::div(get_string('editingquizx', 'ddtaquiz', format_string($block->get_name())));
             $headingContent .=
@@ -414,7 +414,12 @@ class edit_renderer extends \plugin_renderer_base
         $image = $this->pix_icon('t/delete', get_string('delete'));
         $confirmDeleteButton = html_writer::tag('button', 'Confirm',
             array('class' => 'btn btn-danger ml-4', 'type' => 'submit', 'name' => 'delete', 'value' => $element->get_id()));
-        $body = ddtaquiz_bootstrap_render::createModal('Are you sure?', $element->get_name() . ' will be deleted!', $confirmDeleteButton, array('id' => 'confirm-question-delete'.$element->get_id()));
+        $body = ddtaquiz_bootstrap_render::createModal(
+            get_string('areYouSure','ddtaquiz'),
+            get_string('elementDeleted','ddtaquiz',$element->get_name()),
+            $confirmDeleteButton,
+            array('id' => 'confirm-question-delete'.$element->get_id())
+        );
         $body .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-question-delete'.$element->get_id(), "submit", $image, array('class' => 'btn btn-danger ml-4'));
         return $body;
 
@@ -433,7 +438,11 @@ class edit_renderer extends \plugin_renderer_base
         $image = $this->pix_icon('t/delete', get_string('delete'));
         $confirmDeleteButton = html_writer::tag('button', 'Confirm',
             array('class' => 'btn btn-danger ml-4', 'type' => 'submit', 'name' => 'feedbackdelete', 'value' => $element->get_id()));
-        $body = ddtaquiz_bootstrap_render::createModal('Are you sure?', $element->get_name() . ' will be deleted!', $confirmDeleteButton, array('id' => 'confirm-feedback-delete'.$element->get_id()));
+        $body = ddtaquiz_bootstrap_render::createModal(
+            get_string('areYouSure','ddtaquiz'),
+            get_string('elementDeleted','ddtaquiz',$element->get_name()) ,
+            $confirmDeleteButton, array('id' => 'confirm-feedback-delete'.$element->get_id())
+        );
         $body .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-feedback-delete'.$element->get_id(), "submit", $image, array('class' => 'btn btn-danger ml-4'));
 
         return $body;
@@ -517,8 +526,13 @@ class edit_renderer extends \plugin_renderer_base
         $domainstable= ddtaquiz_bootstrap_render::createDomainCheckboxes($element->get_id(), explode(";", $quizconfig));
 
         $image = $this->pix_icon('t/edit', get_string('domainEdit','ddtaquiz'));
-        $confirmButton = html_writer::tag('button', 'Confirm',array('class' => 'btn btn-success', 'data-dismiss'=>'modal'));
-        $body = ddtaquiz_bootstrap_render::createModal('Set up the domains for question: '.$element->get_name(), $domainstable, $confirmButton, array('id' => 'confirm-domains'.$element->get_id(),'one-button'=>true,'size'=>'modal-lg','position'=>'modal-dialog-centered'));
+        $confirmButton = html_writer::tag('button', get_string('confirm','ddtaquiz'),array('class' => 'btn btn-success', 'data-dismiss'=>'modal'));
+        $body = ddtaquiz_bootstrap_render::createModal(
+            get_string('setupDomainsForQuestion','ddtaquiz',$element->get_name()),
+            $domainstable,
+            $confirmButton,
+            array('id' => 'confirm-domains'.$element->get_id(),'one-button'=>true,'size'=>'modal-lg','position'=>'modal-dialog-centered')
+        );
         $body .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-domains'.$element->get_id(), "submit", $image, array('class' => 'btn btn-primary'));
 
         return $body;
@@ -549,7 +563,7 @@ class edit_renderer extends \plugin_renderer_base
         $pointsConditionBtn = \html_writer::tag('button', get_string('addpointscondition', 'ddtaquiz'),
             array('type' => 'submit', 'class' => 'btn btn-primary', 'id' => 'addPointsConditionBtn'));
 
-        $mqPointsConditionBtn = \html_writer::tag('button', 'Add MQ Condition',
+        $mqPointsConditionBtn = \html_writer::tag('button', get_string('addMqCondition','ddtaquiz'),
             array('type' => 'submit', 'class' => 'btn btn-primary mr-3', 'id' => 'addMQPointsConditionBtn'));
 
         $conditionCardFooter =
@@ -1033,7 +1047,7 @@ class edit_renderer extends \plugin_renderer_base
     public function question_bank_modal()
     {
         $buttons =
-            html_writer::tag('button', 'Add Selected Questions',
+            html_writer::tag('button', get_string('addSelectedQuestions','ddtaquiz'),
                 ['class' => 'btn btn-primary', 'id' => 'qbankAddButton']);
 
         return ddtaquiz_bootstrap_render::createModal(
@@ -1346,7 +1360,12 @@ class edit_renderer extends \plugin_renderer_base
 
         $confirmDeleteButton = $this->action_link('#', $image, null, array('title' => $strdelete,
             'class' => 'cm-edit-action editing_delete element-remove-button usesdelete btn ml-4 btn-danger ml-auto', 'data-action' => 'delete'));
-            $postContent = ddtaquiz_bootstrap_render::createModal('Are you sure?', 'Question ' . chr($index) . ' will be deleted!', $confirmDeleteButton, array('id' => 'confirm-fbquestion-delete' . chr($index)));
+            $postContent = ddtaquiz_bootstrap_render::createModal(
+                get_string('areYouSure','ddtaquiz'),
+                get_string('elementDeleted','ddtaquiz','Question ' . chr($index)),
+                $confirmDeleteButton,
+                array('id' => 'confirm-fbquestion-delete' . chr($index))
+            );
             $postContent .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-fbquestion-delete' . chr($index), "submit", $image, array('class' => 'btn btn-danger cm-edit-action editing_delete element-remove-button  ml-5 ml-auto'),"false");
 
 

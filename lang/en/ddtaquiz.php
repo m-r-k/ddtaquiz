@@ -223,5 +223,19 @@ $string['questionFeedbackAccordionHeaderPostLabelCorrect']="Correct";
 $string['questionFeedbackAccordionHeaderPostLabelPartialCorrect']="Partially Correct";
 
 
+$string['areYouSure']='Are you sure?';
+$string['elementDeleted']='"{$a}" will be deleted!';
+
+$string['confirm']='Confirm';
+
+
+$string['setupDomainsForQuestion']='Set up the domains for question: {$a}';
+
+$string['addMqCondition']='Add MQ Condition';
+$string['addSelectedQuestions']='Add Selected Questions';
+
+
+
+
 
 
