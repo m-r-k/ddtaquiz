@@ -138,7 +138,7 @@ class ddtaquiz_bootstrap_render extends \html_writer
         if ($collapseId) {
             $output .=
                 self::start_tag('span', [
-                    'class'=>'maincontent w-100',
+                    'class'=>'maincontent w-75',
                     'data-toggle' => "collapse",
                     'data-target' => "#" . $collapseId,
                     'aria-expanded' => "true",

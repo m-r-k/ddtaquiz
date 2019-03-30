@@ -233,6 +233,8 @@ $string['setupDomainsForQuestion']='Set up the domains for question: {$a}';
 
 $string['addMqCondition']='Add MQ Condition';
 $string['addSelectedQuestions']='Add Selected Questions';
+$string['selectedQuestions']='Selected Questions';
+$string['gradeOfAll']='Grade of all ';
 
 
 

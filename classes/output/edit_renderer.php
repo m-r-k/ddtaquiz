@@ -860,8 +860,8 @@ class edit_renderer extends \plugin_renderer_base
 
         $content =
             html_writer::start_div('w-100').
-            \html_writer::tag('label', 'Grade of all ', array('class' => 'conditionelement')).
-            \html_writer::tag('a', 'Selected Questions',array('class' => 'conditionelement text-primary btn btn-link',)).
+            \html_writer::tag('label', get_string('gradeOfAll','ddtaquiz'), array('class' => 'conditionelement')).
+            \html_writer::tag('a', get_string('selectedQuestions','ddtaquiz'),array('class' => 'conditionelement text-primary btn btn-link',)).
             \html_writer::tag('label', get_string('mustbe', 'ddtaquiz'),array('class' => 'conditionelement'));
 
 
