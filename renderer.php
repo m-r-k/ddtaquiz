@@ -527,6 +527,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $output = "";
         $quiz = $attempt->get_quiz();
         $feedback = \domain_feedback::get_feedback($quiz);
+        $output = "";
         /** @var \feedback_block $block */
         foreach ($feedback->get_blocks() as $block) {
             $condition = $block->get_condition();
@@ -539,7 +540,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                 /**
                  * Collapsible accordions for domainfeedback
                  */
-                $collapseId = 'collapse-id';
+                $collapseId = 'collapse-id'.$block->get_id();
                 $accordionId = 'feedback-accordion';
                 $headerId = 'accordion-header';
                 $blockClass = 'blockAccordionHeader';
@@ -578,7 +579,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                     ) .
                     $collapseContent;
 
-                $output = ddtaquiz_bootstrap_render::createAccordion($accordionId, $container);
+                $output .= ddtaquiz_bootstrap_render::createAccordion($accordionId, $container);
             }
         }
         return $output;

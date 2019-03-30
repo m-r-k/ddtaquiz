@@ -189,5 +189,20 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
+    if($oldversion < 20190330001){
+        try{
+
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz_condition ADD domaingrade2 DECIMAL(10,5) AFTER domaingrade"
+            );
+
+            // Label savepoint reached.
+            upgrade_mod_savepoint(true, 20190330001, 'ddtaquiz');
+        }
+        catch(Exception $e){
+
+        }
+    }
+
     return true;
 }

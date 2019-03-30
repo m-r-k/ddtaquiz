@@ -62,11 +62,11 @@ if ($save) {
             if (array_key_exists('domainname', $_POST)) {
                 $feedbackblock->get_condition()->set_name($_POST['domainname']);
             }
-            if (array_key_exists('domaintype', $_POST)) {
-                $feedbackblock->get_condition()->set_type($_POST['domaintype']);
-            }
             if (array_key_exists('domaingrade', $_POST)) {
                 $feedbackblock->get_condition()->set_grade($_POST['domaingrade']);
+            }
+            if (array_key_exists('domaingrade2', $_POST)) {
+                $feedbackblock->get_condition()->set_grade2($_POST['domaingrade2']);
             }
             if (array_key_exists('domainreplace', $_POST)) {
                 $feedbackblock->get_condition()->set_replace($_POST['domainreplace']);
