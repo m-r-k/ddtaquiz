@@ -196,7 +196,7 @@ input[type=number].conditionelement {
 }
 
 .card-btn{
-    width:150px;
+    /*width:150px;*/
     text-align: center;
     margin-right:22px;
 }
