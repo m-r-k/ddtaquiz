@@ -217,6 +217,10 @@ $string['finishSQ']="Finish this question";
 
 
 $string['feedbackShift']="Shift: ";
+$string['specialFeedbackAccordionHeaderPre']="Special Feedback";
+$string['questionFeedbackAccordionHeaderPostLabelIncorrect']="Incorrect";
+$string['questionFeedbackAccordionHeaderPostLabelCorrect']="Correct";
+$string['questionFeedbackAccordionHeaderPostLabelPartialCorrect']="Partially Correct";
 
 
 
