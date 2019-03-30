@@ -566,55 +566,7 @@ class edit_renderer extends \plugin_renderer_base
     {
         $conditionCardHeader = \html_writer::tag('h3', get_string('conditions', 'ddtaquiz'), array('class' => 'conditionblockheader'));
 
-        //If no candidate is available display a warning
-        if (count($candidates) == 0) {
-            $this->page->requires->js_call_amd('mod_ddtaquiz/main', 'cleanAlerts');
-            $content = \html_writer::tag('label', get_string('noCandidatesForCondition', 'ddtaquiz'));
-            $conditionpart = ddtaquiz_bootstrap_render::createAlert('danger', $content);
-        } else {
-            $preContent = \html_writer::tag('label', get_string('gradeatdomain', 'ddtaquiz'),
-                array('class' => 'conditionelement'));
-
-            $options = '';
-            foreach ($candidates as $element) {
-                $attributes = [];
-                if (trim($element) == trim($condition->get_name())) {
-                    $attributes['selected'] = '';
-                }
-                $options .= \html_writer::tag('option', $element, $attributes);
-            }
-            $option_select = \html_writer::tag('select', $options,
-                array('class' => 'conditionquestion custom-select', 'name' => 'domainname'));
-            $content = \html_writer::tag('span', $option_select);
-            $content .= ' ' . \html_writer::tag('label', get_string('mustbe', 'ddtaquiz'),
-                    array('class' => 'conditionelement'));
-
-            $comparator_options = $this->comparator_attributes($condition);
-            $comparator = \html_writer::tag('select', $comparator_options,
-                array('class' => 'conditiontype custom-select', 'name' => 'domaintype'));
-            $postContent = \html_writer::tag('span', $comparator);
-            $postContent .= ' ' . \html_writer::tag('input', '',
-                    array('class' => 'conditionelement conditionpoints form-control inline', 'name' => 'domaingrade',
-                        'type' => 'number', 'value' => $condition->get_grade()));
-
-            $postContent .= ' ' . \html_writer::tag('input', '',
-                    array('class' => 'conditionelement conditionreplace form-control inline', 'name' => 'domainreplace',
-                        'value' => $condition->get_replace()));
-
-            $strdelete = get_string('delete');
-            $image = $this->pix_icon('t/delete', $strdelete);
-            $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
-                'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-4 float-right', 'data-action' => 'delete'));
-
-            $conditionpart = ddtaquiz_bootstrap_render::createAccordionHeader(
-                $preContent,
-                $content,
-                $postContent
-            );
-        }
-
-        $conditionpart .= \html_writer::tag('input', '',
-            array('class' => 'conditionid', 'name' => 'id', 'value' => $condition->get_id()));
+        $conditionpart = $this->domain_condition($candidates, $condition);
 
         $conditioncontent = \html_writer::div($conditionpart, 'conditionpart');
 
@@ -801,6 +753,74 @@ class edit_renderer extends \plugin_renderer_base
             $content,
             $postContent
         );
+    }
+    /**
+     * Renders the HTML for the condition over question points.
+     *
+     * @param array $candidates the block_elements the condition can depend on.
+     * @param \domain_condition $condition the condition to be rendered.
+     * @return string the HTML of the points condition.
+     * @throws
+     */
+    protected function domain_condition($candidates, $condition = null)
+    {
+        if (is_null($condition)) {
+            $condition = \domain_condition::create();
+        }
+        //If no candidate is available display a warning
+        if (count($candidates) == 0) {
+            $this->page->requires->js_call_amd('mod_ddtaquiz/main', 'cleanAlerts');
+            $content = \html_writer::tag('label', get_string('noCandidatesForCondition', 'ddtaquiz'));
+            $conditionpart = ddtaquiz_bootstrap_render::createAlert('danger', $content);
+        } else {
+            $preContent = \html_writer::tag('label', get_string('gradeatdomain', 'ddtaquiz'),
+                array('class' => 'conditionelement col-1'));
+
+            $options = '';
+            foreach ($candidates as $element) {
+                $attributes = [];
+                if (trim($element) == trim($condition->get_name())) {
+                    $attributes['selected'] = '';
+                }
+                $options .= \html_writer::tag('option', $element, $attributes);
+            }
+            $option_select = \html_writer::tag('select', $options,
+                array('class' => 'conditiondomain custom-select', 'name' => 'domainname'));
+            $content = \html_writer::tag('span', $option_select, array('class' => 'col-1'));
+            $content .= ' ' . \html_writer::tag('label', get_string('domainrangestart', 'ddtaquiz'),
+                    array('class' => 'conditionelement col-2', 'for' => 'domaingrade'));
+
+            $postContent = ' ' . \html_writer::tag('input', '',
+                    array('class' => 'conditionelement conditionpoints form-control inline col-1', 'name' => 'domaingrade',
+                        'type' => 'number', 'value' => $condition->get_grade()));
+            $postContent .= ' ' . \html_writer::tag('label', get_string('domainrangebetween', 'ddtaquiz'),
+                    array('class' => 'conditionelement col-1', 'for' => 'domaingrade2'));
+            $postContent .= ' ' . \html_writer::tag('input', '',
+                    array('class' => 'conditionelement conditionpoints2 form-control inline col-1', 'name' => 'domaingrade2',
+                        'type' => 'number', 'value' => $condition->get_grade()));
+            $postContent .= ' ' . \html_writer::tag('label', 'Replace name for student view: ',
+                    array('class' => 'conditionelement col-2', 'name' => 'domainreplacelabel',
+                        'for' => 'domainreplace'));
+
+            $postContent .= ' ' . \html_writer::tag('input', '',
+                    array('class' => 'conditionelement conditionreplace form-control inline col-2', 'name' => 'domainreplace',
+                        'value' => $condition->get_replace()));
+
+            $strdelete = get_string('delete');
+            $image = $this->pix_icon('t/delete', $strdelete);
+            $postContent .= $this->action_link('#', $image, null, array('title' => $strdelete,
+                'class' => 'cm-edit-action editing_delete element-remove-button conditionpartdelete btn btn-danger ml-4 float-right', 'data-action' => 'delete'));
+
+            $postContent .= \html_writer::tag('input', '',
+                array('class' => 'conditionid', 'name' => 'id', 'value' => $condition->get_id()));
+
+            $conditionpart = ddtaquiz_bootstrap_render::createAccordionHeader(
+                $preContent,
+                $content,
+                $postContent
+            );
+            return $conditionpart;
+        }
     }
 
     /**
