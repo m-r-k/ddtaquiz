@@ -70,7 +70,9 @@ define(['jquery'], function ($) {
 
         init: function () {
             $(document).ready(function () {
-                $('[data-toggle="tooltip"]').tooltip();
+
+                // $('[data-toggle="tooltip"]').tooltip();
+
 
                 $('#addPointsConditionBtn').click(function (e) {
                     condition.addcondition(e);
@@ -80,8 +82,8 @@ define(['jquery'], function ($) {
                 });
 
                 $('.conditionpartdelete').click(function (e) {
-                    e.preventDefault();
-                    e.stopImmediatePropagation();
+                     e.preventDefault();
+                     e.stopImmediatePropagation();
                     $(this).parents('.conditionpart').remove();
                     $(this).parents('.mq-conditionpart').remove();
                 });
