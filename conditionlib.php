@@ -722,25 +722,10 @@ class domain_condition extends condition {
     protected $name;
     // replacement for domain abbreviation
     protected $replace;
-    // condition type (see class condition part)
-    protected $type;
-    // reference grade for evaluation
+    // reference grade for evaluation (start of interval)
     protected $grade = 0;
-
-    /** */
-    const WAS_DISPLAYED     = 0;
-    /** condition that student has less points than a set amount */
-    const LESS              = 1;
-    /** condition that student has less or more points than a set amount */
-    const LESS_OR_EQUAL     = 2;
-    /** condition that student has more points than a set amount */
-    const GREATER           = 3;
-    /** condition that student has more or the same points than a set amount */
-    const GREATER_OR_EQUAL  = 4;
-    /** condition that student has the same points than a set amount */
-    const EQUAL             = 5;
-    /** condition that student has not the same points than a set amount */
-    const NOT_EQUAL         = 6;
+    // reference grade for evaluation (end of interval)
+    protected $grade2 = 0;
 
     /**
      * Constructor, assuming we already have the necessary data loaded.
@@ -748,15 +733,15 @@ class domain_condition extends condition {
      * @param int $id the id of this condition.
      * @param string $name
      * @param string $replace
-     * @param int $type
      * @param int $grade
+     * @param int $grade2
      */
-    public function __construct($id, $name, $replace, $type, $grade = 0) {
+    public function __construct($id, $name, $replace, $grade = 0, $grade2 = 0) {
         parent::__construct($id, [], [], 1);
         $this->name = $name;
         $this->replace = $replace;
-        $this->type = $type;
         $this->grade = $grade;
+        $this->grade2 = $grade2;
     }
 
     /**
@@ -779,21 +764,21 @@ class domain_condition extends condition {
                 $replace = $condition->domainreplace;
             else
                 $replace = "";
-            if (isset($condition->domaintype))
-                $type = $condition->domaintype;
-            else
-                $type = 1;
             if (isset($condition->domaingrade))
                 $grade = $condition->domaingrade;
             else
                 $grade = 0;
+            if (isset($condition->domaingrade2))
+                $grade2 = $condition->domaingrade2;
+            else
+                $grade2 = 0;
         } else {
             $name = "";
             $replace = "";
-            $type = 1;
             $grade = 0;
+            $grade2 = 0;
         }
-        return new domain_condition($id, $name,$replace, $type, $grade);
+        return new domain_condition($id, $name,$replace, $grade, $grade2);
     }
 
     /**
@@ -810,7 +795,7 @@ class domain_condition extends condition {
 
         $id = $DB->insert_record('ddtaquiz_condition', $record);
 
-        return new domain_condition($id, "", "", 0);
+        return new domain_condition($id, "", "", 0, 0);
     }
 
     /**
@@ -823,22 +808,10 @@ class domain_condition extends condition {
     public function is_fullfilled($attempt) {
         $grades = $this->get_grading($attempt);
         $achieved_grade = $grades[0];
-        switch ($this->type) {
-            case self::LESS:
-                return $achieved_grade < $this->grade;
-            case self::LESS_OR_EQUAL:
-                return $achieved_grade <= $this->grade;
-            case self::GREATER:
-                return $achieved_grade > $this->grade;
-            case self::GREATER_OR_EQUAL:
-                return $achieved_grade >= $this->grade;
-            case self::EQUAL:
-                return $achieved_grade == $this->grade;
-            case self::NOT_EQUAL:
-                return $achieved_grade != $this->grade;
-            default:
-                debugging('Unsupported condition part type: ' . $this->type);
-                return true;
+        if ($achieved_grade >= $this->grade && $achieved_grade <= $this->grade2) {
+            return true;
+        } else {
+            return false;
         }
     }
 
@@ -936,26 +909,6 @@ class domain_condition extends condition {
     /**
      * @return int
      */
-    public function get_type()
-    {
-        return $this->type;
-    }
-
-    /**
-     * @param int $type
-     * @throws dml_exception
-     */
-    public function set_type($type)
-    {
-        global $DB;
-
-        $this->type = $type;
-        $DB->set_field("ddtaquiz_condition", "domaintype", $type, ["id" => $this->get_id()]);
-    }
-
-    /**
-     * @return int
-     */
     public function get_grade()
     {
         return $this->grade;
@@ -971,6 +924,26 @@ class domain_condition extends condition {
 
         $this->grade = $grade;
         $DB->set_field("ddtaquiz_condition", "domaingrade", $grade, ["id" => $this->get_id()]);
+    }
+
+    /**
+     * @return int
+     */
+    public function get_grade2()
+    {
+        return $this->grade2;
+    }
+
+    /**
+     * @param int $grade
+     * @throws dml_exception
+     */
+    public function set_grade2($grade)
+    {
+        global $DB;
+
+        $this->grade2 = $grade;
+        $DB->set_field("ddtaquiz_condition", "domaingrade2", $grade, ["id" => $this->get_id()]);
     }
 
 

@@ -797,7 +797,7 @@ class edit_renderer extends \plugin_renderer_base
                     array('class' => 'conditionelement col-1', 'for' => 'domaingrade2'));
             $postContent .= ' ' . \html_writer::tag('input', '',
                     array('class' => 'conditionelement conditionpoints2 form-control inline col-1', 'name' => 'domaingrade2',
-                        'type' => 'number', 'value' => $condition->get_grade()));
+                        'type' => 'number', 'value' => $condition->get_grade2()));
             $postContent .= ' ' . \html_writer::tag('label', 'Replace name for student view: ',
                     array('class' => 'conditionelement col-2', 'name' => 'domainreplacelabel',
                         'for' => 'domainreplace'));
