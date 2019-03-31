@@ -807,8 +807,10 @@ class domain_condition extends condition {
      */
     public function is_fullfilled($attempt) {
         $grades = $this->get_grading($attempt);
-        $achieved_grade = $grades[0];
-        if ($achieved_grade >= $this->grade && $achieved_grade <= $this->grade2) {
+        $achieved_grade = $grades[0]/$grades[1];
+        if ($achieved_grade > $this->grade && $achieved_grade <= $this->grade2) {
+            return true;
+        } elseif ($this->grade == 0 && $achieved_grade == $this->grade) {
             return true;
         } else {
             return false;
@@ -914,7 +916,7 @@ class domain_condition extends condition {
      */
     public function get_grade()
     {
-        return $this->grade;
+        return (int)$this->grade;
     }
 
     /**
@@ -934,7 +936,7 @@ class domain_condition extends condition {
      */
     public function get_grade2()
     {
-        return $this->grade2;
+        return (int)$this->grade2;
     }
 
     /**
