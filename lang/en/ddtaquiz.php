@@ -195,7 +195,7 @@ $string['questionFeedbackAccordionHeaderPre'] = 'Feedback for question: ';
 $string['blockFeedbackAccordionHeaderPre'] = 'Feedback for block: ';
 $string['domainEdit'] = 'Setup domains';
 
-$string['domainrangestart'] = 'must be between';
+$string['domainrangestart'] = '(in %) must be between';
 $string['domainrangebetween'] = 'and';
 
 //Showgrade
