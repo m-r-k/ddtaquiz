@@ -47,7 +47,10 @@ $quba = $attempt->get_quba();
 $question = $quba->get_question($slot);
 
 $options = new question_display_options();
-$options->marks = question_display_options::MARK_AND_MAX;
+if($ddtaquiz->getQuizmodes()===0)
+    $options->marks = question_display_options::HIDDEN;
+else
+    $options->marks = question_display_options::MARK_AND_MAX;
 $options->flags = question_display_options::HIDDEN;
 $options->hide_all_feedback();
 $options->manualcomment = question_display_options::EDITABLE;

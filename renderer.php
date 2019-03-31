@@ -536,7 +536,27 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                 $grades = $condition->get_grading($attempt);
 
                 $title = $condition->get_replace() ? $condition->get_replace() : $condition->get_name();
-                $conditionCardBody = \html_writer::div("Result: " . $grades[0] . " / " . $grades[1], 'result');
+
+
+                $diff = $grades[1]  - $grades[0];
+                if($mode==0) {
+
+                    if ($diff ==  $grades[1])
+                        $content = " " . get_string('questionFeedbackAccordionHeaderPostLabelIncorrect', 'ddtaquiz');
+                    else if ($diff == 0)
+                        $content = " " . get_string('questionFeedbackAccordionHeaderPostLabelCorrect', 'ddtaquiz');
+                    else
+                        $content = " " . get_string('questionFeedbackAccordionHeaderPostLabelPartialCorrect', 'ddtaquiz');
+                    $conditionCardBody=$content;
+                }
+                else{
+                    $content = $grades[0] . "/" . $grades[1];
+                    $conditionCardBody = \html_writer::div("Result: " . $grades[0] . " / " . $grades[1], 'result');
+                }
+
+
+
+
                 $conditionCardBody .= \html_writer::div($block->get_feedback_text(), 'conditionpartslist');
 
                 /**
@@ -552,19 +572,6 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                     $accordionId,
                     $conditionCardBody
                 );
-
-                $diff = $grades[0]  - $grades[1];
-                if($mode==0) {
-                    if ($diff ==  $grades[1])
-                        $content = " " . get_string('questionFeedbackAccordionHeaderPostLabelIncorrect', 'ddtaquiz');
-                    else if ($diff == 0)
-                        $content = " " . get_string('questionFeedbackAccordionHeaderPostLabelCorrect', 'ddtaquiz');
-                    else
-                        $content = " " . get_string('questionFeedbackAccordionHeaderPostLabelPartialCorrect', 'ddtaquiz');
-                }
-                else{
-                    $content = $grades[0] . "/" . $grades[1];
-                }
 
                 $progress = floor(($grades[0]  /  $grades[1]) * 100);
 
@@ -652,9 +659,22 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
             $specialfeedback = $feedback->get_specialized_feedback_at_element($blockelem, $attempt);
             /** @var specialized_feedback $sf */
             foreach ($specialfeedback as $sf) {
-                $grade = $sf->get_grade($attempt);
-                $maxgrade = $sf->get_maxgrade();
-                $diff = $grade - $maxgrade;
+                $grade = 0;
+                $maxgrade = 0;
+
+                foreach ( $sf->getFeedbackBlock()->get_used_question_instances() as $usedInstance){
+                    $element=$usedInstance->getBlockElement();
+                    $maxgrade+=$element->get_maxgrade();
+                    $grade+=$element->get_grade($attempt);
+
+                    echo '<pre>',
+                    print_r($element->get_grade($attempt).'/'.$element->get_maxgrade(),1),'</pre>';
+                }
+
+
+                $diff = $maxgrade - $grade;
+
+
                 $parts = $sf->get_parts();
                 $output .= $this->review_parts($parts, $block, $attempt, $options, $feedback);
                 $collapseContent = ddtaquiz_bootstrap_render::createAccordionCollapsible(
@@ -663,27 +683,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                     $accordionId,
                     $output
                 );
-//
-////                $mark = html_writer::start_div('reviewInfo');
-////                $mark .= html_writer::start_div('result');
-//                if ($diff == $max)
-//                    $mark .= 'Incorrect';
-//                else if ($diff == 0)
-//                    $mark .= 'Correct';
-//                else
-//                    $mark .= 'Partially Correct';
-////                $mark .= html_writer::end_div();
-//                if ($options->marks == question_display_options::MARK_AND_MAX) {
-//                    $mark .= html_writer::div(
-//                        ('Mark ' . $achieved . ' out of ' . $max)
-//                        , 'reviewMarks');
-//                }
-////                $mark .= html_writer::end_div();
-//
-//                $review = $mark;
-//                $parts = $sf->get_parts();
-//                $review .= $this->review_parts($parts, $block, $attempt, $options, $feedback);
-//                $output .= html_writer::div($review, 'reviewblock');
+
                 $label = get_string('specialFeedbackAccordionHeaderPre', 'ddtaquiz');
 
                 if($mode==0) {
@@ -799,12 +799,18 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
             }
 
             //Set Postcontent for Header
-            if ($mode != 0)
+            $diff = $maxgrade - $grade;
+            if($mode==0) {
+                if ($diff == $maxgrade)
+                    $content = " " . get_string('questionFeedbackAccordionHeaderPostLabelIncorrect', 'ddtaquiz');
+                else if ($diff == 0)
+                    $content = " " . get_string('questionFeedbackAccordionHeaderPostLabelCorrect', 'ddtaquiz');
+                else
+                    $content = " " . get_string('questionFeedbackAccordionHeaderPostLabelPartialCorrect', 'ddtaquiz');
+            }
+            else{
                 $content = $grade . "/" . $maxgrade;
-            else
-                $content = $grade != $maxgrade ?
-                    " " . get_string('questionFeedbackAccordionHeaderPostLabelIncorrect', 'ddtaquiz') :
-                    " " . get_string('questionFeedbackAccordionHeaderPostLabelCorrect', 'ddtaquiz');
+            }
 
             $postContent = \html_writer::tag('label', $content, []);
             $postContent .= $progressBarContainer;

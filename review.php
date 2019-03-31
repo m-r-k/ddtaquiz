@@ -59,7 +59,7 @@ $ddtaquiz = ddtaquiz::load($cm->instance);
 
 $options = new question_display_options();
 $options->flags = question_display_options::HIDDEN;
-if(!$ddtaquiz->show_grades())
+if($ddtaquiz->getQuizmodes()===0)
     $options->marks = question_display_options::HIDDEN;
 
 $PAGE->set_url($attempt->review_url());

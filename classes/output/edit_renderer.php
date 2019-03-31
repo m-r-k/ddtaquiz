@@ -1371,18 +1371,8 @@ class edit_renderer extends \plugin_renderer_base
         $strdelete = get_string('delete');
         $image = $this->pix_icon('t/delete', $strdelete);
 
-        $confirmDeleteButton = $this->action_link('#', $image, null, array('title' => $strdelete,
+        $postContent = $this->action_link('#', $image, null, array('title' => $strdelete,
             'class' => 'cm-edit-action editing_delete element-remove-button usesdelete btn ml-4 btn-danger ml-auto', 'data-action' => 'delete'));
-            $postContent = ddtaquiz_bootstrap_render::createModal(
-                get_string('areYouSure','ddtaquiz'),
-                get_string('elementDeleted','ddtaquiz','Question ' . chr($index)),
-                $confirmDeleteButton,
-                array('id' => 'confirm-fbquestion-delete' . chr($index))
-            );
-            $postContent .= ddtaquiz_bootstrap_render::createModalTrigger('confirm-fbquestion-delete' . chr($index), "submit", $image, array('class' => 'btn btn-danger cm-edit-action editing_delete element-remove-button  ml-5 ml-auto'),"false");
-
-
-
 
         return ddtaquiz_bootstrap_render::createAccordionHeader(
             $preContent,

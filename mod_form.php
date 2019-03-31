@@ -78,14 +78,6 @@ class mod_ddtaquiz_mod_form extends moodleform_mod {
         $mform->addElement('select', 'grademethod', get_string('grademethod', 'ddtaquiz'), $gradingoptions);
         $mform->setDefault('grademethod', 0);
 
-        $showGradeOptions = array(
-            0 => get_string('showGradeNo', 'ddtaquiz'),
-            1 => get_string('showGradeYes', 'ddtaquiz'),
-        );
-        $mform->addElement('select', 'showgrade','Show grades during attempt: ', $showGradeOptions);
-        $mform->setDefault('grademethod', 0);
-
-
         //Direct Feedback
         $mform->addElement('header', 'directfeedbackheader',get_string('directfeedbackheader', 'ddtaquiz') );
         $feedbackDisplayoptions = array(

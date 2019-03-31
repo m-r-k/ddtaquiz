@@ -564,6 +564,14 @@ class feedback_used_question{
 class specialized_feedback {
     /** @var feedback_block the feedback block this feedback is constructed from. */
     protected $feedbackBlock = null;
+
+    /**
+     * @return feedback_block
+     */
+    public function getFeedbackBlock(): feedback_block
+    {
+        return $this->feedbackBlock;
+    }
     /**
      * Constructor.
      *
@@ -633,7 +641,7 @@ class specialized_feedback {
         },$complexQuestions);
 
         $sum = 0;
-        
+
         foreach ($parts as $part){
             if(!is_string($part)){
                 if(!in_array($part->getBlockElement()->get_id(),$complexQuestions)) {

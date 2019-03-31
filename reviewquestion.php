@@ -49,7 +49,11 @@ $question = $attempt->get_quba()->get_question($slot);
 $options = new question_display_options();
 $options->feedback = question_display_options::VISIBLE;
 $options->generalfeedback = question_display_options::VISIBLE;
+if($ddtaquiz->getQuizmodes()===0)
+    $options->marks = question_display_options::HIDDEN;
+else
 $options->marks = question_display_options::MARK_AND_MAX;
+
 $options->correctness = question_display_options::VISIBLE;
 $options->flags = question_display_options::HIDDEN;
 $options->rightanswer = question_display_options::VISIBLE;
