@@ -633,13 +633,25 @@ class specialized_feedback {
         },$complexQuestions);
 
         $sum = 0;
-        foreach ($parts as $part){
-            if(!is_string($part)){
-                if(!in_array($part->getBlockElement()->get_id(),$complexQuestions))
-                    $sum += $part->getBlockElement()->get_maxgrade();
-            }
-        }
-        return $sum;
+
+        return $parts[0]->getBlockElement()->get_maxgrade();
+//
+//        foreach ($parts as $part){
+//
+//            echo '<pre>',
+//            print_r(  $parts[0]->getBlockElement()->get_maxgrade(),1),'</pre>';
+//
+//
+////            if(!is_string($part)){
+////                if(!in_array($part->getBlockElement()->get_id(),$complexQuestions)) {
+////                    $sum += $part->getBlockElement()->get_maxgrade();
+////                    echo '<pre>',
+////                    print_r($part->getBlockElement()->get_maxgrade(),1),'</pre>';
+////                }
+////            }
+//        }
+//        die();
+//        return $sum;
     }
 
     /**
