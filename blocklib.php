@@ -609,6 +609,22 @@ class block_element {
     /** @var int the slot of this element. */
     protected $slot = 0;
 
+    /**
+     * @return int
+     */
+    public function get_slot(): int
+    {
+        return $this->slot;
+    }
+
+    /**
+     * @return int
+     */
+    public function get_type(): int
+    {
+        return $this->type;
+    }
+
     // Constructor =============================================================
     /**
      * Constructor, assuming we already have the necessary data loaded.

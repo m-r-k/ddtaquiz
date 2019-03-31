@@ -831,17 +831,25 @@ class domain_condition extends condition {
         $elements = $attempt->get_quiz()->get_elements();
         $active_elements = [];
 
+        $seenQuestions=explode(";", $attempt->getSeenQuestions());
+
         /** @var block_element $element */
         foreach ($elements as $element) {
             $id = $element->get_id();
             $q_instance = $DB->get_record("ddtaquiz_qinstance", ["id" => $id]);
-            if (in_array($this->name, explode(";", $q_instance->domains))) {
-                array_push($active_elements, $id);
+
+            if (in_array($q_instance->slot, $seenQuestions)) {
+                if (in_array($this->name, explode(";", $q_instance->domains))) {
+                    array_push($active_elements, $id);
+                }
+
             }
         }
 
 
-
+echo '<pre>',
+print_r($active_elements,1);
+//die();
 
         $achieved_grade = 0;
         $total_grade = 0;

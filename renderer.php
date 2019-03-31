@@ -304,7 +304,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
 
         $body .= html_writer::start_tag('div');
         $body .= $attempt->get_quba()->render_question($slot, $options);
-
+        $attempt->setSeenQuestions($slot);
 
         // Some hidden fields to track what is going on.
         $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'attempt',
@@ -456,20 +456,48 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      */
     public function review_summary_table($summarydata, $attempt = Null)
     {
-
         $mode = $attempt->get_quiz()->getQuizmodes();
         $slots = $attempt->get_quba()->get_slots();
         $correctanswers = 0;
         $usedQuestions = 0;
+        $mainblocks=[];
+        foreach($attempt->get_quiz()->get_main_block()->get_children() as $mainblock){
+            /* @var block_element $mainblock*/
+            if($mainblock->is_question()) {
+                $mainblocks[]=$mainblock->get_slot();
+            }
+
+
+        }
+        echo '<pre>',
+        print_r($mainblocks,1),'</pre>';
+
         foreach ($slots as $slot) {
             $response = $attempt->get_quba()->get_response_summary($slot);
-            if ($response != null) {
+//            if ($response != null) {
                 $grade = $attempt->get_grade_at_slot($slot);
                 $maxgrade = $attempt->get_quba()->get_question_max_mark($slot);
+
+            echo '<pre>',
+            print_r($slot,1),'</pre>';
+
+            if(in_array($slot-1,$mainblocks)){
                 if ($grade == $maxgrade)
                     $correctanswers++;
                 $usedQuestions++;
             }
+            else{
+                echo '<pre>',
+                print_r("else",1),'</pre>';
+
+                //if( !($attempt->get_quba()->get_question_attempt($slot)->get_state()->is_gave_up())){
+                if ($response != null) {
+                    if ($grade == $maxgrade)
+                        $correctanswers++;
+                    $usedQuestions++;
+                }
+            }
+
 
         }
 

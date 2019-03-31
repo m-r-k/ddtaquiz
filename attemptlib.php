@@ -88,6 +88,26 @@ class attempt {
 
     protected $timemodified;
 
+    protected $seenquestions;
+
+    /**
+     * @return mixed
+     */
+    public function getseenquestions()
+    {
+        return $this->seenquestions;
+    }
+
+    /**
+     * @param mixed $seenquestions
+     */
+    public function setseenquestions($seenquestions)
+    {
+        if($this->seenquestions==="")
+            $this->seenquestions = $seenquestions;
+        else
+            $this->seenquestions .= ";".$seenquestions;
+    }
 
     // Constructor =============================================================
 
@@ -107,10 +127,11 @@ class attempt {
      * @param boolean $preview attempt is a preview attempt.
      * @param $timecheckstate
      * @param $timemodified
+     * @param $seenquestions
      */
     public function __construct($id, question_usage_by_activity $quba, ddtaquiz $quiz,
             $userid, $attemptnumber, $currentslot = 1, $timestart, $state, $timefinish,
-            $sumgrades, $preview,$timecheckstate,$timemodified) {
+            $sumgrades, $preview,$timecheckstate,$timemodified,$seenquestions) {
         $this->id = $id;
         $this->quba = $quba;
         $this->quiz = $quiz;
@@ -124,6 +145,7 @@ class attempt {
         $this->preview = $preview;
         $this->timecheckstate = $timecheckstate;
         $this->timemodified = $timemodified;
+        $this->seenquestions=$seenquestions;
     }
 
 
@@ -140,11 +162,13 @@ class attempt {
         $attemptrow = $DB->get_record('ddtaquiz_attempts', array('id' => $attemptid), '*', MUST_EXIST);
         $quba = question_engine::load_questions_usage_by_activity($attemptrow->quba);
         $quiz = ddtaquiz::load($attemptrow->quiz);
+echo '<pre>',
+print_r($attemptrow,1),'</pre>';
 
         return new attempt($attemptid, $quba, $quiz, $attemptrow->userid, $attemptrow->attempt,
             $attemptrow->currentslot, $attemptrow->timestart, $attemptrow->state,
             $attemptrow->timefinish, $attemptrow->sumgrades, $attemptrow->preview,$attemptrow->timecheckstate,
-            $attemptrow->timemodified);
+            $attemptrow->timemodified, $attemptrow->seenquestions);
     }
 
     /**
@@ -180,7 +204,7 @@ class attempt {
         $attemptrow->attempt = $DB->count_records('ddtaquiz_attempts',
             array('quiz' => $quiz->get_id(), 'userid' => $userid)) + 1;
         $attemptrow->preview = $preview;
-
+        $attemptrow->seenquestions="";
         if (!$override) {
             $attemptid = $DB->insert_record('ddtaquiz_attempts', $attemptrow);
         } else {
@@ -209,7 +233,7 @@ class attempt {
 
         $attempt = new attempt($attemptid, $quba, $quiz, $userid, $attemptrow->attempt,
             $attemptrow->currentslot, $attemptrow->timestart, $attemptrow->state,
-            $attemptrow->timefinish, $attemptrow->sumgrades, $preview, $attemptrow->timecheckstate, $attemptrow->timemodified);
+            $attemptrow->timefinish, $attemptrow->sumgrades, $preview, $attemptrow->timecheckstate, $attemptrow->timemodified,$attemptrow->seenquestions);
         return $attempt;
     }
 
