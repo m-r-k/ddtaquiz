@@ -579,7 +579,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                     array('role' => 'progressbar', 'style' => 'width:' . $progress . '%;color:black;', 'class' => 'bg-primary', 'aria-valuenow' => $progress, 'aria-valuemin' => "0", 'aria-valuemax' => "100"));
                 $progressbar .= \html_writer::div((100 - $progress) . '%', 'progress-bar bg-danger',
                     array('role' => 'progressbar', 'style' => 'width:' . (100 - $progress) . '%;color:black;', 'class' => 'bg-primary', 'aria-valuenow' => (100 - $progress), 'aria-valuemin' => "0", 'aria-valuemax' => "100"));
-                $progressBarContainer = html_writer::div($progressbar, 'progress ml-auto', array());
+                $progressBarContainer = html_writer::div($progressbar, 'progress feedback ml-auto', array());
 
 
                 $postContent = \html_writer::tag('label', $content, []);
@@ -667,8 +667,6 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                     $maxgrade+=$element->get_maxgrade();
                     $grade+=$element->get_grade($attempt);
 
-                    echo '<pre>',
-                    print_r($element->get_grade($attempt).'/'.$element->get_maxgrade(),1),'</pre>';
                 }
 
 
@@ -704,7 +702,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                     array('role' => 'progressbar', 'style' => 'width:' . $progress . '%;color:black;', 'class' => 'bg-primary', 'aria-valuenow' => $progress, 'aria-valuemin' => "0", 'aria-valuemax' => "100"));
                 $progressbar .= \html_writer::div((100 - $progress) . '%', 'progress-bar bg-danger',
                     array('role' => 'progressbar', 'style' => 'width:' . (100 - $progress) . '%;color:black;', 'class' => 'bg-primary', 'aria-valuenow' => (100 - $progress), 'aria-valuemin' => "0", 'aria-valuemax' => "100"));
-                $progressBarContainer = html_writer::div($progressbar, 'progress ml-auto', array());
+                $progressBarContainer = html_writer::div($progressbar, 'progress feedback ml-auto', array());
 
                 $postContent = \html_writer::tag('label', $content, []);
                 $postContent .= $progressBarContainer;
@@ -785,7 +783,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                     array('role' => 'progressbar', 'style' => 'width:' . $progress . '%;color:black;', 'class' => 'bg-primary', 'aria-valuenow' => $progress, 'aria-valuemin' => "0", 'aria-valuemax' => "100"));
                 $progressbar .= \html_writer::div((100 - $progress) . '%', 'progress-bar bg-danger',
                     array('role' => 'progressbar', 'style' => 'width:' . (100 - $progress) . '%;color:black;', 'class' => 'bg-primary', 'aria-valuenow' => (100 - $progress), 'aria-valuemin' => "0", 'aria-valuemax' => "100"));
-                $progressBarContainer = html_writer::div($progressbar, 'progress ml-auto', array());
+                $progressBarContainer = html_writer::div($progressbar, 'progress feedback ml-auto', array());
 
                 $backgroundColor = "blockBackgroundHeader";
             } else {
