@@ -292,6 +292,7 @@ input[type=number].conditionelement {
 }
 .collapsible-highlight{
 	color:blue;
+	word-wrap: break-word;
 }
 
 div.tooltip-inner {
@@ -335,14 +336,19 @@ div.tooltip-inner {
 }
 
 .precontent{
-	width:15%;
+	width:20%;
+	word-wrap: break-word;
 }
 .maincontent{
-	width:10%;
+	width:20%;
 }
-
 
 .info .state{
     font-weight: bold;
     margin-bottom: 10px;
+}
+
+.progress{
+height: 25px;
+	width:40%;
 }

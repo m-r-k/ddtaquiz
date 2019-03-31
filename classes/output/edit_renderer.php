@@ -247,7 +247,7 @@ class edit_renderer extends \plugin_renderer_base
                 $edithtml = $this->element_edit_button($blockelem);
                 $removehtml = $this->element_remove_button($blockelem);
                 if($blockelem->is_question())
-                $domainshtml=$this->domains_button($blockelem);
+                    $domainshtml=$this->domains_button($blockelem);
             }else{
             // STATE:Editing
             //} else if ($blockelem->is_block() || ) {
@@ -255,6 +255,13 @@ class edit_renderer extends \plugin_renderer_base
             }
 
             $postContent = \html_writer::div($domainshtml.$edithtml . $removehtml, 'blockelementbuttons ml-auto');
+        }
+        else{
+            $domainshtml='';
+            if($blockelem->is_question())
+                $domainshtml=$this->domains_button($blockelem);
+
+            $postContent = \html_writer::div($domainshtml, 'blockelementbuttons ml-auto');
         }
 
         $blockClass = '';

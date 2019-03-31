@@ -838,6 +838,9 @@ class domain_condition extends condition {
             }
         }
 
+
+
+
         $achieved_grade = 0;
         $total_grade = 0;
 
