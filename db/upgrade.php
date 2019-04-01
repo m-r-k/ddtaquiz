@@ -42,7 +42,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
-    if ($oldversion < 20190331005) {
+    if ($oldversion < 20190401005) {
         try {
 
             // Update all records in 'course_modules' for labels to have showdescription = 1.
@@ -56,7 +56,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if ($oldversion < 20190331005) {
+    if ($oldversion < 20190401005) {
         try {
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD timelimit BIGINT(10) NOT NULL DEFAULT 0 AFTER timemodified"
@@ -77,7 +77,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190331005){
+    if($oldversion < 20190401005){
         try{
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD domains VARCHAR(255) NOT NULL DEFAULT ' ' AFTER  mainblock"
@@ -94,7 +94,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190331005){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
@@ -109,7 +109,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190331005){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
@@ -130,7 +130,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190331005){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
@@ -145,7 +145,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190331005){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
@@ -162,11 +162,11 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190331005){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
-                "ALTER TABLE mdl_ddtaquiz ADD quizmodes INT(10) AFTER ddtaquiz_feedback_uses"
+                "ALTER TABLE mdl_ddtaquiz ADD quizmodes INT(10) AFTER domains"
             );
             // Label savepoint reached.
             upgrade_mod_savepoint(true, 20190326001, 'ddtaquiz');
@@ -175,7 +175,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
 
         }
     }
-    if($oldversion < 20190331005){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
@@ -189,11 +189,25 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190331005){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz_condition ADD domaingrade2 DECIMAL(10,5) AFTER domaingrade"
+            );
+
+            // Label savepoint reached.
+            upgrade_mod_savepoint(true, 20190330001, 'ddtaquiz');
+        }
+        catch(Exception $e){
+
+        }
+    }
+    if($oldversion < 20190401005){
+        try{
+
+            $DB->execute(
+                "ALTER TABLE mdl_ddtaquiz_attempts ADD seenquestions VARCHAR(255) DEFAULT '' AFTER preview"
             );
 
             // Label savepoint reached.

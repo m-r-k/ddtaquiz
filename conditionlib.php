@@ -387,6 +387,12 @@ class condition_part {
      */
     public function is_fullfilled(attempt $attempt) {
         $referencedelement = block_element::load($attempt->get_quiz(), $this->elementid);
+
+        $seenQuestions=explode(";", $attempt->getSeenQuestions());
+        if (!in_array($attempt->get_quiz()->get_slot_for_element($referencedelement->get_id()), $seenQuestions)) {
+            return false;
+        }
+
         if (is_null($referencedelement)) {
             return false;
         }
@@ -457,17 +463,17 @@ class condition_part {
 
         switch ($this->type) {
             case self::LESS:
-                return 'Grade of '.$question->name.' < '.$this->grade."<br>";
+                return 'Grade of '.$question->name.' < '.$this->grade;
             case self::LESS_OR_EQUAL:
-                return 'Grade of '.$question->name.' <= '.$this->grade."<br>";
+                return 'Grade of '.$question->name.' <= '.$this->grade;
             case self::GREATER:
-                return 'Grade of '.$question->name.' > '.$this->grade."<br>";
+                return 'Grade of '.$question->name.' > '.$this->grade;
             case self::GREATER_OR_EQUAL:
-                return 'Grade of '.$question->name.' >= '.$this->grade."<br>";
+                return 'Grade of '.$question->name.' >= '.$this->grade;
             case self::EQUAL:
-                return 'Grade of '.$question->name.' == '.$this->grade."<br>";
+                return 'Grade of '.$question->name.' == '.$this->grade;
             case self::NOT_EQUAL:
-                return 'Grade of '.$question->name.' != '.$this->grade."<br>";
+                return 'Grade of '.$question->name.' != '.$this->grade;
             default:
                 debugging('Unsupported condition part type: ' . $this->type);
                 return true;
@@ -583,10 +589,13 @@ class multiquestions_condition_part {
      */
     public function is_fullfilled(attempt $attempt) {
         // total grade of questions of interest
+        $seenQuestions=explode(";", $attempt->getSeenQuestions());
+
         $achievedGrade = 0;
         foreach ($this->elements as $questionId){
             $referencedElement = block_element::load($attempt->get_quiz(), $questionId);
-            if (is_null($referencedElement)) {
+
+            if (!in_array($attempt->get_quiz()->get_slot_for_element($referencedElement->get_id()), $seenQuestions)) {
                 continue;
             }
             $achievedGrade += $referencedElement->get_grade($attempt);
@@ -651,17 +660,17 @@ class multiquestions_condition_part {
         $names= ' ('.implode(",", $questionNames) . ') ';
         switch ($this->type) {
             case self::LESS:
-                return 'Sum of '.$names.' < '.$this->get_grade()."<br>";
+                return 'Sum of '.$names.' < '.$this->get_grade();
             case self::LESS_OR_EQUAL:
-                return 'Sum of '.$names.' <= '.$this->get_grade()."<br>";
+                return 'Sum of '.$names.' <= '.$this->get_grade();
             case self::GREATER:
-                return 'Sum of '.$names.' > '.$this->get_grade()."<br>";
+                return 'Sum of '.$names.' > '.$this->get_grade();
             case self::GREATER_OR_EQUAL:
-                return 'Sum of '.$names.' >= '.$this->get_grade()."<br>";
+                return 'Sum of '.$names.' >= '.$this->get_grade();
             case self::EQUAL:
-                return 'Sum of '.$names.' == '.$this->get_grade()."<br>";
+                return 'Sum of '.$names.' == '.$this->get_grade();
             case self::NOT_EQUAL:
-                return 'Sum of '.$names.' != '.$this->get_grade()."<br>";
+                return 'Sum of '.$names.' != '.$this->get_grade();
             default:
                 debugging('Unsupported condition part type: ' . $this->type);
                 return true;
@@ -807,7 +816,10 @@ class domain_condition extends condition {
      */
     public function is_fullfilled($attempt) {
         $grades = $this->get_grading($attempt);
-        $achieved_grade = $grades[0]/$grades[1];
+        if ($grades[1] != 0)
+            $achieved_grade = $grades[0]/$grades[1];
+        else
+            $achieved_grade = 0;
         if ($achieved_grade > $this->grade && $achieved_grade <= $this->grade2) {
             return true;
         } elseif ($this->grade == 0 && $achieved_grade == $this->grade) {
@@ -829,22 +841,33 @@ class domain_condition extends condition {
 
         global $DB;
         $elements = $attempt->get_quiz()->get_elements();
+
         $active_elements = [];
+        $seenQuestions=explode(";", $attempt->getSeenQuestions());
 
         /** @var block_element $element */
         foreach ($elements as $element) {
             $id = $element->get_id();
+
             $q_instance = $DB->get_record("ddtaquiz_qinstance", ["id" => $id]);
-            if (in_array($this->name, explode(";", $q_instance->domains))) {
-                array_push($active_elements, $id);
+            $slot=$attempt->get_quiz()->get_slot_for_element($id);
+//            echo '<pre>',
+//            print_r($slot,1), '</pre>';
+            if (in_array($slot, $seenQuestions)) {
+
+                if (in_array($this->name, explode(";", $q_instance->domains))) {
+                    array_push($active_elements, $id);
+                }
+
+
+
             }
         }
-
-
-
-
+//die();
         $achieved_grade = 0;
         $total_grade = 0;
+
+
 
         /** @var block_element $element */
         foreach ($elements as $element) {

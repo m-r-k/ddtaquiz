@@ -304,7 +304,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
 
         $body .= html_writer::start_tag('div');
         $body .= $attempt->get_quba()->render_question($slot, $options);
-
+        $attempt->setSeenQuestions($slot);
 
         // Some hidden fields to track what is going on.
         $body .= html_writer::empty_tag('input', array('type' => 'hidden', 'name' => 'attempt',
@@ -361,6 +361,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $body .= html_writer::start_tag('div');
         for ($count = 1; $count <= $slots; $count++) {
             $body .= html_writer::div($attempt->get_quba()->render_question($count, $options), 'binDifContainer', array('max-points' => $attempt->get_quba()->get_question_max_mark($count)));
+            $attempt->setSeenQuestions($count);
         }
 
         // Some hidden fields to track what is going on.
@@ -456,21 +457,22 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
      */
     public function review_summary_table($summarydata, $attempt = Null)
     {
-
         $mode = $attempt->get_quiz()->getQuizmodes();
         $slots = $attempt->get_quba()->get_slots();
         $correctanswers = 0;
         $usedQuestions = 0;
+
         foreach ($slots as $slot) {
-            $response = $attempt->get_quba()->get_response_summary($slot);
-            if ($response != null) {
                 $grade = $attempt->get_grade_at_slot($slot);
                 $maxgrade = $attempt->get_quba()->get_question_max_mark($slot);
+
+            $seenQuestions=explode(";", $attempt->getSeenQuestions());
+            if (in_array($slot, $seenQuestions)) {
                 if ($grade == $maxgrade)
                     $correctanswers++;
                 $usedQuestions++;
-            }
 
+            }
         }
 
 
@@ -488,6 +490,18 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                 if ($mode == 0) {
                     $rowdata['title'] = 'Correct answers';
                     $rowdata['content'] = $correctanswers . "/" . $usedQuestions;
+                }
+                else if($mode==1){
+                    $max=0;
+                    $used=0;
+
+                    foreach(explode(';',$attempt->getseenquestions()) as $seenQuestion){
+                        if( $attempt->get_quba()->get_question_attempt($seenQuestion)->get_response_summary()) {
+                            $max+=$attempt->get_quba()->get_question_attempt($seenQuestion)->get_max_mark();
+                            $used+=$attempt->get_grade_at_slot($seenQuestion);
+                            $rowdata['content'] = $used . "/" . $max;
+                        }
+                    }
                 }
             }
 
@@ -573,7 +587,10 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                     $conditionCardBody
                 );
 
-                $progress = floor(($grades[0]  /  $grades[1]) * 100);
+                if ($grades[1] != 0)
+                    $progress = floor(($grades[0]  /  $grades[1]) * 100);
+                else
+                    $progress = 0;
 
                 $progressbar = \html_writer::div($progress . '%', 'progress-bar bg-success',
                     array('role' => 'progressbar', 'style' => 'width:' . $progress . '%;color:black;', 'class' => 'bg-primary', 'aria-valuenow' => $progress, 'aria-valuemin' => "0", 'aria-valuemax' => "100"));
@@ -620,10 +637,9 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
     {
         $modes=$block->get_quiz()->getQuizmodes();
         $output = '';
-        //TODO: check blocks in bindif
         /**@var block_element $child*/
         foreach ($block->get_children() as $child) {
-            if(($child->get_grade($attempt)&&$modes==1)||$modes!=1) {
+              if(( $attempt->get_quba()->get_question_attempt($child->get_slot()+1)->get_response_summary()&&$modes==1)||$modes!=1) {
                 $output .= $this->review_block_element($block, $child, $attempt, $options, $feedback);
             }
         }
@@ -754,30 +770,7 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
 
                 $label = get_string('blockFeedbackAccordionHeaderPre', 'ddtaquiz');
 
-                //TODO: Fix num of correct answer isntead of grade in Collabisple header
-                //            $correct=0;
-                //            foreach ($childblock->get_children()as $child){
-                //                /** @var block_element $child */
-                //                if($child->is_block()) {
-                //                    /** @var block $child */
-                //                    $maxgrade=$child->get_maxgrade();
-                //                    $grade= $child->get_grade($attempt);
-                //                    if($maxgrade==$grade)
-                //                        $correct++;
-                //                }
-                //                else{
-                //                    /** @var question_attempt $test */
-                //                    $test=$child;
-                //                    $grade = $attempt->get_grade_at_slot($test->get_slot());
-                ////                    $maxgrade = $attempt->get_quba()->get_question_max_mark($child->get_element()->get_slot());
-                //                }
-                //            }
-                // The progress bar.
-                //            if($mode==0)
                 $progress = floor(($grade / $maxgrade) * 100);
-                //            else
-                //                $progress=floor($correct/$childblock->get_slotcount())*100;
-
 
                 $progressbar = \html_writer::div($progress . '%', 'progress-bar bg-success',
                     array('role' => 'progressbar', 'style' => 'width:' . $progress . '%;color:black;', 'class' => 'bg-primary', 'aria-valuenow' => $progress, 'aria-valuemin' => "0", 'aria-valuemax' => "100"));
