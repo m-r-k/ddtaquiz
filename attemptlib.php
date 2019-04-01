@@ -103,10 +103,14 @@ class attempt {
      */
     public function setseenquestions($seenquestions)
     {
-        if($this->seenquestions==="")
+        global $DB;
+
+        if(is_null($this->seenquestions)||$this->seenquestions==="")
             $this->seenquestions = $seenquestions;
         else
             $this->seenquestions .= ";".$seenquestions;
+
+        $DB->set_field("ddtaquiz_attempts", "seenquestions",  $this->seenquestions , ["id" => $this->get_id()]);
     }
 
     // Constructor =============================================================
@@ -162,8 +166,6 @@ class attempt {
         $attemptrow = $DB->get_record('ddtaquiz_attempts', array('id' => $attemptid), '*', MUST_EXIST);
         $quba = question_engine::load_questions_usage_by_activity($attemptrow->quba);
         $quiz = ddtaquiz::load($attemptrow->quiz);
-echo '<pre>',
-print_r($attemptrow,1),'</pre>';
 
         return new attempt($attemptid, $quba, $quiz, $attemptrow->userid, $attemptrow->attempt,
             $attemptrow->currentslot, $attemptrow->timestart, $attemptrow->state,

@@ -42,7 +42,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
 
     $dbman = $DB->get_manager(); // Loads ddl manager and xmldb classes.
 
-    if ($oldversion < 20190401004) {
+    if ($oldversion < 20190401005) {
         try {
 
             // Update all records in 'course_modules' for labels to have showdescription = 1.
@@ -56,7 +56,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if ($oldversion < 20190401004) {
+    if ($oldversion < 20190401005) {
         try {
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD timelimit BIGINT(10) NOT NULL DEFAULT 0 AFTER timemodified"
@@ -77,7 +77,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190401004){
+    if($oldversion < 20190401005){
         try{
             $DB->execute(
                 "ALTER TABLE mdl_ddtaquiz ADD domains VARCHAR(255) NOT NULL DEFAULT ' ' AFTER  mainblock"
@@ -94,7 +94,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190401004){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
@@ -109,7 +109,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190401004){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
@@ -130,7 +130,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190401004){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
@@ -145,7 +145,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190401004){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
@@ -162,7 +162,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190401004){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
@@ -175,7 +175,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
 
         }
     }
-    if($oldversion < 20190401004){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
@@ -189,7 +189,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
         }
     }
 
-    if($oldversion < 20190401004){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
@@ -203,7 +203,7 @@ function xmldb_ddtaquiz_upgrade($oldversion)
 
         }
     }
-    if($oldversion < 20190401004){
+    if($oldversion < 20190401005){
         try{
 
             $DB->execute(
