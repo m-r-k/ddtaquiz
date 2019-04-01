@@ -491,18 +491,27 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
                     $rowdata['title'] = 'Correct answers';
                     $rowdata['content'] = $correctanswers . "/" . $usedQuestions;
                 }
-                else if($mode==1){
-                    $max=0;
-                    $used=0;
+                else if($mode==1) {
+                    $max = 0;
+                    $used = 0;
 
-                    foreach(explode(';',$attempt->getseenquestions()) as $seenQuestion){
-                        if( $attempt->get_quba()->get_question_attempt($seenQuestion)->get_response_summary()) {
-                            $max+=$attempt->get_quba()->get_question_attempt($seenQuestion)->get_max_mark();
-                            $used+=$attempt->get_grade_at_slot($seenQuestion);
-                            $rowdata['content'] = $used . "/" . $max;
+                    foreach (explode(';', $attempt->getseenquestions()) as $seenQuestion) {
+
+                        $response = $attempt->get_quba()->get_question_attempt($seenQuestion)->get_response_summary();
+
+                        if (!empty($response)) {
+                            if (strpos('#', $response) === false) {
+                                $max += $attempt->get_quba()->get_question_attempt($seenQuestion)->get_max_mark();
+                                $used += $attempt->get_grade_at_slot($seenQuestion);
+                                $rowdata['content'] = $used . "/" . $max;
+                            }
                         }
+
                     }
+
                 }
+
+
             }
 
             if ($rowdata['title'] instanceof renderable) {
@@ -639,8 +648,17 @@ class mod_ddtaquiz_renderer extends plugin_renderer_base
         $output = '';
         /**@var block_element $child*/
         foreach ($block->get_children() as $child) {
-              if(( $attempt->get_quba()->get_question_attempt($child->get_slot()+1)->get_response_summary()&&$modes==1)||$modes!=1) {
+            $slot=$attempt->get_quiz()->get_slot_for_element($child->get_id());
+            $response=$attempt->get_quba()->get_question_attempt($slot)->get_response_summary();
+            if($modes!=1){
                 $output .= $this->review_block_element($block, $child, $attempt, $options, $feedback);
+            }
+            else{
+                if(!empty($response)) {
+                    if (strpos('#', $response)===false) {
+                        $output .= $this->review_block_element($block, $child, $attempt, $options, $feedback);
+                    }
+                }
             }
         }
         return $output;
